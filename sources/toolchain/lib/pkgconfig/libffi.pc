@@ -1,0 +1,11 @@
+prefix=/sources/buildroot-source_toolchains.bootlin.com-2022.08.1/aarch64--glibc--stable-2022.08-1
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+toolexeclibdir=${libdir}/../lib
+includedir=${prefix}/include
+
+Name: libffi
+Description: Library supporting Foreign Function Interfaces
+Version: 3.4.2
+Libs: -L${toolexeclibdir} -lffi
+Cflags: -I${includedir}

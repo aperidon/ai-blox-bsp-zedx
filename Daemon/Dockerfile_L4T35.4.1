@@ -1,0 +1,29 @@
+# Build Image
+# This image contains all the necessary dependencies to build your sl_iot application
+FROM nvcr.io/nvidia/l4t-base:35.4.1 AS builder
+
+#Install build dependencies
+RUN apt-get update -y && \
+DEBIAN_FRONTEND=noninteractive apt-get install -y cmake build-essential qt5-default && \
+     rm -rf /var/lib/apt/lists/* && apt autoremove && apt clean
+     
+## Compilation of people analyser app
+COPY ./Daemon/include/ /home/include/
+ 
+COPY ./Daemon/src/ /home/src/
+ 
+COPY ./Daemon/CMakeLists.txt /home
+ 
+
+WORKDIR /home
+RUN mkdir build
+WORKDIR /home/build
+RUN cmake -DRT_L4T_VERSION=354 .. && \
+make && mv ZEDX_Daemon /
+WORKDIR /
+
+
+## Output part -- send files out of docker context
+# seems seems not to work with DIND
+# FROM scratch AS export-stage
+# COPY --from=builder /ZEDX_Daemon ./

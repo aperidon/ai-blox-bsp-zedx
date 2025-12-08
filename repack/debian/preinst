@@ -1,0 +1,40 @@
+#!/bin/bash
+
+## remove old stereolabs driver content - this is normally already done with the postrm+purge of the repack
+if [ -d "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max9296/" ] 
+then
+if [ "$(ls -A "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max9296/")" ]; then
+   rm /lib/modules/$(uname -r)/kernel/drivers/stereolabs/max9296/*
+fi 
+fi
+
+if [ -d "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max96712/" ] 
+then
+if [ "$(ls -A "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max96712/")" ]; then
+   rm /lib/modules/$(uname -r)/kernel/drivers/stereolabs/max96712/*
+fi 
+fi
+
+if [ -d "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/zedx/" ] 
+then
+if [ "$(ls -A "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/zedx/")" ]; then
+   rm /lib/modules/$(uname -r)/kernel/drivers/stereolabs/zedx/*
+fi 
+fi
+ 
+## Stop Daemon / remove service / remove executable (either from old ZED SDK + old driver)
+DAEMON_FILE=/etc/systemd/system/zed_x_daemon.service
+if [[ -f "$DAEMON_FILE" ]]; then
+    sudo systemctl stop zed_x_daemon
+    rm $DAEMON_FILE
+    if [[ -f "/usr/local/zed/bin/ZEDX_Daemon" ]]; then
+    rm "/usr/local/zed/bin/ZEDX_Daemon"
+    fi
+    if [[ -f "/usr/sbin/ZEDX_Daemon" ]]; then
+    rm "/usr/sbin/ZEDX_Daemon"
+    fi
+fi
+
+sync
+
+exit 0

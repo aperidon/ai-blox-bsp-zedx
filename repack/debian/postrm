@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# set -x
+
+pushd /boot/extlinux &> /dev/null
+
+if [ -d "/boot/stereolabs/utils/Headers/__pycache__/" ]; then
+   rm -r /boot/stereolabs/utils/Headers/__pycache__/
+fi
+
+if [ -d "/boot/stereolabs/utils/Utils/__pycache__/" ]; then
+   rm -r /boot/stereolabs/utils/Utils/__pycache__/
+fi
+
+if [ -d "/boot/stereolabs/utils/Linux/__pycache__/" ]; then
+   rm -r /boot/stereolabs/utils/Linux/__pycache__/
+fi
+
+if [ -d "/boot/stereolabs/utils/Jetson/__pycache__/" ]; then
+   rm -r /boot/stereolabs/utils/Jetson/__pycache__/
+fi
+
+if [ -d "/boot/stereolabs/utils/__pycache__/" ]; then
+   rm -r /boot/stereolabs/utils/__pycache__/
+fi
+
+if [ -f "extlinux.conf.sl-backup" ]; then
+	mv extlinux.conf.sl-backup extlinux.conf
+fi
+
+## Stop Daemon / remove service / remove executable (either from old ZED SDK + old driver)
+DAEMON_FILE=/etc/systemd/system/zed_x_daemon.service
+if [[ -f "$DAEMON_FILE" ]]; then
+    sudo systemctl stop zed_x_daemon
+    sudo systemctl disable zed_x_daemon
+    sudo rm $DAEMON_FILE
+fi
+
+if [ -f "/usr/lib/aarch64-linux-gnu/tegra/libnvisppg.so.sl-backup" ]; then
+	mv /usr/lib/aarch64-linux-gnu/tegra/libnvisppg.so.sl-backup /usr/lib/aarch64-linux-gnu/tegra/libnvisppg.so
+fi
+
+popd &> /dev/null
+
+sync
+
+exit 0

@@ -1,0 +1,14 @@
+Source: stereolabs-zedx
+Section: kernel
+Priority: standard
+Maintainer: NVIDIA Corporation, Stereolabs Inc.
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+Homepage: www.stereolabs.com
+
+Package: stereolabs-zedx
+Architecture: arm64
+Pre-Depends: nvidia-l4t-core (>> 36.4-0), nvidia-l4t-core (<< 36.5-0), libqt5core5a
+Depends: device-tree-compiler, nvidia-l4t-kernel (>= 5.15.148-tegra-36.4.0-20240912212859), nvidia-l4t-kernel (<= 5.15.148-tegra-36.4.4-20250616085344)
+Description: NVIDIA Kernel DTB Modified Package by Stereolabs
+X-Jetpack_Base: L4T36.4
