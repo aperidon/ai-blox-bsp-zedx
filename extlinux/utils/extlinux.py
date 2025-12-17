@@ -110,20 +110,13 @@ def add_entry(extlinux, label, mlabel, dtb, overlays, default):
 
 
 def main():
-   var1 = sys.argv[1]
-   var2 = sys.argv[2]
+    var1 = sys.argv[1]
 
-   if (var2=="None"):
-       jetson = board.Board('stereolabs')
-       headers = jetson.get_board_headers()
-       print("Set FDT to : /boot/stereolabs/"+var1+".dtb")
-       add_entry("/boot/extlinux/extlinux.conf","Stereolabs","Stereolabs kernel","/boot/stereolabs/"+var1+".dtb", "None","Stereolabs")
-   else:
-       jetson = board.Board('dtb')
-       headers = jetson.get_board_headers()
-       dtb = jetson.dtb
-       print("Set FDT to : "+dtb)
-       add_entry("/boot/extlinux/extlinux.conf","Stereolabs","Stereolabs kernel",dtb,"/boot/"+var1+"-camera-"+var2+"-sl-overlay.dtbo","Stereolabs")
+    jetson = board.Board('dtb')
+    headers = jetson.get_board_headers()
+    dtb = jetson.dtb
+    print("Set FDT to : "+dtb)
+    add_entry("/boot/extlinux/extlinux.conf","Stereolabs","Stereolabs kernel",dtb,"/boot/"+var1,"Stereolabs")
 
 if __name__ == "__main__":
     main()

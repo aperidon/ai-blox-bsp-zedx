@@ -25,33 +25,22 @@ if [ -n "${EXTLINUX}" ]; then
 	l4t_minor=$(grep -oP ': \K[0-9]+' "/etc/nv_tegra_release" | head -1)
 	l4t_rev=$(grep -oP ': \K[0-9].\K[0-9]' "/etc/nv_tegra_release" | head -1)
 
-	if [ $l4t_version -gt 35 ]; then
-		## Get current DTB in /boot/dtb/
-		board=$(ls /boot/dtb/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $2}')
-		teg_version=$(ls /boot/dtb/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $1}')
-		if [ -z "$board" ] ## fallback to /boot/kernel_*
-		then
-			board=$(ls /boot/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $2}')
-			teg_version=$(ls /boot/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $1}')
-		fi
-		extension=$teg_version-$board
-		echo "Detected DTB to update : $extension"
-		value=$(</boot/stereolabs/utils/zlconfig)
-		echo "Detected capture card : $value"
-		sudo python3 /boot/stereolabs/utils/extlinux.py $extension $value
-		RC=$?
-	else
-		## Get current DTB in /boot/dtb/
-		extension=$(ls /boot/dtb/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}')
-		if [ -z "$extension" ] ## fallback to /boot/kernel_*
-		then
-			extension=$(ls /boot/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}')
-		fi
-		echo "Detected DTB to update : $extension"
-		value="None"
-		sudo python3 /boot/stereolabs/utils/extlinux.py $extension $value
-		RC=$?
+
+	## Get current DTB in /boot/dtb/
+	board=$(ls /boot/dtb/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $2}')
+	teg_version=$(ls /boot/dtb/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $1}')
+	if [ -z "$board" ] ## fallback to /boot/kernel_*
+	then
+		board=$(ls /boot/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $2}')
+		teg_version=$(ls /boot/kernel_* | awk -F"." '{print $1}' | awk -F"_" '{print $NF}' | awk -F"-" '{print $1}')
 	fi
+	extension=$teg_version-$board
+	echo "Detected DTB to update : $extension"
+	value=$(</boot/stereolabs/utils/zlconfig)
+	echo "Detected capture card : $value"
+	sudo python3 /boot/stereolabs/utils/extlinux.py $value
+	RC=$?
+
 
 	if (( $RC != 0 )); then
 		echo "[Error] Fail to update extlinux.conf. This Will require a custom configuration."

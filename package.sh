@@ -149,7 +149,7 @@ if [ $? -eq 0 ]; then
 
 	## ----> Create Deb file <-------
 	cd $DEST_TARGET/repack
-	echo "$ZEDLINK_NAME" > $REPACK_TARGET/boot/stereolabs/utils/zlconfig
+	echo "$DTBO_NAME" > $REPACK_TARGET/boot/stereolabs/utils/zlconfig
 	export CC=aarch64-linux-gnu-gcc
 	dpkg-buildpackage -uc -b -d -a arm64
 	cd ..
