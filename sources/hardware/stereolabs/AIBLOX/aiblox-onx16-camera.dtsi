@@ -1,0 +1,2831 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+/ {
+	fragment-camera-zedx-aiblox@0 {
+		target-path = "/";
+		__overlay__ {
+			tegra-capture-vi {
+				num-channels = <16>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					status = "okay";
+
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						ar0234_vi_in0: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <0>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out0>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						ar0234_vi_in1: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <0>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out1>;
+						};
+					};
+					port@2 {
+						reg = <2>;
+						status = "okay";
+						ar0234_vi_in2: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <1>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out2>;
+						};
+					};
+					port@3 {
+						reg = <3>;
+						status = "okay";
+						ar0234_vi_in3: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <1>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out3>;
+						};
+					};
+					port@4 {
+						reg = <4>;
+						status = "okay";
+						ar0234_vi_in4: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <2>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out4>;
+						};
+					};
+					port@5 {
+						reg = <5>;
+						status = "okay";
+						ar0234_vi_in5: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <2>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out5>;
+						};
+					};
+					port@6 {
+						reg = <6>;
+						status = "okay";
+						ar0234_vi_in6: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <3>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out6>;
+						};
+					};
+					port@7 {
+						reg = <7>;
+						status = "okay";
+						ar0234_vi_in7: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <3>;
+							bus-width = <2>;
+							remote-endpoint = <&ar0234_csi_out7>;
+						};
+					};
+
+					port@8 {
+						reg = <8>;
+						status = "okay";
+						zedxonepro_vi_in0: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <0>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out0>;
+						};
+					};
+					port@9 {
+						reg = <9>;
+						status = "okay";
+						zedxonepro_vi_in1: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <0>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out1>;
+						};
+					};
+					port@10 {
+						reg = <10>;
+						status = "okay";
+						zedxonepro_vi_in2: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <1>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out2>;
+						};
+					};
+					port@11 {
+						reg = <11>;
+						status = "okay";
+						zedxonepro_vi_in3: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <1>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out3>;
+						};
+					};
+					port@12 {
+						reg = <12>;
+						status = "okay";
+						zedxonepro_vi_in4: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <2>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out4>;
+						};
+					};
+					port@13 {
+						reg = <13>;
+						status = "okay";
+						zedxonepro_vi_in5: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <2>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out5>;
+						};
+					};
+					port@14 {
+						reg = <14>;
+						status = "okay";
+						zedxonepro_vi_in6: endpoint {
+							status = "okay";
+							vc-id = <0>;
+							port-index = <3>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out6>;
+						};
+					};
+					port@15 {
+						reg = <15>;
+						status = "okay";
+						zedxonepro_vi_in7: endpoint {
+							status = "okay";
+							vc-id = <2>;
+							port-index = <3>;
+							bus-width = <2>;
+							remote-endpoint = <&zedxonepro_csi_out7>;
+						};
+					};
+				};
+			};
+			bus@0 {
+				host1x@13e00000 {
+					nvcsi@15a00000 {
+						status = "okay";
+						num-channels = <16>;
+						#address-cells = <1>;
+						#size-cells = <0>;
+
+						channel@0 {
+							reg = <0>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in0: endpoint@0 {
+										status = "okay";
+										port-index = <0>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out0>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out0: endpoint@1 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in0>;
+									};
+								};
+							};
+						};
+						channel@1 {
+							reg = <1>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in1: endpoint@2 {
+										status = "okay";
+										port-index = <0>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out1>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out1: endpoint@3 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in1>;
+									};
+								};
+							};
+						};
+						channel@2 {
+							reg = <2>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in2: endpoint@4 {
+										status = "okay";
+										port-index = <1>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out2>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out2: endpoint@5 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in2>;
+									};
+								};
+							};
+						};
+						channel@3 {
+							reg = <3>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in3: endpoint@6 {
+										status = "okay";
+										port-index = <1>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out3>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out3: endpoint@7 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in3>;
+									};
+								};
+							};
+						};
+						channel@4 {
+							reg = <4>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in4: endpoint@8 {
+										status = "okay";
+										port-index = <2>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out4>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out4: endpoint@9 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in4>;
+									};
+								};
+							};
+						};
+						channel@5 {
+							reg = <5>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in5: endpoint@10 {
+										status = "okay";
+										port-index = <2>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out5>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out5: endpoint@11 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in5>;
+									};
+								};
+							};
+						};
+						channel@6 {
+							reg = <6>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in6: endpoint@12 {
+										status = "okay";
+										port-index = <3>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out6>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out6: endpoint@13 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in6>;
+									};
+								};
+							};
+						};
+						channel@7 {
+							reg = <7>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									ar0234_csi_in7: endpoint@14 {
+										status = "okay";
+										port-index = <3>;
+										bus-width = <2>;
+										remote-endpoint = <&ar0234_ar0234_out7>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									ar0234_csi_out7: endpoint@15 {
+										status = "okay";
+										remote-endpoint = <&ar0234_vi_in7>;
+									};
+								};
+							};
+						};
+
+						channel@8 {
+							reg = <8>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in0: endpoint@16 {
+										status = "okay";
+										port-index = <0>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out0>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out0: endpoint@17 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in0>;
+									};
+								};
+							};
+						};
+						channel@9 {
+							reg = <9>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in1: endpoint@18 {
+										status = "okay";
+										port-index = <0>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out1>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out1: endpoint@19 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in1>;
+									};
+								};
+							};
+						};				
+						channel@10 {
+							reg = <10>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in2: endpoint@20 {
+										status = "okay";
+										port-index = <1>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out2>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out2: endpoint@21 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in2>;
+									};
+								};
+							};
+						};
+						channel@11 {
+							reg = <11>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in3: endpoint@22 {
+										status = "okay";
+										port-index = <1>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out3>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out3: endpoint@23 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in3>;
+									};
+								};
+							};
+						};
+						channel@12 {
+							reg = <12>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in4: endpoint@24 {
+										status = "okay";
+										port-index = <2>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out4>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out4: endpoint@25 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in4>;
+									};
+								};
+							};
+						};
+						channel@13 {
+							reg = <13>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in5: endpoint@26 {
+										status = "okay";
+										port-index = <2>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out5>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out5: endpoint@27 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in5>;
+									};
+								};
+							};
+						};
+						channel@14 {
+							reg = <14>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in6: endpoint@28 {
+										status = "okay";
+										port-index = <3>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out6>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out6: endpoint@29 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in6>;
+									};
+								};
+							};
+						};
+						channel@15 {
+							reg = <15>;
+							status = "okay";
+							ports {
+								status = "okay";
+								#address-cells = <1>;
+								#size-cells = <0>;
+								port@0 {
+									reg = <0>;
+									status = "okay";
+									zedxonepro_csi_in7: endpoint@30 {
+										status = "okay";
+										port-index = <3>;
+										bus-width = <2>;
+										remote-endpoint = <&zedxonepro_isx031_out7>;
+									};
+								};
+								port@1 {
+									reg = <1>;
+									status = "okay";
+									zedxonepro_csi_out7: endpoint@31 {
+										status = "okay";
+										remote-endpoint = <&zedxonepro_vi_in7>;
+									};
+								};
+							};
+						};
+					};
+				};
+			
+				i2c@3180000{
+				/* Channel A */
+					/* ZEDX One GS 0 camera sensor*/
+					zedxone_gs0:zedxone_gs_0@10 {
+						compatible = "stereolabs,zedx";
+						devnode = "video8";
+						
+						reg = <0x10>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM0";
+						sync_sensor_index = <1>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out0: endpoint {
+									vc-id = <0>;
+									port-index = <0>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in0>;
+								};
+							};
+						};
+					};
+
+					/* ZEDX One GS 0 camera sensor*/
+					zedxone_gs1:zedxone_gs_1@11 {
+						compatible = "stereolabs,zedx";
+						devnode = "video9";
+						
+						reg = <0x11>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM1";
+						sync_sensor_index = <1>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out1: endpoint {
+									vc-id = <2>;
+									port-index = <0>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in1>;
+								};
+							};
+						};
+					};
+
+					/* ZEDX One GS 0 camera sensor*/
+					zedxone_gs2:zedxone_gs_2@12 {
+						compatible = "stereolabs,zedx";
+						devnode = "video10";
+						
+						reg = <0x12>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM2";
+						sync_sensor_index = <1>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out2: endpoint {
+									vc-id = <0>;
+									port-index = <1>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in2>;
+								};
+							};
+						};
+					};
+
+					/* ZEDX One GS 0 camera sensor*/
+					zedxone_gs3:zedxone_gs_3@13 {
+						compatible = "stereolabs,zedx";
+						devnode = "video11";
+						
+						reg = <0x13>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM3";
+						sync_sensor_index = <1>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out3: endpoint {
+									vc-id = <2>;
+									port-index = <1>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in3>;
+								};
+							};
+						};
+					};
+
+
+					zedxone_pro0: zedxone_pro_0@3c {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video24";
+						reg = <0x3c>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM5";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "0";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out0: endpoint {
+									vc-id = <0>;
+									port-index = <0>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in0>;
+								};
+							};
+						};
+					};
+
+					zedxone_pro1: zedxone_pro_1@3d {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video25";
+						reg = <0x3d>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM6";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_a";
+							lane_polarity = "6";
+							vc_id = "2";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out1: endpoint {
+									vc-id = <2>;
+									port-index = <0>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in1>;
+								};
+							};
+						};
+					};
+
+					zedxone_pro2: zedxone_pro_2@3e {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video26";
+						reg = <0x3e>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM7";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "0";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out2: endpoint {
+									vc-id = <0>;
+									port-index = <1>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in2>;
+								};
+							};
+						};
+					};
+
+					zedxone_pro3: zedxone_pro_3@3f {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video27";
+						reg = <0x3f>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM8";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_b";
+							lane_polarity = "6";
+							vc_id = "2";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out3: endpoint {
+									vc-id = <2>;
+									port-index = <1>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in3>;
+								};
+							};
+						};
+					};
+
+				/* Channel B */ 
+	
+
+					/* ZEDX One GS 4 camera sensor*/
+					zedxone_gs4:zedxone_gs_4@30 {
+						compatible = "stereolabs,zedx";
+						devnode = "video36";
+						
+						reg = <0x30>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM9";
+						sync_sensor_index = <1>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out4: endpoint {
+									vc-id = <0>;
+									port-index = <2>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in4>;
+								};
+							};
+						};
+					};
+
+					/* ZEDX One GS 5 camera sensor*/
+					zedxone_gs5:zedxone_gs_5@31 {
+						compatible = "stereolabs,zedx";
+						devnode = "video37";
+						
+						reg = <0x31>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM10";
+						sync_sensor_index = <1>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out5: endpoint {
+									vc-id = <2>;
+									port-index = <2>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in5>;
+								};
+							};
+						};
+					};
+
+					/* ZEDX One GS 6 camera sensor*/
+					zedxone_gs6:zedxone_gs_6@32 {
+						compatible = "stereolabs,zedx";
+						devnode = "video38";
+						
+						reg = <0x32>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM11";
+						sync_sensor_index = <1>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "0";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out6: endpoint {
+									vc-id = <0>;
+									port-index = <3>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in6>;
+								};
+							};
+						};
+					};
+
+					/* ZEDX One GS 7 camera sensor*/
+					zedxone_gs7:zedxone_gs_7@33 {
+						compatible = "stereolabs,zedx";
+						devnode = "video39";
+						
+						reg = <0x33>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM12";
+						sync_sensor_index = <1>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						//use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1200";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode1 {/*mode ZEDX_MODE_960x600_120FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "960";
+							active_h = "600";
+							readout_orientation = "0";
+							line_length = "6248";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "120000000";
+							step_framerate = "15000000";
+							default_framerate = "120000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "8000";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						mode2 {/*mode ZEDX_MODE_1920X1080_CROP_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "2";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "10";
+							csi_pixel_bit_depth = "10";
+							mode_type = "bayer";
+							pixel_phase = "grbg";
+							active_w = "1920";
+							active_h = "1080";
+							readout_orientation = "0";
+							line_length = "12496";
+							inherent_gain = "1";
+							mclk_multiplier = "3.01";
+							//pix_clk_hz = "134400000";
+							pix_clk_hz = "229500000";
+							serdes_pix_clk_hz = "299000000";
+							gain_factor = "100";
+							min_gain_val = "100"; /* dB */
+							max_gain_val = "1600"; /* dB */
+							step_gain_val = "1"; /* 0.1 */
+							default_gain = "100";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "60000000";
+							step_framerate = "15000000";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "28"; /*us, 2 lines*/
+							max_exp_time = "66000";
+							step_exp_time = "1";
+							default_exp_time = "13000";/* us */
+							embedded_metadata_height = "0";
+						};
+
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								ar0234_ar0234_out7: endpoint {
+									vc-id = <2>;
+									port-index = <3>;
+									bus-width = <2>;
+									remote-endpoint = <&ar0234_csi_in7>;
+								};
+							};
+						};
+					};
+
+					zedxone_pro4: zedxone_pro_4@5c {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video52";
+						reg = <0x5c>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM14";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "0";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out4: endpoint {
+									vc-id = <0>;
+									port-index = <2>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in4>;
+								};
+							};
+						};
+					};
+
+					zedxone_pro5: zedxone_pro_5@5d {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video53";
+						reg = <0x5d>;
+
+						dser-port = <2>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM15";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_c";
+							vc_id = "2";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out5: endpoint {
+									vc-id = <2>;
+									port-index = <2>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in5>;
+								};
+							};
+						};
+					};
+
+					zedxone_pro6: zedxone_pro_6@5e {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video54";
+						reg = <0x5e>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM16";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "0";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out6: endpoint {
+									vc-id = <0>;
+									port-index = <3>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in6>;
+								};
+							};
+						};
+					};
+
+					zedxone_pro7: zedxone_pro_7@5f {
+						compatible = "stereolabs,zedxpro";
+						
+						devnode = "video55";
+						reg = <0x5f>;
+
+						dser-port = <3>;
+						dser-cc-port = <1>;
+						
+						/* Physical dimensions of sensor */
+						physical_w = "15.0";
+						physical_h = "12.5";
+						
+						sensor_model ="zedxone";
+						sync_sensor = "ZEDXONE_CAM17";
+						sync_sensor_index = <1>;
+						
+						/* Defines number of frames to be dropped by driver internally after applying */
+						/* sensor crop settings. Some sensors send corrupt frames after applying */
+						/* crop co-ordinates */
+						post_crop_frame_drop = "0";
+						
+						/* Convert Gain to unit of dB (decibel) befor passing to kernel driver */
+						use_decibel_gain = "true";
+						
+						/* enable CID_SENSOR_MODE_ID for sensor modes selection */
+						use_sensor_mode_id = "true";
+						
+						mode0 {/*mode ZEDX_MODE_1920X1200_60FPS*/
+							mclk_khz = "24000";
+							num_lanes = "2";
+							tegra_sinterface = "serial_d";
+							vc_id = "2";
+							phy_mode = "DPHY";
+							discontinuous_clk = "no";
+							dpcm_enable = "false";
+							cil_settletime = "0";
+							dynamic_pixel_bit_depth = "16";
+							csi_pixel_bit_depth = "16";
+							mode_type = "yuv";
+							pixel_phase = "yuyv";
+							
+							active_w = "1920";
+							active_h = "1536";
+							readout_orientation = "0";
+							line_length = "2200";
+							inherent_gain = "1";
+							mclk_multiplier = "3.09";
+							pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */
+							serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */
+							//pix_clk_hz = "120000000";
+							//serdes_pix_clk_hz = "833333333";
+							
+							gain_factor = "10";
+							min_gain_val = "10"; /* dB */
+							max_gain_val = "300"; /* dB */
+							step_gain_val = "3"; /* 0.3 */
+							default_gain = "10";
+							min_hdr_ratio = "1";
+							max_hdr_ratio = "1";
+							framerate_factor = "1000000";
+							min_framerate = "15000000";
+							max_framerate = "30000000";
+							step_framerate = "1";
+							default_framerate = "30000000";
+							exposure_factor = "1000000";
+							min_exp_time = "59"; /*us, 2 lines*/
+							max_exp_time = "16657";
+							step_exp_time = "1";
+							default_exp_time = "16657";/* us */
+							embedded_metadata_height = "0";
+						};
+						
+						ports {
+							#address-cells = <1>;
+							#size-cells = <0>;
+							port@0 {
+								reg = <0>;
+								zedxonepro_isx031_out7: endpoint {
+									vc-id = <2>;
+									port-index = <3>;
+									bus-width = <2>;
+									remote-endpoint = <&zedxonepro_csi_in7>;
+								};
+							};
+						};
+					};
+				};
+			};
+
+			tegra-camera-platform {
+				compatible = "nvidia, tegra-camera-platform";
+				/**
+				* Physical settings to calculate max ISO BW
+				*
+				* num_csi_lanes = <>;
+				* Total number of CSI lanes when all cameras are active
+				*
+				* max_lane_speed = <>;
+				* Max lane speed in Kbit/s
+				*
+				* min_bits_per_pixel = <>;
+				* Min bits per pixel
+				*
+				* vi_peak_byte_per_pixel = <>;
+				* Max byte per pixel for the VI ISO case
+				*
+				* vi_bw_margin_pct = <>;
+				* Vi bandwidth margin in percentage
+				*
+				* max_pixel_rate = <>;
+				* Max pixel rate in Kpixel/s for the ISP ISO case
+				*
+				* isp_peak_byte_per_pixel = <>;
+				* Max byte per pixel for the ISP ISO case
+				*
+				* isp_bw_margin_pct = <>;
+				* Isp bandwidth margin in percentage
+				*/
+
+				num_csi_lanes = <8>;
+				max_lane_speed = <2000000>;
+				min_bits_per_pixel = <8>;
+				vi_peak_byte_per_pixel = <2>;
+				vi_bw_margin_pct = <25>;
+				isp_peak_byte_per_pixel = <5>;
+				isp_bw_margin_pct = <25>;
+				
+				/**
+				* The general guideline for naming badge_info contains 3 parts, and is as follows,
+				* The first part is the camera_board_id for the module; if the module is in a FFD
+				* platform, then use the platform name for this part.
+				* The second part contains the position of the module, ex. "rear" or "front".
+				* The third part contains the last 6 characters of a part number which is found
+				* in the module's specsheet from the vender.
+				*/
+				modules {
+
+					module0 {
+						badge = "zedx_ar0234";
+						position = "bottomright";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_0@10";
+						};
+					};
+					module1 {
+						badge = "zedx_ar0234";
+						position = "topright";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_1@11";
+						};
+					};
+					module2 {
+						badge = "zedx_ar0234";
+						position = "bottomleft";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_2@12";
+						};
+					};
+					module3 {
+						badge = "zedx_ar0234";
+						position = "leftcenter";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_3@13";
+						};
+					};
+					module4 {
+						badge = "zedx_ar0234";
+						position = "bottomright";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_4@30";
+						};
+					};
+					module5 {
+						badge = "zedx_ar0234";
+						position = "topright";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_5@31";
+						};
+					};
+					module6 {
+						badge = "zedx_ar0234";
+						position = "bottomleft";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_6@32";
+						};
+					};
+					module7 {
+						badge = "zedx_ar0234";
+						position = "leftcenter";
+						orientation = "1";
+						status = "okay";
+						drivernode0 {
+							status = "okay";
+							/* Declare PCL support driver (classically known as guid)  */
+							pcl_id = "v4l2_sensor";
+							/* Declare the device-tree hierarchy to driver instance */
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/i2c@3180000/zedxone_gs_7@33";
+						};
+					};
+				};
+			};
+		};
+	};
+};

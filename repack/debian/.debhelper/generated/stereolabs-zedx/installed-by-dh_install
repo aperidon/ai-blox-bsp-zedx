@@ -1,0 +1,5 @@
+./debian/out/boot
+./debian/out/etc
+./debian/out/tmp
+./debian/out/usr
+./debian/out/var

@@ -1,0 +1,7 @@
+append_menu "Device Drivers"
+
+if ARCH_TEGRA
+source "drivers/stereolabs/Kconfig"
+endif
+
+endmenu

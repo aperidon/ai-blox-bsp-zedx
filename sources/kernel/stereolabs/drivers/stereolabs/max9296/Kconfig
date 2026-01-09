@@ -1,0 +1,13 @@
+config SL_DESER_MAX9296
+	tristate "Stereolabs MAX9296 Deserializer"
+	help
+	  If you say yes here you get support for the MAX9296 deserializer.
+
+	  To compile this driver as a module, choose M here: the module
+	  will be called max9296.
+
+config TEGRA_STREAMERBOX_ADDR_FIX
+	tristate "Stereolabs option for StreamerBox"
+	depends on SL_DESER_MAX9296
+	help
+		If you wish to compile for L4T R32.7, please check this option.
