@@ -1,1 +1,5 @@
 build_R*
+output/
+repack/debian/out/
+repack/debian/stereolabs-zedx/
+stereolabs-zedx*
