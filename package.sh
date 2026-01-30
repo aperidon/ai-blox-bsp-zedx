@@ -16,6 +16,7 @@ SL_REPACK_PATH="/drivers/stereolabs/"
 REPACK_TARGET=$DEST_TARGET/repack/debian/out
 ZEDLINK_NAME="ai-blox"
 OVERLAY_PATH=("$DEST_TARGET/sources/hardware/stereolabs/AIBLOX")
+CAM_MODES_PATH=("$DEST_TARGET/sources/hardware/stereolabs/Utils")
 ZEDX_INC=$SRC_ROOT_TARGET/kernel/stereolabs/drivers/stereolabs/zedx/zedx_mode_tbls.h
 NVIDIA_DT_ROOT=$DEST_TARGET/sources/hardware/nvidia/
 DTBO_NAME=tegra234-p3768-camera-ai-blox-sl-overlay.dtbo
@@ -26,15 +27,15 @@ mkdir -p $DEST_TARGET/output/
 rm -r $DEST_TARGET/output/* || true
 
 mkdir -p $REPACK_TARGET/$MODULES_PATH
-mkdir -p $REPACK_TARGET/$MODULES_PATH/$IMU_PATH
-rm -R $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/* || true
+mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/bmi088
 mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/max96712
 mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/max96724
 mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/max9296
 mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/zedx
 mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/zedone4k
-mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/zedxpro
+mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/zedxhdr
 mkdir -p $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/max9295
+mkdir -p $REPACK_TARGET/tmp/nvidia-capture-patches
 mkdir -p $REPACK_TARGET/boot/stereolabs/
 mkdir -p $REPACK_TARGET/var/nvidia/nvcam/settings/
 
@@ -46,18 +47,29 @@ mkdir -p $REPACK_TARGET/tmp/
 mkdir -p $REPACK_TARGET/etc/modprobe.d/
 
 ### Remove existing files
-rm  $REPACK_TARGET/usr/sbin/ZEDX_Daemon || true
+rm  $REPACK_TARGET/usr/sbin/ZEDX_Daemon 2> /dev/null || true
+rm  $REPACK_TARGET/usr/sbin/ZEDX_Driver 2> /dev/null || true
+rm  $REPACK_TARGET/usr/sbin/IMU_Daemon 2> /dev/null || true
 rm  $REPACK_TARGET/boot/tegra*.dtbo || true
 
 ### Build Daemon
 ### Get L4T version
 V_JETPACK=$(awk '/X-Jetpack_Base:/ { print $2 }' $DEBIAN_ROOT_TARGET/control)
-#./build_Daemon.sh $V_JETPACK
+V_JETPACK_NUM=$(echo "$V_JETPACK" | sed -E 's/^L4T([0-9]+)\.([0-9]+)(\.[0-9]+)?$/\1\2/')
+./build_Daemon_CC.sh $V_JETPACK
+
 
 ### Copy Daemon bin in repack
 cp $DEST_TARGET/Daemon/ZEDX_Daemon $REPACK_TARGET/usr/sbin/
+cp $DEST_TARGET/Daemon/ZEDX_Driver $REPACK_TARGET/usr/sbin/
+cp $DEST_TARGET/Daemon/IMU_Daemon $REPACK_TARGET/usr/sbin/
+
+### Copy Daemon service in repack/tmp directory. Will be copied by postint scrpt in /etc/systemd/system
+cp $DEST_TARGET/Daemon/zed_x_daemon/zed_x_daemon.service $REPACK_TARGET/tmp/
+cp $DEST_TARGET/Daemon/driver_zed_loader/driver_zed_loader.service $REPACK_TARGET/tmp/
+cp $DEST_TARGET/Daemon/imu-daemon/IMU_Daemon.service $REPACK_TARGET/tmp/
+
 ### Copy Daemon service in repack
-cp $DEST_TARGET/Daemon/zed_x_daemon.service $REPACK_TARGET/tmp/
 cp $DEST_TARGET/Daemon/blacklist-zed.conf $REPACK_TARGET/etc/modprobe.d/
 
 cd sources
@@ -73,15 +85,17 @@ export TEGRA_KERNEL_OUT=$DEST_TARGET/build_R364/
 export ARCH=arm64
 export LOCALVERSION=-tegra
 
-rm $TEGRA_KERNEL_OUT/$SL_PATH/max96712/*
-rm $TEGRA_KERNEL_OUT/$SL_PATH/max96724/*
-rm $TEGRA_KERNEL_OUT/$SL_PATH/max9296/*
-rm $TEGRA_KERNEL_OUT/$SL_PATH/zedx/*
-rm $TEGRA_KERNEL_OUT/$SL_PATH/zedone4k/*
-rm $TEGRA_KERNEL_OUT/$SL_PATH/zedxpro/*
-rm $TEGRA_KERNEL_OUT/$SL_PATH/max9295/*
+rm $TEGRA_KERNEL_OUT/$SL_PATH/max96712/* 2> /dev/null || true
+rm $TEGRA_KERNEL_OUT/$SL_PATH/max96724/* 2> /dev/null || true
+rm $TEGRA_KERNEL_OUT/$SL_PATH/max9296/* 2> /dev/null || true
+rm $TEGRA_KERNEL_OUT/$SL_PATH/zedx/* 2> /dev/null || true
+rm $TEGRA_KERNEL_OUT/$SL_PATH/zedone4k/* 2> /dev/null || true
+rm $TEGRA_KERNEL_OUT/$SL_PATH/zedxhdr/* 2> /dev/null || true
+rm $TEGRA_KERNEL_OUT/$SL_PATH/max9295/* 2> /dev/null || true
+rm $TEGRA_KERNEL_OUT/$SL_PATH/bmi088* 2> /dev/null || true
 
 cp ${OVERLAY_PATH}/* ${NVIDIA_DT_ROOT}/t23x/nv-public/overlay/
+cp -r ${CAM_MODES_PATH} ${NVIDIA_DT_ROOT}/t23x/nv-public/overlay/
 
 ### Modify defconfig accordingly
 
@@ -103,39 +117,61 @@ if [ $? -eq 0 ]; then
 	
  	cp $TEGRA_KERNEL_OUT/kernel-devicetree/generic-dts/dtbs/$DTBO_NAME $DEST_TARGET/output/
 
-	### Copy overlays in repack
-	cp $DEST_TARGET/output/$DTBO_NAME $REPACK_TARGET/boot/
+	for module in $(find $TEGRA_KERNEL_OUT/$SL_PATH -name "*.ko")
+	do
+		cp -R $module $DEST_TARGET/output/
+	done
 
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/zedx/*.ko $DEST_TARGET/output/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/max96724/*.ko $DEST_TARGET/output/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/max9295/*.ko $DEST_TARGET/output/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/zedone4k/*.ko $DEST_TARGET/output/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/zedxpro/*.ko $DEST_TARGET/output/
-	
 	cp -R $DEST_TARGET/ISP/* $DEST_TARGET/output/
  
 	### Copy the specific extlinux-xxxx.conf into deb package
 	### --> The correct extlinux will be taken during the deb installation by parsing the ls /boot/kernel_xxx name used (see posint)
 	cp  -r $DEST_TARGET/extlinux/* $REPACK_TARGET/boot/stereolabs/
 	cp  -r $DEST_TARGET/output/Image $REPACK_TARGET/boot/stereolabs/
+
+	### Copy overlays in repack
+	cp $DEST_TARGET/output/$DTBO_NAME $REPACK_TARGET/boot/
 	
 	### Copy drivers in repack
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/zedx/*.ko $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/zedx/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/max96724/*.ko $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/max96724/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/max9295/*.ko $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/max9295/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/zedone4k/*.ko $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/zedone4k/
-	cp -R $TEGRA_KERNEL_OUT/$SL_PATH/zedxpro/*.ko $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/zedxpro/
-
+	for folder in $(ls $TEGRA_KERNEL_OUT/$SL_PATH/)
+	do
+		if [[ -n $DEBUG ]]
+		then
+			echo "$TEGRA_KERNEL_OUT/$SL_PATH/$folder/"
+			echo $(ls $TEGRA_KERNEL_OUT/$SL_PATH/$folder/)
+		fi
+		if [[ -d $TEGRA_KERNEL_OUT/$SL_PATH/$folder && $(ls $TEGRA_KERNEL_OUT/$SL_PATH/$folder/*.ko) ]]
+		then
+			cp -R $TEGRA_KERNEL_OUT/$SL_PATH/$folder/*.ko $REPACK_TARGET/$MODULES_PATH/$SL_REPACK_PATH/$folder
+		fi
+	done
 
 	### Copy ISP files in repack
 	cp  $DEST_TARGET/ISP/* $REPACK_TARGET/var/nvidia/nvcam/settings/
 
+	## Add nvidia kernel patch
 	cp -r $DEST_TARGET/nvidia_364_fix/* $REPACK_TARGET/tmp/
 
-	# ## Modify modules.order to have the correct path
-	# while read p; do
-	# 	sed -i "s+$p+kernel/$p+" $REPACK_TARGET/$MODULES_PATH/../modules.order
-	# done <$REPACK_TARGET/$MODULES_PATH/../modules.order
+	NV_OOT_DIR="$DEST_TARGET/${BUILD_DIR}/nvidia-oot"
+
+	CAPTURE_IVC_SRC="$NV_OOT_DIR/drivers/platform/tegra/rtcpu/capture-ivc.ko"
+	NVHOST_VI5_SRC="$NV_OOT_DIR/drivers/video/tegra/host/vi/nvhost-vi5.ko"
+
+	CAPTURE_IVC_TMP="$REPACK_TARGET/tmp/nvidia-capture-patches/capture-ivc.ko"
+	NVHOST_VI5_TMP="$REPACK_TARGET/tmp/nvidia-capture-patches/nvhost-vi5.ko"
+
+	if [[ -f "$CAPTURE_IVC_SRC" ]]; then
+		cp -v "$CAPTURE_IVC_SRC" "$CAPTURE_IVC_TMP"
+	else
+		echo "Warning: capture-ivc.ko not found at $CAPTURE_IVC_SRC"
+	fi
+
+	if [[ -f "$NVHOST_VI5_SRC" ]]; then
+		cp -v "$NVHOST_VI5_SRC" "$NVHOST_VI5_TMP"
+	else
+		echo "Warning: nvhost-vi5.ko not found at $NVHOST_VI5_SRC"
+	fi
+
 
 	### Get Version
 	V_MAJOR=$(awk '/ZEDX_DRIVER_VERSION_MAJOR/ { print $3 }' $ZEDX_INC)

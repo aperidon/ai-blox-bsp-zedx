@@ -46,9 +46,10 @@ u32 fps_set_Dser(int channel, s64 val);
 int dser_get_gmsl_port(int channel, int zedx_id);
 int dser_enable_gmsl_link(int channel, int zedx_id);
 int dser_open_all_gmsl_link(int channel);
-bool isSecondCamFromI2C(int channel, int zedx_id);
-int getCamPipeIndex(int channel, int zedx_id);
-	
+int isSecondCamFromI2C(int channel, int zedx_id);
+int dser_read_video_lock(int channel, int zedx_id);
+int dser_read_link_lock(int channel, int zedx_id);
+
 struct sensor
 {
     struct list_head list;
@@ -62,13 +63,14 @@ struct sensor
     u32 n_lanes; /* Jetson number of CSI lanes */
     u32 serial; /* Jetson CSI connection */
     u32 i2c_bus; /* i2c bus of the device from dts */
-    u32 dser_port; /*Dser CSI connection */
-    u32 dser_cc_port;
-    u8 gmsl_link; /* GMSL link connected to the device */
+    int gmsl_link; /* GMSL link connected to the device */
     u32 cam_addr;
     u32 ser_addr;
     u32 zedx_id;
+    int phy_index;
+    int i2c_cc;
     bool is_second_cam_from_i2c;
+    int dsr_pipe;
 };
 
 /**
@@ -99,56 +101,22 @@ typedef struct serializer_devices{
  */
 struct max96724
 {
+    bool intialized;
     struct i2c_client *i2c_client;
     struct regmap *regmap;
     struct list_head sensor_list;
     u32 channel; // channel id from dts
-    char csi_port;
     u32 n_lanes;
     int reset_gpio;
     int pwr_gpio;
     int pwdn_gpio;
     s8 port_to_i2c[N_GMSL_PORTS];
-    u8 i2c_trans[2*N_GMSL_PORTS][2];
-    u8 sensor_list_sz;
     u8 avail_pipe;
     u8 n_cam;
-	u8 avail_i2c_bus[N_DSER_I2C_BUS];
     struct serializer_devices ser_devices[N_MAX_TOTAL_SER];
     struct sensor detected_sensors[2*N_GMSL_PORTS];
+	int mfp_trig_in; // Mfp used as trigger input (default MFP10) 
 };
-
-// static void print_sensor_info(struct max96724 *priv, struct sensor *sp)
-// {
-//     struct i2c_client *client = priv->i2c_client;
-// 	u8 i;
-
-//     dev_info(&client->dev, "%s: following comes from dts\n", __func__);
-//     dev_info(&client->dev, "%s: camera %s\n", __func__, sp->camera);
-//     dev_info(&client->dev, "%s: model id %d\n", __func__, sp->model);
-//     dev_info(&client->dev, "%s: dts id %d\n", __func__, sp->cam_dts_id);
-//     dev_info(&client->dev, "%s: n_lanes %d\n", __func__, sp->n_lanes);
-//     dev_info(&client->dev, "%s: serial port %d\n", __func__, sp->serial);
-//     dev_info(&client->dev, "%s: vc-id %d\n", __func__, sp->vc_id);
-//     dev_info(&client->dev, "%s: i2c bus %d\n", __func__, sp->i2c_bus);
-//     dev_info(&client->dev, "%s: SER ADDR %x\n", __func__, sp->ser_addr);
-//     dev_info(&client->dev, "%s: CAM ADDR %x\n", __func__, sp->cam_addr);
-
-
-//     if (sp->detection_id < 0)
-//         return;
-
-//     dev_info(&client->dev, "%s: following comes from port parsing\n", __func__);
-//     dev_info(&client->dev, "%s: detection id  %d\n", __func__, sp->detection_id);
-
-//     for (i = 0; i < N_SER_PIPES; i++)
-//     {
-//         dev_info(&client->dev, "%s: pipe %d = %d\n", __func__, i, sp->pipes[i]);
-//     }
-
-//     return;
-
-// }
 
 /**
  * global_priv - Array of pointers to deserializer device structures
@@ -156,6 +124,8 @@ struct max96724
  * Array of pointers to deserializer device structures representing connected devices.
  */
 struct max96724 *global_priv[4];
+static int sync_mode = 0;
+module_param(sync_mode, int, 0);
 
 /**
  * write_reg_Dser - Write value to register on MAX96724 deserializer device
@@ -190,25 +160,73 @@ static int write_reg_Dser(int channel, u16 addr, u8 val)
 
 static bool isCameraMono (struct sensor *sp)
 {
-    if(!strcmp(sp->camera,"zedonepro") || !strcmp(sp->camera,"zedone4k") || !strcmp(sp->camera,"zedonegs"))
+    if(!strcmp(sp->camera,"zedonehdr") || !strcmp(sp->camera,"zedone4k") || !strcmp(sp->camera,"zedonegs"))
         return true; 
     else
         return false;
 }
 
-static inline int apply_alternate_mapping(struct max96724 *priv, struct sensor *sp,
-		struct i2c_fingerprint *alt_i2c)
-{
+static inline int update_ISX_nor_flash(struct max96724 *priv, int addr, int force_update){
+	int j = 0;
+	int err = 0;
+	struct i2c_client *client = priv->i2c_client;
+    unsigned int register_val = 0;
+
+    struct i2c_fingerprint update_flash_table[] = {
+			{0x1a, 0x8A54, addr}, // Image sensor @ x10 unlock reg
+			{0x1a, 0xFFFF, 0xF4}, // Image sensor @ x10 unlock reg
+			{0x1a, 0xFFFF, 0xF7}, // Image sensor @ x10 unlock reg
+			{0x1a, 0x8000, 0x04}, // Image sensor @ x10 unlock reg
+			{0x1a, 0x8001, 0x19}, // Image sensor @ x10 unlock reg
+			{0x1a, 0x8005, 0x5a}, // Image sensor @ x10 unlock reg
+            {SLEEP, 	0x00, 	0x00},
+			{0x1a, 0xFFFF, 0xF5}, // Image sensor @ x10 unlock reg
+			{MAX96724_TABLE_END, 0x00, 0x00},
+	};
+
+    // Check if the ISX NOR flash already contains the right I2C address
+    if(!force_update){
+        err = regmap_read(priv->regmap, 0x8A54, &register_val);
+        msleep(12);
+
+        if(register_val == addr && !err){
+            dev_dbg(&client->dev, "%s: ISX NOR flash already contains the right I2C address\n", __func__);
+            return err;
+        }
+    }
+
+    // Update the ISX NOR flash with the new I2C address
+    dev_dbg(&client->dev, "%s: Update ISX NOR flash with new I2C address 0x%x\n", __func__, addr);
+	while (update_flash_table[j].i2c_addr!=MAX96724_TABLE_END){
+		client->addr = update_flash_table[j].i2c_addr;
+
+        if(update_flash_table[j].i2c_addr==SLEEP){
+            msleep(100);
+            j++;
+            continue;
+        }
+
+		err = regmap_write(priv->regmap, update_flash_table[j].reg_addr, update_flash_table[j].val);
+		if(err)
+			return err;
+
+		msleep(12);
+		j++;
+	}
+
+    dev_dbg(&client->dev, "%s: ISX NOR flash updated with new I2C address 0x%x\n", __func__, addr);
+
+	return err;
+}
+
+static inline int apply_alternate_mapping(struct max96724 *priv, struct sensor *sp){
 	struct i2c_client *client = priv->i2c_client;
 	int deser_addr = client->addr;
-	int err;
-	u8 j = 0;
-    u32 val;
-    u32 ser_addr = sp->ser_addr;
-    u32 sen_1_addr = 0, sen_2_addr = 0;
+	struct i2c_fingerprint alt_i2c[60];
+	int err = 0;
+	u8 j = 0, update_isx_address = 0, force_update = 0;
+    u32 ser_addr = sp->ser_addr , sen_1_addr = sp->cam_addr, sen_2_addr = sp->cam_addr;
 
-    sen_1_addr = sp->cam_addr;
-    //if camera mono, sen_2_addr won't be used so it doesn't matter if it takes a wrong addr
     if(!isCameraMono(sp))
     sp = list_entry(sp->list.next, struct sensor, list);
     sen_2_addr = sp->cam_addr;
@@ -216,64 +234,45 @@ static inline int apply_alternate_mapping(struct max96724 *priv, struct sensor *
     dev_dbg(&client->dev, "%s: Apply new addr : Serializer -> @0x%x / sen 0 -> @0x%x / sen 1 -> @0x%x \n",
 					__func__, ser_addr, sen_1_addr,sen_2_addr);
 
-	while (alt_i2c[j].i2c_addr!=MAX96724_TABLE_END)
-	{
-        if(alt_i2c[j].i2c_addr==SLEEP)
-        {
+    get_fingerprint_alt_table[sp->model](alt_i2c, sizeof(alt_i2c),
+        sp->ser_addr, sen_2_addr, sen_1_addr);
+
+    while (alt_i2c[j].i2c_addr!=MAX96724_TABLE_END){
+		client->addr = alt_i2c[j].i2c_addr;
+
+        if(alt_i2c[j].i2c_addr==SLEEP){
             msleep(100);
             j++;
             continue;
         }
-        switch(alt_i2c[j].val)
-        {
-            case SER_ADDR:
-                val = ser_addr<<1;
-            break;
-            case RIGHT_SENSOR_ADDR:
-                if(!strcmp(sp->camera,"zedxpro") || !strcmp(sp->camera,"zedonepro"))
-                    val = sen_1_addr;
-                else
-                    val = sen_1_addr<<1;
-            break;
-            case LEFT_SENSOR_ADDR:
-                if(!strcmp(sp->camera,"zedxpro") || !strcmp(sp->camera,"zedonepro"))
-                    val = sen_2_addr;
-                else
-                    val = sen_2_addr<<1;   
-            break;
-            default:
-                val = alt_i2c[j].val;
-            break;
+
+        // For ISX only: we need to check whether the address needs to be updated to prevent unnecessary writes to the NOR flash
+        update_isx_address = alt_i2c[j].reg_addr == 0x8A54 && 
+			(sp->model == ZEDXHDR || sp->model == ZEDONEHDR);
+        if(update_isx_address){
+            err = update_ISX_nor_flash(priv, alt_i2c[j].val, force_update);
+            if(err) {
+	            client->addr = deser_addr;
+                dev_err(&client->dev, "%s: ISX NOR flash update failed\n", __func__);
+                return err;
+            }
+
+            j++;
+            continue;
         }
 
-        switch(alt_i2c[j].i2c_addr)
-        {
-            case SER_ADDR:
-                client->addr = ser_addr;
-            break;
-            case RIGHT_SENSOR_ADDR:
-                client->addr = sen_1_addr;
-            break;
-            case LEFT_SENSOR_ADDR:
-                client->addr = sen_2_addr;
-            break;
-            default:
-                client->addr = alt_i2c[j].i2c_addr;
-            break;
-        }
-
-        err = regmap_write(priv->regmap, alt_i2c[j].reg_addr, val);
+        err = regmap_write(priv->regmap, alt_i2c[j].reg_addr, alt_i2c[j].val);
 
 		dev_dbg(&client->dev, "%s: I2C device @0x%x, read returns %d\n",
 					__func__, client->addr, err);
 
 		dev_dbg(&client->dev, "%s: value written in 0x%x (if any) : 0x%x",
-					__func__,alt_i2c[j].reg_addr, val);
+					__func__,alt_i2c[j].reg_addr, alt_i2c[j].val);
 
 		if (err)
 		{
 			dev_err(&client->dev, "%s: Cannot write 0x%x in 0x%x\n",
-					__func__,val, alt_i2c[j].reg_addr);
+					__func__,alt_i2c[j].val, alt_i2c[j].reg_addr);
 			client->addr = deser_addr;
 
 			return -1;
@@ -305,13 +304,13 @@ static inline void zedxep_patch(struct max96724 *priv,
 	client->addr = deser_addr;
 }
 
-static inline void model_reset(struct max96724 *priv, u8 model)
+static inline int model_reset(struct max96724 *priv, u8 model)
 {
 	struct i2c_fingerprint *fingerprint = reset_table[model];
 	struct i2c_client *client = priv->i2c_client;
 	int deser_addr=client->addr;
 	u8 j=0;
-	int err;
+	int err = 0;
 
 	/* If we need to reset the serializer because we changed its address */
 	if (fingerprint[j].reg_addr == 0x0000)
@@ -353,12 +352,12 @@ static inline void model_reset(struct max96724 *priv, u8 model)
 
 		err = regmap_write(priv->regmap, fingerprint[j].reg_addr  , fingerprint[j].val);
 
+		dev_dbg(&client->dev, "%s: I2C device @0x%x (reg 0x%x), returns %d\n",
+				__func__, fingerprint[j].i2c_addr,fingerprint[j].reg_addr, err);
 
-		dev_dbg(&client->dev, "%s: I2C device @0x%x, read returns %d\n",
-				__func__, fingerprint[j].i2c_addr, err);
+        if(err)
+            return err;
 
-		dev_dbg(&client->dev, "%s: value wrote in 0x%x (if any) : 0x%x",
-				__func__,fingerprint[j].reg_addr, fingerprint[j].val);
 
 		msleep(6);
 
@@ -367,7 +366,7 @@ static inline void model_reset(struct max96724 *priv, u8 model)
 
 	client->addr = deser_addr;
 
-	return;
+	return err;
 
 }
 
@@ -377,7 +376,7 @@ static inline int check_model(struct max96724 *priv, u8 i)
 	struct i2c_fingerprint *fingerprint = fingerprint_table[i];
 	unsigned int val = 0;
 	int deser_addr=client->addr;
-	int err;
+	int err = 0;
 	u8 j = 0;
 
 	/* ZED X EP Patch */
@@ -390,8 +389,9 @@ static inline int check_model(struct max96724 *priv, u8 i)
 	}
 
 	/* We reset the alternative i2c_mapping, if any */
-	model_reset(priv, i);
-
+    /* Do not check returned error, try to communicate with empty address */
+	err = model_reset(priv, i);
+    
 	/* We check the i2c fingerprint correspondance with this model */
 	while (fingerprint[j].i2c_addr!=MAX96724_TABLE_END)
 	{
@@ -402,11 +402,8 @@ static inline int check_model(struct max96724 *priv, u8 i)
 
 		err = regmap_read(priv->regmap, fingerprint[j].reg_addr  , &val);
 
-		dev_dbg(&client->dev, "%s: I2C device @0x%x, read returns %d\n",
-				__func__, fingerprint[j].i2c_addr, err);
-
-		dev_dbg(&client->dev, "%s: value read in 0x%x (if any) : 0x%x",
-				__func__,fingerprint[j].reg_addr, val);
+		dev_dbg(&client->dev, "%s: I2C device @0x%x (reg 0x%x), read returns %d\n",
+				__func__, fingerprint[j].i2c_addr, fingerprint[j].reg_addr, err);
 
 		if (fingerprint[j].val != val || err)
 		{
@@ -424,6 +421,61 @@ static inline int check_model(struct max96724 *priv, u8 i)
 	return 0;
 }
 
+// Reset serializer at 3Gbps and set it to 6Gpbs gmsl speed to match other camera speed
+// Necessary for one HDR
+static inline int configure_3Gbps_cameras_to_6Gbps(struct max96724 *priv, int link){
+	int j = 0;
+	int err = 0;
+	struct i2c_client *client = priv->i2c_client;
+    int deser_addr = client->addr; //init addr
+    const int gmsl_6gbps_mode = 0x22;
+    int reg_gmsl_ctrl_addr = (link == 0 || link == 1) ? 0x10 : 0x11;
+    int gmsl_3gbps_mode = (link == 0 || link == 2) ? 0x21 : 0x12;
+
+	// Set deserializer at 3Gpbs gmsl speed
+	client->addr = deser_addr;
+	err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr, gmsl_3gbps_mode);
+	dev_dbg(&client->dev, "%s: Switching deserializer mode to 3Gbps: %d %x %x %02x\n",
+		__func__, err,client->addr, reg_gmsl_ctrl_addr, gmsl_3gbps_mode);
+	msleep(150);
+
+	// Reset every possible serializer at 3Gbps
+    for (j = 0; j < N_MAX_TOTAL_SER; j++){
+        struct i2c_fingerprint reset_table[] = {
+            {priv->ser_devices[j].ser_addr, 0x0010, 0x91}, /* Reset every possible serializer */
+        };
+
+        if(!priv->ser_devices[j].ser_addr)
+            continue;
+        
+        client->addr = reset_table[0].i2c_addr;
+        err = regmap_write(priv->regmap, reset_table[0].reg_addr, reset_table[0].val);
+        dev_dbg(&client->dev, "%s: %d %x %x %02x\n",
+                __func__, err,client->addr,reset_table[0].reg_addr,reset_table[0].val);
+        
+        if(err ==0 ){
+            msleep(100);
+            break;
+        }
+        msleep(6);
+    }
+
+	// Set serializer at 6Gbps gmsl speed
+	client->addr = ZED_ONE_SER_DFLT_ADDR;
+	err = regmap_write(priv->regmap, MAX9295_GMSL_LINK_RATE_CTRL, MAX9295_GMSL_6GBPS_MODE);
+	dev_dbg(&client->dev, "%s: Switching serializer mode to 6Gbps: %d %x %x %02x\n",
+		__func__, err,client->addr,MAX9295_GMSL_LINK_RATE_CTRL,MAX9295_GMSL_6GBPS_MODE);
+
+	// Set deserializer at 6 Gbps gmsl speed
+	client->addr = deser_addr;
+	err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr, gmsl_6gbps_mode);
+	dev_dbg(&client->dev, "%s: Switching deserializer mode to 6Gbps: %d %x %x %02x\n",
+		__func__, err,client->addr,reg_gmsl_ctrl_addr,gmsl_6gbps_mode);
+	msleep(150);
+
+	return err;
+}
+
 static inline int sl_max96724_get_camera_model(struct max96724 *priv)
 {
 	struct i2c_client *client = priv->i2c_client;
@@ -432,6 +484,8 @@ static inline int sl_max96724_get_camera_model(struct max96724 *priv)
 
 	for (i = 0; i<N_CAM_TYPE; i++)
 	{
+        dev_dbg(&client->dev, "%s: Check if cam model is %s",
+				__func__, camera_names[i]);
 
 		err = check_model(priv, i);
 
@@ -494,6 +548,9 @@ static int sl_max96724_i2c_setup(struct max96724 *priv)
     err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, val_port);
 
     msleep(SLEEP_TIME);
+
+    dev_dbg(&priv->i2c_client->dev,"%s: set GMSL to i2c [ %d, %d, %d, %d ]",
+        __func__, priv->port_to_i2c[0], priv->port_to_i2c[1], priv->port_to_i2c[2], priv->port_to_i2c[3]);
 
     return 0;
 }
@@ -569,7 +626,7 @@ static int setup_sensor_pipe(struct max96724 *priv, struct sensor *sp, u8 ser_pi
 	val = 0;
 
 	for (i=0; i<n_map_out; i++)
-		val = val | (u8)((offset + (sp->dser_port%4)) << 2*i);
+		val = val | (u8)((offset + (sp->phy_index%4)) << 2*i);
 
 	ret = regmap_write(priv->regmap, addr, val);
     dev_dbg(&i2c_client->dev,"%s: (0x%x ; 0x%x)\n",__func__,addr,val);
@@ -578,13 +635,13 @@ static int setup_sensor_pipe(struct max96724 *priv, struct sensor *sp, u8 ser_pi
 		dev_warn(&i2c_client->dev, "%s: fail write in csi reg of pipe %d\n",
 				__func__, dser_pipe);
 
-	offset = 0;
-
-	/* Set the data rate for this CSI Link, there is one cam per I2C so should be all right */
-	addr = csi_data_rate_reg.addr + 0x03 * sp->dser_port + offset;
+    sp->dsr_pipe=dser_pipe;
+    
+    /* Set the data rate for this CSI Link, there is one cam per I2C so should be all right */
+	addr = csi_data_rate_reg.addr + 0x03 * sp->phy_index;
 
 	ret = regmap_write(priv->regmap, addr, csi_data_rate_reg.val);
-    dev_dbg(&i2c_client->dev,"%s: (0x%x ; 0x%x)\n",__func__,addr,csi_data_rate_reg.val);
+    dev_dbg(&i2c_client->dev, "set pipping : opt-csi-port %d / vc-id %d \n", sp->phy_index, sp->vc_id);
 
     return 0;
 }
@@ -601,8 +658,19 @@ static int sl_max96724_pipes_setup(struct max96724 *priv, struct sensor *sp,
     u8 cam_pipping = cam_pipes[model];
 	s8 cam_id = -1;
 
-    for(i=0; i < priv->avail_pipe; i++)
-        cam_pipping = cam_pipping<<1;
+    //first camera of one i2c use X Y pipes 
+    //second cam use Z U pipes
+    //uses i2c_bus as conflicting values because is_second_cam used for IMU and pipping
+    //comes from limitation from max9296
+    for(i=0; i < priv->n_cam; i++)
+    {
+        if(sp->i2c_bus == priv->detected_sensors[i].i2c_bus)
+        {
+            sp->is_second_cam_from_i2c = true;
+            cam_pipping = cam_pipping<<2;
+        }
+    }
+            
 
     dev_dbg(&client->dev, "%s: n_cam = %d ->  cam_pipping = 0x%x\n",
                      __func__, priv->n_cam, cam_pipping);
@@ -682,30 +750,13 @@ static int sl_max96724_pipes_setup(struct max96724 *priv, struct sensor *sp,
         /**
          * get next sensor of this camera, since we filled the list in the right order,
          * we just need to get next element */
-        //sp = list_entry(sp->list.next, struct sensor, list);
-
-        if (sp->list.next != &priv->sensor_list) {
-            sp = list_entry(sp->list.next, struct sensor, list);
-        } else {
-            dev_warn(&client->dev,"%s: No more sensor",__func__);
-            break;
-        }
+        sp = list_entry(sp->list.next, struct sensor, list);
 
     }
 
 	dev_info(&client->dev, "%s: camera pipeline operational\n", __func__);
 
     return 0;
-}
-
-static int filter_by_gmsl_entry(struct max96724 *priv, int id, int gmsl_index)
-{
-    dev_dbg(&priv->i2c_client->dev, "%s: id: %d (eq GMSL %d) / Looking for gmsl %d \n",
-                __func__,id,id % N_GMSL_PORTS,gmsl_index);
-    if(id % N_GMSL_PORTS == gmsl_index)
-        return 0;
-    else
-        return 1;
 }
 
 /**
@@ -725,20 +776,68 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
     int deser_addr=client->addr; //init addr
     struct sensor *sp;
     struct list_head *pos;
-    unsigned int link = 0, ret = 0;
+    unsigned int link = 0;
     int tab_id = MAX96724_LINK_REGS;
-    int err;
+    int err = 0;
     int model;
     bool cam_found, config_supported;
+    int cam_model_count;
     u8 i,j;
-    int cam_gmsl_id;
-
+    int reg_gmsl_ctrl_addr = 0;
+    int gmsl_3gbps_mode = 0;
+    int active_gmsl=0;
     priv->n_cam = 0;
 
     priv->avail_pipe = 0;
 
 	dev_dbg(&client->dev, "%s: client addr = 0x%x\n",
-			__func__, client->addr);   
+			__func__, client->addr);
+
+    for (i = 0; i < N_GMSL_PORTS; i++)
+    {
+        priv->port_to_i2c[i]=-1;
+
+        err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
+
+        msleep(SLEEP_TIME);
+
+        if (err)
+            return -1;
+
+        err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
+
+        if (err)
+            return -1;
+
+        /* Bit mask to get the essential information: is link i connected?*/
+        link = (link & 0x08) >> 3;
+
+        // If the link is not detected, we check if it is a 3Gbps GMSL port
+        if (!link)
+		{
+            reg_gmsl_ctrl_addr = (i == 0 || i == 1) ? 0x10 : 0x11;
+            gmsl_3gbps_mode = (i == 0 || i == 2) ? 0x21 : 0x12;
+            
+            // Set deserializer at 3Gpbs gmsl speed 
+            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
+            dev_dbg(&client->dev, "%s: %d %x %x %02x\n",
+                __func__, err,client->addr,reg_gmsl_ctrl_addr,gmsl_3gbps_mode);
+            msleep(150);
+            
+            // Read the link status again
+            err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
+            link = (link & 0x08) >> 3;
+
+            // Set deserializer at 6Gbps gmsl speed
+            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
+            msleep(150);
+        }
+
+        if(link)
+            active_gmsl++;    
+    }
+
+    dev_info(&client->dev,"%s: Active GMSL ports : %d",__func__, active_gmsl);
 
     for (i = 0; i < N_GMSL_PORTS; i++)
     {
@@ -752,7 +851,7 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
         err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
 
-        if (err && verbosity_level)
+        if (err)
         {
             dev_dbg(&client->dev, "%s: write addr = 0x%x, val = 0x%x, err %d\n",
                     __func__, mode_table[tab_id][i].addr, link, err);
@@ -764,15 +863,35 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
         if (!link)
 		{
-			dev_info(&client->dev, "%s: No camera connected to GMSL port %d\n",
-					__func__, i);
-			continue;
-		}
+            dev_dbg(&client->dev, "%s: No camera connected to 6Gbps GMSL port %d\n",
+                    __func__, i);
+            
+            reg_gmsl_ctrl_addr = (i == 0 || i == 1) ? 0x10 : 0x11;
+            gmsl_3gbps_mode = (i == 0 || i == 2) ? 0x21 : 0x12;
+            
+            // Set deserializer at 3Gpbs gmsl speed 
+            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
+
+            msleep(150);
+            
+            // Read the link status again
+            err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
+            link = (link & 0x08) >> 3;
+
+            if (!link)
+            {
+                dev_info(&client->dev, "%s: No camera connected to GMSL port %d\n",
+                        __func__, i);
+
+                // Set deserializer at 6Gbps gmsl speed
+                err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
+                msleep(150);
+
+                continue;
+            }
+        }
         
-        /* increments the number of connected links accordingly */
-        ret += link;
-        
-        dev_info(&client->dev, "%s: Camera connected to GMSL port %d\n",
+        dev_warn(&client->dev, "%s: Camera connected to GMSL port %d\n",
 				__func__, i);
 
         for (j = 0; j < N_MAX_TOTAL_SER; j++){
@@ -785,14 +904,18 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
             
             client->addr = reset_table[0].i2c_addr;
             err = regmap_write(priv->regmap, reset_table[0].reg_addr, reset_table[0].val);
-            dev_dbg(&client->dev, "%s: reset ser %s %d %d %x %x %02x\n",
-                    __func__,camera_names[priv->ser_devices[j].camera_model],priv->ser_devices[j].zedx_id, err,client->addr,reset_table[0].reg_addr,reset_table[0].val);
 
+            if(err == 0 )
+            {
+                msleep(100);
+                break;
+            }
             msleep(6);
         }
-        msleep(200);
+        client->addr = deser_addr;
 
-        client->addr = deser_addr;        
+        /* Configure 3Gpbs serializer (one hdr) to 6Gbps*/
+        configure_3Gbps_cameras_to_6Gbps(priv, i);
 
         /* read the camera fingerprint and return its ID */
         model = sl_max96724_get_camera_model(priv);
@@ -804,47 +927,68 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
         }
 
         cam_found = false;
-        cam_gmsl_id=0;
+        cam_model_count=0;
         /* for each sensor from the dts */
         list_for_each(pos, &priv->sensor_list)
         {
             sp = list_entry(pos, struct sensor, list);
             
-            err = 0;
             if (sp == NULL)
-            {
                 return -1;
-            }
 
             /* if not the right model or this model has been assigned already
              * we continue looking for an available camera */
             if (!(sp->model == model))
                 continue;
 
-            /* We select the i entry in DT of the detected model to associate to GMSL i */
-            /* if cam_gmsl_id isn't the same as i, we increment it and pass to the next camera */
-            if(filter_by_gmsl_entry(priv, cam_gmsl_id, i))
+            /* For 2 or less cameras, we keep the same behavior so that each get 
+             * its own csi port. Dummies are not taken into account */
+            if(active_gmsl <= 2)
             {
-                cam_gmsl_id++;
-                config_supported=false;
-                /* If camera Stereo, skip second sensor */
-                if(!isCameraMono(sp))
-                    pos = pos->next;
-                continue;
+                if(sp->detection_id >= 0)
+                    continue;
+
+                /* first camera probed will take the first available entry 
+                 * second camera probed will take first entry with a different csi port */
+                if(priv->n_cam > 0)
+                    if(sp->serial == priv->detected_sensors[0].serial)
+                        continue;
+
+                if(sp->zedx_id == -1)
+                    continue;
             }
-            
-            dev_info(&client->dev, "%s: found %s %d linked to GMSL %d  \n",
-                     __func__,camera_names[model], sp->zedx_id, i);
+            /* More than 2 cameras configuration, associate right DT entry to the right GMSL
+             * Allows bandwidth optimization base on the plug-in order 
+             * example : 1st ZED X entry in camera-serializers associated to GMSL #0 
+             * while 3nd ZED X entry associated to GMSL #2 */
+            else
+            {
+                if(cam_model_count != i)
+                {
+                    cam_model_count++;
+                    config_supported=false;
+                    /* If camera Stereo, skip second sensor */
+                    if(!isCameraMono(sp))
+                        pos = pos->next;
+                    continue;
+                }
+
+                if(sp->zedx_id == -1)
+                {
+                    config_supported=false;
+                    break;
+                }
+            }
 
 			/* GMSL port i will be connected to the i2c bus priv->avail_i2c_bus[model] */
-			priv->port_to_i2c[i] = sp->dser_cc_port;
+			priv->port_to_i2c[i] = sp->i2c_cc;
             sp->gmsl_link = i;
-
+            sp->dsr_pipe = -1;
+            
             /* we found the right sensor to initialize a camera */
             cam_found = true;
             config_supported = true;
-		/* Next camera with the same model will be connected to another bus */
-            priv->avail_i2c_bus[sp->dser_cc_port]++;
+
             break;
 
         }
@@ -853,7 +997,8 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
         {
             if(!config_supported)
             {
-                dev_warn(&client->dev, "%s: Camera plugged in GMSL #%d wrongly placed. Check user guide for camera placement info  \n", __func__, i);
+                dev_err(&client->dev, "%s: Camera plugged in GMSL #%d wrongly placed. Check user guide for camera placement info  \n", __func__, i);
+                return -EINVAL;
             }
             else
             {
@@ -861,6 +1006,7 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
                         __func__);
                 dev_warn(&client->dev, "%s: Do you have the right DTS?\n",
                         __func__);
+                return -EINVAL;
             }
 
 			continue;
@@ -872,11 +1018,9 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
         priv->detected_sensors[priv->n_cam] = *sp;
         priv->n_cam++;
 
-        dev_dbg(&client->dev, "%s: csi route : gmsl port %d -> pipes [%d %d %d %d] (vc %d)-> dser port %d -> %d jetson serial",__func__, sp->gmsl_link, 
-            sp->pipes[0],sp->pipes[1],sp->pipes[2],sp->pipes[3],sp->vc_id,sp->dser_port, sp->serial);
+        dev_info(&client->dev, "%s: GMSL #%d : Link Camera %s (id: %d) to port-index %d",__func__,i,sp->camera,sp->zedx_id,sp->serial);
 
-        err = apply_alternate_mapping(priv, sp , fingerprint_alt_table[sp->model]);
-
+        err = apply_alternate_mapping(priv, sp);
     }
 
     /* enable build the correct i2c_map */
@@ -885,7 +1029,7 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
     err = regmap_write(priv->regmap, GMSL_PIPES_ENABLE,
                        0xFF >> (N_DSER_PIPES - (priv->avail_pipe)));
 
-    return ret;
+    return err;
 }
 
 static int sl_max96724_write_table(struct max96724 *priv,
@@ -928,34 +1072,71 @@ static int sl_max96724_write_table(struct max96724 *priv,
     return 0;
 }
 
-static int slow_reset_Dser(struct max96724 *priv)
+// configuration for slave/master mode
+// sync_mode == 0:
+//  > Master mode: Internal Fsync + output Fsync on MFP sync (default=MFP10)
+// sync_mode == 1:
+//  > Master mode deser 1: Internal Fsync + output Fsync on MFP sync (default=MFP10)
+//  > Slave mode deser 2: External Fsync + input Fsync on MFP sync (default=MFP10)
+// sync_mode == 2:
+//  > Slave mode deser 1: External Fsync + input Fsync on MFP sync (default=MFP10)
+//  > Slave mode deser 2: External Fsync + input Fsync on MFP sync (default=MFP10)
+static int sl_max96724_configure_sync_mode(struct max96724 *priv){
+	int err = 0;
+
+    if(sync_mode < 0 || sync_mode > 2){
+        sync_mode = 0; // default to master mode
+    }
+
+    if(sync_mode == 0) // Master mode, default configuration
+        return err;
+
+    // Master/Slave mode, first deser(channel) is configured as master
+    if(sync_mode == 1 && priv->channel == 0){ 
+        return err;
+    }
+
+	if(sync_mode > 0 ){ // Slave mode, read Fsync on MFP sync (default=MFP10)
+        struct index_reg_8 sync_mode_table[10] = {};
+        err = get_max96724_slave_mode_table(priv->mfp_trig_in, sync_mode_table, sizeof(sync_mode_table));
+        if(err){
+            dev_err(&priv->i2c_client->dev, "%s: slave mode table failed to initialize: %d\n",
+				__func__, err);
+            return err;
+        }
+		err = sl_max96724_write_table(priv, sync_mode_table);
+        dev_info(&priv->i2c_client->dev, "Sync mode configured\n");
+	}
+
+	return err;
+}
+
+static int slow_reset_Dser(int channel)
 {
     int err;
-    int channel = priv->channel;
 
     if (channel > 3 || channel < 0 || global_priv[channel] == NULL)
         return -1;
 
-    if(priv->n_lanes == 2)
+    if(global_priv[channel]->n_lanes == 2)
     {
         err = sl_max96724_write_table(global_priv[channel], mode_table[MAX96724_INIT]);
-        dev_err(&priv->i2c_client->dev, "%s: Setup Deser as 2 lanes \n", __func__);
+        dev_info(&global_priv[channel]->i2c_client->dev, "%s: Setup Deser as 2 lanes \n", __func__);
     }
        
-    if(priv->n_lanes == 4)
+    if(global_priv[channel]->n_lanes == 4)
     {
         err = sl_max96724_write_table(global_priv[channel], mode_table[MAX96724_INIT_2x4]);
-        dev_err(&priv->i2c_client->dev, "%s: Setup Deser as 4 lanes \n", __func__);
+        dev_info(&global_priv[channel]->i2c_client->dev, "%s: Setup Deser as 4 lanes \n", __func__);
     }
         
     if (err)
         return -1;
 
-    if (global_priv[channel]->csi_port == 'a')
-	    return 0;
-
-    //pas forcément utile car overwritten while mapping, peut être à enlever
-	err = sl_max96724_write_table(global_priv[channel], mode_table[MAX96724_CSI_B]);
+    dev_dbg(&global_priv[channel]->i2c_client->dev, "%s: Setup Deser as %d lanes \n", __func__, global_priv[channel]->n_lanes);
+    
+    err = sl_max96724_configure_sync_mode(global_priv[channel]);
+	    if(err) return -1;
 
     return 0;
 }
@@ -964,6 +1145,10 @@ int dser_get_gmsl_port(int channel, int zedx_id){
     int err = -1;
     struct list_head *pos;
 	struct sensor *sp;
+
+    if (global_priv[channel]->intialized == 0)
+        return err;
+
     list_for_each(pos, &global_priv[channel]->sensor_list){
 		sp = list_entry(pos, struct sensor, list);
         if (sp == NULL){
@@ -987,15 +1172,89 @@ int dser_get_gmsl_port(int channel, int zedx_id){
 }
 EXPORT_SYMBOL(dser_get_gmsl_port);
 
+static int get_video_pipe(int channel, int zedx_id){
+    int err = -1;
+    struct list_head *pos;
+    struct sensor *sp;
+
+    list_for_each(pos, &global_priv[channel]->sensor_list){
+        sp = list_entry(pos, struct sensor, list);
+        if (sp == NULL){
+            return err;
+        }
+
+        if (sp->zedx_id != zedx_id)
+            continue;
+
+        if(sp->dsr_pipe == -1)
+        {
+            dev_err(&global_priv[channel]->i2c_client->dev,
+                "%s: Invalid video pipe value\n",__func__);
+            return err;
+        }
+
+        return sp->dsr_pipe;
+    }
+
+    return -1;
+}
+
+int dser_read_link_lock(int channel, int zedx_id){
+    int err = -1;
+    int val = 0;
+    int gmsl_link = -1;
+
+    if (channel > 3 || channel < 0 || global_priv[channel] == NULL)
+        return err;
+
+    gmsl_link = dser_get_gmsl_port(channel, zedx_id);
+    gmsl_link = gmsl_link - (channel * N_GMSL_PORTS); // (channel * N_GMSL_PORTS) is added in get gmsl port to take into account board with multiple deser
+
+    if(gmsl_link < 0 || gmsl_link >= N_GMSL_PORTS)
+        return err;
+
+    err = regmap_read(global_priv[channel]->regmap, max96724_link_regs[gmsl_link].addr, &val);
+
+    if(err)
+        return err;
+
+    val = (val >> 3) & 0x01;
+
+    return val;
+}
+EXPORT_SYMBOL(dser_read_link_lock);
+
+int dser_read_video_lock(int channel, int zedx_id){
+    int err = -1;
+    int val = 0;
+    int dsr_pipe = -1;
+
+    if (channel > 3 || channel < 0 || global_priv[channel] == NULL)
+        return err;
+
+    dsr_pipe = get_video_pipe(channel, zedx_id);
+
+    if(dsr_pipe < 0 || dsr_pipe >= N_DSER_PIPES)
+        return err;
+
+    err = regmap_read(global_priv[channel]->regmap, (VIDEO_LOCK_STATUS_REG + 0x20*dsr_pipe), &val);
+    if(err)
+        return err;
+
+    val = val & 0x01;
+
+    return val;
+}
+EXPORT_SYMBOL(dser_read_video_lock);
+
 int dser_enable_gmsl_link(int channel, int zedx_id){
 	int err = -1;
 	struct list_head *pos;
 	struct sensor *sp;
 
-    dev_dbg(&global_priv[channel]->i2c_client->dev,
-        "%s: dser_enable_gmsl_link: %d \n",
-        __func__, zedx_id);
-
+    if (global_priv[channel]->intialized == 0)
+        return err;
+    
     list_for_each(pos, &global_priv[channel]->sensor_list){
 		sp = list_entry(pos, struct sensor, list);
 		if (sp == NULL){
@@ -1004,10 +1263,6 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
       
         if (sp->zedx_id != zedx_id)
 			continue;
-
-        dev_dbg(&global_priv[channel]->i2c_client->dev,
-            "%s: MATCH: %d \n",
-            __func__, sp->zedx_id);
 
         if(sp->gmsl_link == -1)
         {
@@ -1021,9 +1276,9 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
         if (err)
             return -1;
 
-        dev_info(&global_priv[channel]->i2c_client->dev,
-            "%s: gmsl id: %d \n",
-            __func__, sp->gmsl_link);
+        dev_dbg(&global_priv[channel]->i2c_client->dev,
+            "%s: open GMSL link %d for zedx-id %d\n",
+            __func__, sp->gmsl_link, zedx_id);
 
         return sp->gmsl_link + (channel * N_GMSL_PORTS);
     }
@@ -1034,9 +1289,9 @@ EXPORT_SYMBOL(dser_enable_gmsl_link);
 
 int dser_open_all_gmsl_link(int channel){
     int err = -1;
-    dev_dbg(&global_priv[channel]->i2c_client->dev,
-        "%s: dser_open_all_gmsl_link\n",
-        __func__);
+
+    if (global_priv[channel]->intialized == 0)
+        return err;
         
     err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
             0xFF);
@@ -1100,37 +1355,13 @@ int set_bitrate_Dser(int channel, u32 i2c_bus, u8 val)
 }
 EXPORT_SYMBOL(set_bitrate_Dser);
 
-int getCamPipeIndex(int channel, int zedx_id)
-{
-    struct sensor *sp;
-    u8 i,j = 0;
-
-
-    for( i=0; i < global_priv[channel]->n_cam; i++)
-    {
-        sp = &global_priv[channel]->detected_sensors[i];
-        printk("%s: compare input id : %d and zedx_id %d\n",__func__,zedx_id,sp->zedx_id);
-        if( zedx_id == sp->zedx_id)
-        {
-            printk("%s: pipes [%d %d %d %d]",__func__,sp->pipes[0],sp->pipes[1],sp->pipes[2],sp->pipes[3]);
-
-            for( j=0; j<N_SER_PIPES; j++)
-            {
-                if(sp->pipes[j] >= 0)
-                    return j;
-            }
-            break;
-        }
-    }
-    return -1;
-}
-EXPORT_SYMBOL(getCamPipeIndex);
-
-
-bool isSecondCamFromI2C(int channel, int zedx_id)
+int isSecondCamFromI2C(int channel, int zedx_id)
 {
     struct sensor *sp;
     u8 i = 0;
+
+    if (global_priv[channel]->intialized == 0)
+        return -1;
 
     for( i=0; i < global_priv[channel]->n_cam; i++)
     {
@@ -1140,7 +1371,7 @@ bool isSecondCamFromI2C(int channel, int zedx_id)
             return sp->is_second_cam_from_i2c;
         }
     }
-    return false;
+    return -1;
 }
 EXPORT_SYMBOL(isSecondCamFromI2C);
 
@@ -1242,29 +1473,52 @@ static int sl_max96724_parse_serializer_node(struct max96724 *priv,
         sp->detection_id = -1;
         sp->gmsl_link = -1;
 
-        // todo: get i2c, serial, vc-id and n_lanes
+        of_property_read_string(ser_node, "camera_model", &sp->camera);
+        for (j=0; j<N_CAM_TYPE; j++)
+        {
+            if (strcmp(sp->camera, camera_names[j])==0)
+                sp->model = j;
+        }
+
+        /* Parse zedx-id */
+        err = of_property_read_string(ser_node, "zedx-id", &str);
+        if(err){
+            dev_err(&i2c_client->dev, "%s: 'zedx-id' missing in serializer node %s (if it is a dummy, set zedx_id = -1)",__func__,ser_node->full_name);
+            return -EINVAL;
+        }
+
+        err = kstrtoint(str,10,&sp->zedx_id);
+        if(err)
+        {
+            dev_err(&i2c_client->dev, "%s: zedx-id conversion to int failed", __func__);
+            return -1;
+        }
+        /* if cam is dummy (declared with id = -1 in DTS) */
+        if(sp->zedx_id == -1)
+            continue;
+
+        /* Sensor's info */
         cam_node = of_parse_phandle(ser_node, "camera-sensors", i);
         if (cam_node==NULL)
         {  
             dev_warn(&i2c_client->dev, "%s: no cam node in ser node...\n", __func__);
             continue;
         }
-
-        of_property_read_u32(cam_node, "zedx-id", &sp->zedx_id);
-        // dev_dbg(&i2c_client->dev, "%s: ZEDX ID = %d",__func__, sp->zedx_id);
-
-        of_property_read_u32(cam_node, "dser-port", &sp->dser_port);
-
-        of_property_read_u32(cam_node, "dser-cc-port", &sp->dser_cc_port);
-
         of_property_read_u32(cam_node, "reg", &sp->cam_addr);
-        // dev_dbg(&i2c_client->dev, "%s: CAM ADDR = %x",__func__, sp->cam_addr);
+        dev_dbg(&i2c_client->dev, "%s: CAM ADDR = %x",__func__, sp->cam_addr);
 
         of_property_read_u32(ser_node, "reg", &sp->ser_addr);
-        // dev_dbg(&i2c_client->dev, "%s: SER ADDR = %x",__func__, sp->ser_addr);
+        dev_dbg(&i2c_client->dev, "%s: SER ADDR = %x",__func__, sp->ser_addr);
 
         priv->ser_devices[cam_id].ser_addr = sp->ser_addr;
 
+        of_property_read_u32(cam_node, "reg", &sp->cam_addr);
+        if(err){
+            dev_err(&i2c_client->dev, "%s: 'reg' missing in camera node %s",__func__,cam_node->full_name);
+            return -EINVAL;
+        }
+
+        /* porting info */
         mux_node = of_get_parent(cam_node);
         if (mux_node==NULL)
         {  
@@ -1273,7 +1527,6 @@ static int sl_max96724_parse_serializer_node(struct max96724 *priv,
             continue;
         }
         of_property_read_u32(mux_node, "reg", &sp->i2c_bus);
-		// dev_dbg(&i2c_client->dev, "%s: associated bus = %d\n", __func__, sp->i2c_bus);
         
         of_node_put(mux_node);
         
@@ -1303,36 +1556,84 @@ static int sl_max96724_parse_serializer_node(struct max96724 *priv,
             continue;
         }
 
-        of_property_read_u32(endpoint_node, "vc-id", &sp->vc_id);
-        of_property_read_u32(endpoint_node, "bus-width", &sp->n_lanes);
-        of_property_read_u32(endpoint_node, "port-index", &sp->serial);
+        err = of_property_read_u32(endpoint_node, "vc-id", &sp->vc_id);
+        if(err)
+        {
+            dev_err(&i2c_client->dev,"%s: Sensor %d is missing vc-id entry",__func__,sp->zedx_id);
+            return -EINVAL;
+        }
+        if(sp->vc_id<0 || sp->vc_id>3)
+        {
+            dev_err(&i2c_client->dev,"%s: Sensor %d VC-ID out of range [0,1,2,3]",__func__,sp->zedx_id);
+            return -EINVAL;
+        }
 
+        err = of_property_read_u32(endpoint_node, "bus-width", &sp->n_lanes);
+        if(err)
+        {
+            dev_err(&i2c_client->dev,"%s: Sensor %d is missing bus-width entry",__func__,sp->zedx_id);
+            return -EINVAL;
+        }
+        if(sp->n_lanes != 2 && sp->n_lanes != 4)
+        {
+            dev_err(&i2c_client->dev,"%s: Sensor %d bus-width out of range (2 or 4 lanes only)",__func__,sp->zedx_id);
+            return -EINVAL;
+        }
 
-		// dev_dbg(&i2c_client->dev, "%s: associated vc-id = %d\n", __func__, sp->vc_id);
-		// dev_dbg(&i2c_client->dev, "%s: associated n_lanes = %d\n", __func__, sp->n_lanes);
-		// dev_dbg(&i2c_client->dev, "%s: associated mipi port = %d\n", __func__, sp->serial);
-		// dev_dbg(&i2c_client->dev, "%s: associated output deser port = %d\n", __func__, sp->dser_port);
-		// dev_dbg(&i2c_client->dev, "%s: associated cc deser port = %d\n", __func__, sp->dser_cc_port);
+        err = of_property_read_u32(endpoint_node, "port-index", &sp->serial);
+        if(err)
+        {
+            dev_err(&i2c_client->dev,"%s: Sensor %d is missing port-index entry",__func__,sp->zedx_id);
+            return -EINVAL;
+        }
 
+        err = of_property_read_string(endpoint_node, "opt-csi-port", &str);
+        if(err)
+        {
+            dev_err(&i2c_client->dev,"%s: Sensor %d is missing opt-csi-port entry",__func__,sp->zedx_id);
+            return -EINVAL;
+        }
+        if(sp->n_lanes == 2)
+        {
+            sp->phy_index = str[0] - 'c';
+            if(sp->phy_index < 0 || sp->phy_index > 3)
+            {
+                dev_err(&i2c_client->dev, "%s: Sensor %d opt-csi-port out of range ! For 2 lanes configuration : c,d,e,f",__func__,sp->zedx_id);
+                return -EINVAL;
+            }
+        }
+        else
+        {
+            sp->phy_index = str[0] - 'a';
+            if(sp->phy_index < 0 || sp->phy_index > 1)
+            {
+                dev_err(&i2c_client->dev, "%s: Sensor %d opt-csi-port out of range ! For 4 lanes configuration : a,b",__func__,sp->zedx_id);
+                return -EINVAL;
+            }
+        }
+        
+        of_property_read_u32(endpoint_node, "i2c-cc", &sp->i2c_cc);
+
+        priv->n_lanes = sp->n_lanes;
+
+		dev_dbg(&i2c_client->dev, "%s: associated vc-id = %d\n", __func__, sp->vc_id);
+		dev_dbg(&i2c_client->dev, "%s: associated n_lanes = %d\n", __func__, sp->n_lanes);
+		dev_dbg(&i2c_client->dev, "%s: associated mipi port = %d\n", __func__, sp->serial);
+		dev_dbg(&i2c_client->dev, "%s: associated opt-csi-port = %d\n", __func__, sp->phy_index);
+		dev_dbg(&i2c_client->dev, "%s: associated i2c control channel = %d\n", __func__, sp->i2c_cc);
+        
         of_node_put(endpoint_node);
         of_node_put(port_node);
         of_node_put(ports_node);
         
-        of_property_read_string(ser_node, "camera_model", &sp->camera);
-        of_property_read_string(ser_node, "zedx-id", &str);
-
-        err = kstrtoint(str,10,&sp->zedx_id);
-
-        for (j=0; j<N_CAM_TYPE; j++)
-        {
-            if (strcmp(sp->camera, camera_names[j])==0)
-                sp->model = j;
-        }
-        
         sp->cam_dts_id = cam_id;
-        
-		// if (DEBUG > 0)
-		// 	print_sensor_info(priv, sp);
+
+        dev_dbg(&i2c_client->dev, "%s: Parse camera %d (%s) -> SER addr : %d | CAM addr : %d", 
+            __func__, sp->cam_dts_id, sp->camera, sp->ser_addr, sp->cam_addr);
+        dev_dbg(&i2c_client->dev, "%s: (i2c cc %d -> i2c_bus %d) | (phy %d | vc-id %d) -> serial port %d", 
+            __func__, sp->i2c_cc, sp->i2c_bus, sp->phy_index ,sp->vc_id, sp->serial);
+        dev_dbg(&i2c_client->dev, "%s: -------------------------------------------------------------", 
+            __func__);
 
         of_node_put(cam_node);
     }
@@ -1352,41 +1653,36 @@ static int sl_max96724_parse_dt(struct max96724 *priv)
 	s8 i;
 
 	err = of_property_read_string(np, "channel", &str);
-
-	if (err)
-	    dev_err(&i2c_client->dev,
-			    "%s: channel not found --> Requires 'channel' entry in DTS\n",
-			    __func__);
-
-
 	priv->channel = str[0]-'a';
-
-	if (priv->channel < 0 ||  priv->channel > 3 )
+	if (err) {
+        dev_err(&i2c_client->dev, "%s: Channel not found --> Requires 'channel' entry in DTS\n", __func__);
+        return -EINVAL;
+    }
+	if (priv->channel < 0 ||  priv->channel > 3 ) {
+        dev_err(&i2c_client->dev, "%s: Channel value must be : a,b,c,d \n", __func__);
 	    return -EINVAL;
-    
-    dev_info(&i2c_client->dev, "%s: Dser channel %c\n", __func__, str[0]);
+    }
 
-	err = of_property_read_string(np, "opt-csi-port", &str);
-	if (err)
-	{
-		dev_info(&i2c_client->dev, "%s: Using CSI port %c\n", __func__, 'a');
-		priv->csi_port = 'a';
-	}
-	else if (str[0] == 'b' || str[0] == 'a')
-	{
-		dev_info(&i2c_client->dev, "%s: Using CSI port %c\n", __func__, str[0]);
-		priv->csi_port = str[0];
-	}
-
-	err = of_property_read_string(np, "n_lanes", &str);
-    priv->n_lanes = str[0] - '0';
+    priv->mfp_trig_in = -1;
+    err = of_property_read_u32(np, "mfp-trig-in", &priv->mfp_trig_in);
+    if (err || priv->mfp_trig_in < 0 || priv->mfp_trig_in > MAX96724_NB_MFP){
+        dev_dbg(&i2c_client->dev, 
+            "%s: 'mfp-trig-in' not found or invalid, defaulting to MFP10\n", __func__);
+        priv->mfp_trig_in = 0x10;
+    }
 
 	global_priv[priv->channel] = priv;
 
     n_serializers = of_count_phandle_with_args(np, "camera-serializers", NULL);
 
-    dev_info(&i2c_client->dev, "%s: Number of declared cameras with this dts %d\n",
+    dev_dbg(&i2c_client->dev, "%s: Number of declared cameras with this deserializer : %d\n",
      __func__, n_serializers);
+    
+     if(n_serializers % 4 != 0)
+        dev_warn(&i2c_client->dev,"%s: Camera not declared for all GMSL link",__func__);
+
+    if(n_serializers % 4 != 0)
+        dev_warn(&i2c_client->dev,"%s: Camera not declared for all GMSL link. If you don't want a camera at a certain port, set a dummy instead",__func__);
 
     /* retrieve all information for each port */
 	for ( i = 0 ; i < n_serializers ; i++ )
@@ -1464,33 +1760,26 @@ static struct regmap_config sl_max96724_regmap_config = {
     .cache_type = REGCACHE_NONE, //No cache for proper reset
 };
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int sl_max96724_probe(struct i2c_client *client,
         const struct i2c_device_id *id)
+#else
+static int sl_max96724_probe(struct i2c_client *client)
+#endif
 {
     struct device *dev = &client->dev;
     struct max96724 *priv;
     int err = 0;
-    u8 i = 0;
     unsigned int pipe_sync_val;
-    dev_info(dev, "%s: enter\n", __func__);
+    
+	dev_info(dev, "Driver Version : v%d.%d.%d\n",DESER_DRIVER_VERSION_MAJOR,DESER_DRIVER_VERSION_MINOR,DESER_DRIVER_VERSION_PATCH);
 
     priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 
     INIT_LIST_HEAD(&priv->sensor_list);
-    //priv->avail_i2c_bus = devm_kzalloc(dev, N_CAM_TYPE*sizeof(*priv->avail_i2c_bus), GFP_KERNEL);
-    memset(priv->avail_i2c_bus, 0, sizeof(priv->avail_i2c_bus));
-    /* list pointer,  camera list and list structure in stuct camera*/
-    for (i = 0; i<N_GMSL_PORTS; i++)
-    {
-    	priv->port_to_i2c[i] = -1;
-    	priv->i2c_trans[2*i][0] = 0;
-    	priv->i2c_trans[2*i][1] = 0;
-    	priv->i2c_trans[2*i+1][0] = 0;
-    	priv->i2c_trans[2*i+1][1] = 0;
-    }
 
     priv->avail_pipe = 0;
-
+    priv->intialized = 0;
     priv->i2c_client = client;
     priv->regmap = devm_regmap_init_i2c(priv->i2c_client,
             &sl_max96724_regmap_config);
@@ -1504,10 +1793,23 @@ static int sl_max96724_probe(struct i2c_client *client,
     err = sl_max96724_parse_gpios(priv);
 
     err = sl_max96724_parse_dt(priv);
+    if(err)
+    {
+        dev_warn(dev, "%s: Deser initialization failed",__func__);
+        return -EINVAL;
+    }    
 
-    slow_reset_Dser(priv);
+    slow_reset_Dser(priv->channel);
 
-	sl_max96724_gmsl_pipeline_setup(priv);
+	err = sl_max96724_gmsl_pipeline_setup(priv);
+    if(err)
+    {
+        dev_warn(dev, "%s: Deser initialization failed",__func__);
+        return -EINVAL;
+    }
+
+    if(priv->n_cam == 0)
+        dev_info(dev, "%s: No Camera connected to this deserializer",__func__);
 
     /* MAX96724 needs the exact number of used pipes for SYNC */
     pipe_sync_val = 0xC0 | ((1 << priv->avail_pipe) - 1);
@@ -1516,10 +1818,15 @@ static int sl_max96724_probe(struct i2c_client *client,
 
     /*set daymode by fault*/
     dev_info(dev, "%s: success\n", __func__);
+    priv->intialized = 1;
     return err;
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int sl_max96724_remove(struct i2c_client *client)
+#else
+static void sl_max96724_remove(struct i2c_client *client)
+#endif
 {
     dev_info(&client->dev, "%s: success\n", __func__);
 
@@ -1527,7 +1834,9 @@ static int sl_max96724_remove(struct i2c_client *client)
     //  Everything is automatically deallocated.
     //
 
-    return 0;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
+	return 0;
+#endif
 }
 
 static const struct i2c_device_id max96724_id[] = {

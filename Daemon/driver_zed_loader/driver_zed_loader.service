@@ -1,0 +1,13 @@
+[Unit]
+Description=ZED-X Daemon service
+After=nvargus-daemon.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+User=root
+StandardOutput=journal
+ExecStart=/usr/sbin/ZEDX_Driver
+
+[Install]
+WantedBy=multi-user.target

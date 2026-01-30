@@ -16,6 +16,9 @@
 #ifndef __INFO_SYSFS_H__
 #define __INFO_SYSFS_H__
 
+extern int dser_read_video_lock(int channel, int zedx_id);
+extern int dser_read_link_lock(int channel, int zedx_id);
+
 /**
  * struct info_sysfs - Structure that contains information to print via ioctl
  * @parent_kobj: struct kobject - kobject associated with the parent folder
@@ -37,15 +40,19 @@ struct info_sysfs {
 	/* info to print for all sensors */
 	u32 sync_sensor_index; /* right from the dts */
 	unsigned int eeprom_id_addr; /* eeprom address */
-	unsigned long serial_number; /* ZED X Pro serial number */
+	unsigned long serial_number; /* ZED X HDR serial number */
 	int video_id; /* /dev/videoX id */
 	char* name; /* v4l2 subdev name */
 	struct tegracam_device *tc_dev;
 	u8 model_id;
-	u8 gmsl_port;
+	int gmsl_port;
 	unsigned int acc_addr; /* Accelerometer i2c address */
 	unsigned int gyro_addr; /* Gyroscope i2c address */
 	u8 awb;
+	u8 video_lock;
+	u8 channel;
+	int link_lock;
+	int zedx_id;
 };
 
 /**
@@ -88,6 +95,25 @@ static ssize_t sysfs_info_get(struct kobject *kobj,
 
 	else if (!strcmp(attr->name, "gmsl_port"))
 		return sprintf(buf, "%d\n", priv->gmsl_port);
+
+	else if (!strcmp(attr->name, "link_lock")){
+		int ret = dser_read_link_lock(priv->channel, priv->zedx_id);
+		
+		if(ret >= 0) // if ret < 0 (read has failed) do not overwrite existing value
+			priv->link_lock = ret;
+		if (ret == -255) // link not supported
+			priv->link_lock = -1;
+
+		return sprintf(buf, "%d\n", priv->link_lock);
+	}
+
+	else if (!strcmp(attr->name, "video_lock")){
+		int ret = dser_read_video_lock(priv->channel, priv->zedx_id);
+		// if ret < 0 (read has failed) do not overwrite existing value
+		if(ret >= 0)
+			priv->video_lock = ret;
+		return sprintf(buf, "%d\n", priv->video_lock);
+	}
 
 	return 0;
 }
@@ -148,6 +174,12 @@ static struct kobj_attribute gmsl_port_attribute =
 static struct kobj_attribute awb_attribute =
 	__ATTR(awb, 0444, NULL, NULL);
 
+static struct kobj_attribute link_lock_attribute =
+	__ATTR(link_lock, 0444, NULL, NULL);
+
+static struct kobj_attribute video_lock_attribute =
+	__ATTR(video_lock, 0444, NULL, NULL);
+
 /** 
  * Attribute array that contains all the files we want to display.
  * It is then reference in the struct attribute group that is itself
@@ -167,6 +199,8 @@ static struct attribute *attribute_array[] = {
 	&gyro_addr_attribute.attr,
 	&gmsl_port_attribute.attr,
 	&awb_attribute.attr,
+	&link_lock_attribute.attr,
+	&video_lock_attribute.attr,
 	NULL,
 };
 

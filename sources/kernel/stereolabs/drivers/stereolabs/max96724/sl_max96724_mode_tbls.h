@@ -20,7 +20,7 @@
 
 /// Driver Version ///
 #define DESER_DRIVER_VERSION_MAJOR 1
-#define DESER_DRIVER_VERSION_MINOR 3
+#define DESER_DRIVER_VERSION_MINOR 4
 #define DESER_DRIVER_VERSION_PATCH 0
 
 
@@ -70,8 +70,20 @@ struct i2c_fingerprint
 #define GMSL_12BIT_MODE 0x2C
 #define GMSL_10BIT_MODE 0x2B
 
+#define MAX9295_GMSL_LINK_RATE_CTRL 0x0001
+#define MAX9295_GMSL_6GBPS_MODE 	0x08
+#define VIDEO_LOCK_STATUS_REG 		0x1DC // Video lock status register are 0x1DC, 0x1FC, 0x21C.. 
+#define MAX96724_GPIOA_ADDR 0x300
+#define MAX96724_GPIOB_ADDR 0x337
+#define MAX96724_GPIOC_ADDR 0x36D
+#define MAX96724_GPIOD_ADDR 0x3A4
+#define MAX96724_NB_MFP 16
+
 #define PIPES_XZ_MASK 0x20
 
+#define MFP3_REG 0x0309
+
+#define ZED_ONE_SER_DFLT_ADDR 0x42
 
 //values not used as registers in 96724
 #define RIGHT_SENSOR_ADDR 0xff02
@@ -80,6 +92,13 @@ struct i2c_fingerprint
 
 #define N_MAX_CAM 16  /* max number of connected sensors */
 #define N_MAX_TOTAL_SER 32 /* number of ser in DT */
+
+typedef void (*i2c_fingerprint_func)(struct i2c_fingerprint* table, const size_t size, const int ser_addr, const int left_sensor_addr, const int right_sensor_addr);
+void get_zedx_alt_fingerprint(struct i2c_fingerprint* table, const size_t size, const int ser_addr, const int left_sensor_addr, const int right_sensor_addr);
+void get_zedonegs_alt_fingerprint(struct i2c_fingerprint* table, const size_t size, const int ser_addr, const int left_sensor_addr, const int right_sensor_addr);
+void get_zedone4k_alt_fingerprint(struct i2c_fingerprint* table, const size_t size, const int ser_addr, const int left_sensor_addr, const int right_sensor_addr);
+void get_zedxhdr_alt_fingerprint(struct i2c_fingerprint* table, const size_t size, const int ser_addr, const int left_sensor_addr, const int right_sensor_addr);
+void get_zedonehdr_alt_fingerprint(struct i2c_fingerprint* table, const size_t size, const int ser_addr, const int left_sensor_addr, const int right_sensor_addr);
 
 /*
 static u16 gmsl_pipes_table[] = {
@@ -104,21 +123,30 @@ static struct i2c_fingerprint zedx_fingerprint[] = {
 	{MAX96724_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedx_alt_fingerprint[] = {
-	{0x62, 				0x0000, SER_ADDR}, // Set serializer addr 
-	{SER_ADDR, 			0x000D, 0x95}, // Fix addr
-	{0x10, 				0x301B, 0x50}, // Image sensor @ x10 unlock reg 
-	{0x10, 				0x31FD, LEFT_SENSOR_ADDR}, // Image sensor @ x10 change addr 
-	{LEFT_SENSOR_ADDR, 0x301B, 0x58}, // Image sensor new addr relock reg 
-	{0x18, 				0x301B, 0x50}, // Image sensor @ x18 unlock reg 
-	{0x18, 				0x31FC, RIGHT_SENSOR_ADDR}, // Image sensor @ x18 change addr
-	{RIGHT_SENSOR_ADDR,0x301B, 0x58}, // Image sensor new addr relock reg 
-	{MAX96724_TABLE_END,0x00, 	0x00}
-};
+void get_zedx_alt_fingerprint(struct i2c_fingerprint* table, const size_t size,const int ser_addr, const int left_sensor_addr, const int right_sensor_addr){
+	struct i2c_fingerprint zedx_alt_fingerprint[] = {
+		{0x62, 				0x0000, ser_addr<<1}, // Set serializer addr 
+		{ser_addr, 			0x000D, 0x95}, // Fix addr
+		{0x10, 				0x301B, 0x50}, // Image sensor @ x10 unlock reg 
+		{0x10, 				0x31FD, left_sensor_addr<<1}, // Image sensor @ x10 change addr 
+		{left_sensor_addr, 0x301B, 0x58}, // Image sensor new addr relock reg 
+		{0x18, 				0x301B, 0x50}, // Image sensor @ x18 unlock reg 
+		{0x18, 				0x31FC, right_sensor_addr<<1}, // Image sensor @ x18 change addr
+		{right_sensor_addr,0x301B, 0x58}, // Image sensor new addr relock reg 
+		{MAX96724_TABLE_END,0x00, 	0x00}
+	};
+
+	if(size < sizeof(zedx_alt_fingerprint)){
+		printk(KERN_ERR "zedx_alt_fingerprint: table size too small %zu < %zu\n", size, sizeof(zedx_alt_fingerprint));
+	}
+
+	memcpy(table, zedx_alt_fingerprint, sizeof(zedx_alt_fingerprint));
+}
 
 static struct i2c_fingerprint zedx_sensor_reset[]= {
 	//Test reset addr
   //	{0x63, 0x0000, 0x84}, /* Fsync pin is pulled up */
+/* not sure */
   	{0x42, 0x0010, 0x91}, /* Fsync pin is pulled up */
 	{0x62, 0x02D4, 0x60}, /* Set sensor MFP to push pull */
 	{0x62, 0x02D3, 0x80}, /* Power off sensor MFP */
@@ -134,7 +162,7 @@ static struct index_reg_8 zedx_mappings[] = {
 	 * it depends on the buswidth of the deserializer *
 	 * The address and the port might change*/
 	{ 0x092D, 0x00}, // All mappings to controller 0 (port B/E)
-	{ 0x0415, 0x30}, // 1600Mbps for zedx
+	{ 0x0415, 0x39}, // 2500Mbps for zedx
 
 	/* Then comes the input stream registers,
 	 * only the address might change*/
@@ -168,21 +196,29 @@ static struct i2c_fingerprint zedonegs_fingerprint[] = {
 	{MAX96724_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedonegs_alt_fingerprint[] = {
-	{0x42, 				0x0000, SER_ADDR}, // Set serializer addr 
-	{SER_ADDR, 			0x000D, 0x95}, // Fix addr
-	{0x10, 				0x301B, 0x50}, // Image sensor @ x10 unlock reg 
-	{0x10, 				0x31FD, RIGHT_SENSOR_ADDR}, // Image sensor @ x10 change addr 
-	{RIGHT_SENSOR_ADDR, 0x301B, 0x58}, // Image sensor new addr relock reg 
-	{MAX96724_TABLE_END, 0x00, 0x00},
-};
+void get_zedonegs_alt_fingerprint(struct i2c_fingerprint* table, const size_t size,const int ser_addr, const int left_sensor_addr, const int right_sensor_addr){
+	struct i2c_fingerprint zedonegs_alt_fingerprint[] = {
+		{0x42, 				0x0000, ser_addr<<1}, // Set serializer addr 
+		{ser_addr, 			0x000D, 0x95}, // Fix addr
+		{0x10, 				0x301B, 0x50}, // Image sensor @ x10 unlock reg 
+		{0x10, 				0x31FD, right_sensor_addr<<1}, // Image sensor @ x10 change addr 
+		{right_sensor_addr, 0x301B, 0x58}, // Image sensor new addr relock reg 
+		{MAX96724_TABLE_END, 0x00, 0x00},
+	};
+
+	if(size < sizeof(zedonegs_alt_fingerprint)){
+		printk(KERN_ERR "zedonegs_alt_fingerprint: table size too small %zu < %zu\n", size, sizeof(zedonegs_alt_fingerprint));
+	}
+
+	memcpy(table, zedonegs_alt_fingerprint, sizeof(zedonegs_alt_fingerprint));
+}
 
 static struct index_reg_8 zedonegs_mappings[] = {
 	/* First mapping register is the MIPI mapping,
 	 * it depends on the buswidth of the deserializer *
 	 * The address and the port might change*/
 	{ 0x092D, 0x00}, // All mappings to controller 0 (port B/E)
-	{ 0x0415, 0x30}, // 1600Mbps for zedonegs
+	{ 0x0415, 0x39}, // 2500Mbps for zedonegs
 
 	/* Then comes the input stream registers,
 	 * only the address might change*/
@@ -200,7 +236,7 @@ static struct index_reg_8 zedonegs_mappings[] = {
 	{MAX96724_TABLE_END, 0x00}
 };
 
-static struct i2c_fingerprint zedxpro_sensor_reset[]= {
+static struct i2c_fingerprint zedxhdr_sensor_reset[]= {
 //	{0x61, 0x0000, 0xC0},
 
 	{0x60, 0x02D3, 0x80}, /* FSYNC sensor 2 down */
@@ -212,61 +248,49 @@ static struct i2c_fingerprint zedxpro_sensor_reset[]= {
 	{MAX96724_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedxpro_fingerprint[] = {
+static struct i2c_fingerprint zedxhdr_fingerprint[] = {
 	{0x60, 0x000D, 0x95}, /* Serializer device ID */
 	//{0x1A, 0x8A54, 0x1A}, // Image sensor device i2c address 
 	{MAX96724_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedxpro_alt_fingerprint[] = {
-	{0x60, 				0x0000, SER_ADDR}, // Set serializer addr 
-	{SER_ADDR, 			0x000D, 0x95}, // Fix serializer addr
+void get_zedxhdr_alt_fingerprint(struct i2c_fingerprint* table, const size_t size, const int ser_addr,const int left_sensor_addr,const int right_sensor_addr){
+	struct i2c_fingerprint zedxhdr_alt_fingerprint[] = {
+		{0x60, 				0x0000, ser_addr<<1}, // Set serializer addr 
+		{ser_addr, 			0x000D, 0x95}, // Fix serializer addr
 
-	{SER_ADDR, 0x02D6, 0x90}, /* Power on sensor MFP */
-	{SLEEP, 0x00, 0x00},
+		{ser_addr, 0x02D6, 0x90}, /* Power on sensor MFP */
+		{SLEEP, 0x00, 0x00},
 
-	{0x1a, 				0x8A54, RIGHT_SENSOR_ADDR}, // Write sensor new addr
-	{0x1a, 				0xffff, 0xf4}, // Serial NOR Flash access unlock
-	{0x1a, 				0xffff, 0xf7}, // Serial NOR Flash access
-	{0x1a,	0x8000, 	0x04}, //Serial NOR Flash : select category save mode
-	{0x1a,	0x8001, 	0x19}, //Serial NOR Flash : select category
-	{0x1a,	0x8005, 	0x5a}, //Serial NOR Flash : execute 
-	{SLEEP, 0x00, 0x00},
-	{SLEEP, 0x00, 0x00},
-	{0x1a, 				0xffff, 0xf5}, // Serial NOR Flash access lock
+		{0x1a, 				0x8A54, right_sensor_addr}, // Write sensor new addr
 
-	{SER_ADDR, 0x02D6, 0x80}, /* Power off sensor MFP */
-	{SER_ADDR, 0x02D3, 0x90}, /* Power on sensor MFP */
-	{SLEEP, 0x00, 0x00},
+		{ser_addr, 0x02D6, 0x80}, /* Power off sensor MFP */
+		{ser_addr, 0x02D3, 0x90}, /* Power on sensor MFP */
+		{SLEEP, 0x00, 0x00},
 
-	{0x1a, 				0x8A54, LEFT_SENSOR_ADDR}, // Write sensor new addr
-	{0x1a, 				0xffff, 0xf4}, // Serial NOR Flash access unlock
-	{0x1a, 				0xffff, 0xf7}, // Serial NOR Flash access
-	{0x1a,	0x8000, 	0x04}, //Serial NOR Flash : select category save mode
-	{0x1a,	0x8001, 	0x19}, //Serial NOR Flash : select category
-	{0x1a,	0x8005, 	0x5a}, //Serial NOR Flash : execute 
-	{SLEEP, 0x00, 0x00},
-	{SLEEP, 0x00, 0x00},
-	{0x1a, 				0xffff, 0xf5}, // Serial NOR Flash access lock
+		{0x1a, 				0x8A54, left_sensor_addr}, // Write sensor new addr
 
-	{SER_ADDR, 0x02D3, 0x80}, /* Power off sensor MFP */
+		{ser_addr, 0x02D3, 0x80}, /* Power off sensor MFP */
 
-	{SER_ADDR, 0x02D9, 0x90}, /* FSYNC sensor 1 up */
-	{SER_ADDR, 0x02DC, 0x90}, /* FSYNC sensor 2 up */
-	{SLEEP, 0x00, 0x00},
+		{ser_addr, 0x02D9, 0x90}, /* FSYNC sensor 1 up */
+		{ser_addr, 0x02DC, 0x90}, /* FSYNC sensor 2 up */
+		{SLEEP, 0x00, 0x00},
 
-	{SER_ADDR, 0x02D6, 0x90}, /* Power on sensor MFP */
-	{SER_ADDR, 0x02D3, 0x90}, /* Power on sensor MFP */
+		{ser_addr, 0x02D6, 0x90}, /* Power on sensor MFP */
+		{ser_addr, 0x02D3, 0x90}, /* Power on sensor MFP */
 
-	{MAX96724_TABLE_END, 0x00, 0x00},
-};
+		{MAX96724_TABLE_END, 0x00, 0x00},
+	};
 
-static struct index_reg_8 zedxpro_mappings[] = {
+	memcpy(table, zedxhdr_alt_fingerprint, sizeof(zedxhdr_alt_fingerprint));
+}
+
+static struct index_reg_8 zedxhdr_mappings[] = {
 	/* First mapping register is the MIPI mapping,
 	 * it depends on the buswidth of the deserializer *
 	 * The address and the port might change*/
 	{ 0x092D, 0x00}, // All mappings to controller 0 (port B/E)
-	{ 0x0415, 0x34}, // 2000Mbps for zedxpro
+	{ 0x0415, 0x34}, // 2000Mbps for zedxhdr
 
 	/* Then comes the input stream registers,
 	 * only the address might change*/
@@ -284,9 +308,8 @@ static struct index_reg_8 zedxpro_mappings[] = {
 	{MAX96724_TABLE_END, 0x00}
 };
 
-static struct i2c_fingerprint zedonepro_sensor_reset[]= {
-  //	{0x40, 0x0000, 0x84}, /* Fsync pin is pulled up */
-  	{0x42, 0x0010, 0x91}, /* Fsync pin is pulled up */
+static struct i2c_fingerprint zedonehdr_sensor_reset[]= {
+  	//	{0x40, 0x0000, 0x84}, /* Fsync pin is pulled up */
 	{0x42, 0x02BE, 0x90}, /* Power on sensor MFP */
 	{SLEEP, 0x00, 0x00},
 	{SLEEP, 0x00, 0x00},
@@ -304,39 +327,37 @@ static struct i2c_fingerprint zedonepro_sensor_reset[]= {
 	{MAX96724_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedonepro_fingerprint[] = {
+static struct i2c_fingerprint zedonehdr_fingerprint[] = {
 	{0x42, 0x000D, 0x91}, /* Serializer device ID */
 	//{0x1A, 0x8A54, 0x1A}, // Image sensor device i2c address 
 	{MAX96724_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedonepro_alt_fingerprint[] = {
-	{0x42, 		0x0000, SER_ADDR}, // Set serializer addr 
-	{SER_ADDR, 	0x000D, 0x95}, // Fix serializer addr
-	{SLEEP, 0x00, 0x00},
-	{SLEEP, 0x00, 0x00},
+void get_zedonehdr_alt_fingerprint(struct i2c_fingerprint* table, const size_t size,const int ser_addr, const int left_sensor_addr, const int right_sensor_addr){
+	struct i2c_fingerprint zedonepro_alt_fingerprint[] = {
+		{0x42, 		0x0000, ser_addr<<1}, // Set serializer addr 
+		{ser_addr, 	0x000D, 0x95}, // Fix serializer addr
+		{SLEEP, 0x00, 0x00},
+		{SLEEP, 0x00, 0x00},
 
-	{0x1a, 		0x8A54, RIGHT_SENSOR_ADDR}, // Write sensor new addr
-	{0x1a, 		0xffff, 0xf4}, // Serial NOR Flash access unlock
-	{0x1a, 		0xffff, 0xf7}, // Serial NOR Flash access
+		{0x1a, 		0x8A54, right_sensor_addr}, // Write sensor new addr
 
-	{0x1a,		0x8000, 0x04}, //Serial NOR Flash : select category save mode
-	{0x1a,		0x8001, 0x19}, //Serial NOR Flash : select category
-	{0x1a,		0x8005, 0x5a}, //Serial NOR Flash : execute 
-	
-	{SLEEP, 	0x00, 	0x00},
-	{SLEEP, 	0x00,	0x00},
-	{0x1a, 		0xffff, 0xf5}, // Serial NOR Flash access lock
+		{ser_addr, 	0x02be, 0x80}, /* Power off sensor MFP */
+		{ser_addr,	0x02D6, 0x90}, /* Fsync pin is pulled up */
+		{SLEEP, 	0x00, 	0x00},
+		{SLEEP, 	0x00, 	0x00},
+		{ser_addr, 	0x02be, 0x90}, /* Power on sensor MFP */
+		{MAX96724_TABLE_END, 0x00, 0x00},
+	};
 
-	{SER_ADDR, 	0x02be, 0x80}, /* Power off sensor MFP */
-	{SER_ADDR,	0x02D6, 0x90}, /* Fsync pin is pulled up */
-	{SLEEP, 	0x00, 	0x00},
-	{SLEEP, 	0x00, 	0x00},
-	{SER_ADDR, 	0x02be, 0x90}, /* Power on sensor MFP */
-	{MAX96724_TABLE_END, 0x00, 0x00},
-};
+	if(size < sizeof(zedonepro_alt_fingerprint)){
+		printk(KERN_ERR "zedonepro_alt_fingerprint: table size too small %zu < %zu\n", size, sizeof(zedonepro_alt_fingerprint));
+	}
 
-static struct index_reg_8 zedonepro_mappings[] = {
+	memcpy(table, zedonepro_alt_fingerprint, sizeof(zedonepro_alt_fingerprint));
+}
+
+static struct index_reg_8 zedonehdr_mappings[] = {
 	/* First mapping register is the MIPI mapping,
 	 * it depends on the buswidth of the deserializer *
 	 * The address and the port might change*/
@@ -362,6 +383,7 @@ static struct index_reg_8 zedonepro_mappings[] = {
 
 static struct i2c_fingerprint zedone4k_sensor_reset[]= {
 //	{0x44, 0x0000, 0x84}, /* Reset the serializer */
+/* not sure */
 	{0x42, 0x0010, 0x91}, /* Reset the serializer */
 	{0x42, 0x02BF, 0x60}, /* Set sensor MFP to push pull */
 	{0x42, 0x02BE, 0x80}, /* Power off sensor MFP */
@@ -376,12 +398,18 @@ static struct i2c_fingerprint zedone4k_fingerprint[] = {
 	{MAX96724_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedone4k_alt_fingerprint[] = {
-	{0x42, 				0x0000, SER_ADDR}, // Set serializer addr 
-	{SER_ADDR, 			0x000D, 0x95}, // Fix addr
+void get_zedone4k_alt_fingerprint(struct i2c_fingerprint* table, const size_t size, const int ser_addr, const int left_sensor_addr, const int right_sensor_addr){
+	struct i2c_fingerprint zedone4k_alt_fingerprint[] = {
+		{0x42, 0x0000, ser_addr<<1}, /* SER address becomes 0x44  */
+		{MAX96724_TABLE_END, 0x00, 0x00},
+	};
 
-	{MAX96724_TABLE_END, 0x00, 0x00},
-};
+	if(size < sizeof(zedone4k_alt_fingerprint)){
+		printk(KERN_ERR "zedonepro_alt_fingerprint: table size too small %zu < %zu\n", size, sizeof(zedone4k_alt_fingerprint));
+	}
+
+	memcpy(table, zedone4k_alt_fingerprint, sizeof(zedone4k_alt_fingerprint));
+}
 
 static struct index_reg_8 zedone4k_mappings[] = {
 	/* First mapping register is the MIPI mapping,
@@ -629,6 +657,45 @@ static struct index_reg_8 max96724_2x4_init_table[] = {
 	{ MAX96724_TABLE_END, 0x00}
 };
 
+static int get_max96724_slave_mode_table(int mfp_trig_in, struct index_reg_8* table, const size_t size){
+	int err = 0;
+	// Every 16 registers, a register is inserted, this means we have to add this small increment
+	// to the base offset depending on the mfp_trig_in value.
+	int offset_linkA = (mfp_trig_in > 4) ? (mfp_trig_in > 9) ? (mfp_trig_in > 14) ? 
+						MAX96724_GPIOA_ADDR+3 : MAX96724_GPIOA_ADDR+2 : MAX96724_GPIOA_ADDR+1 : MAX96724_GPIOA_ADDR;
+	int offset_linkB = (mfp_trig_in > 2) ? (mfp_trig_in > 7) ? (mfp_trig_in > 12) ? 
+						MAX96724_GPIOB_ADDR+3 : MAX96724_GPIOB_ADDR+2 : MAX96724_GPIOB_ADDR+1 : MAX96724_GPIOB_ADDR;
+	int offset_linkC = (mfp_trig_in > 0) ? (mfp_trig_in > 5) ? (mfp_trig_in > 10) ? (mfp_trig_in > 15) ? 
+						MAX96724_GPIOC_ADDR+4 : MAX96724_GPIOC_ADDR+3 : MAX96724_GPIOC_ADDR+2 : MAX96724_GPIOC_ADDR+1 : MAX96724_GPIOC_ADDR;
+	int offset_linkD = (mfp_trig_in > 3) ? (mfp_trig_in > 8) ? (mfp_trig_in > 13) ? 
+						MAX96724_GPIOD_ADDR+3 : MAX96724_GPIOD_ADDR+2 : MAX96724_GPIOD_ADDR+1 : MAX96724_GPIOD_ADDR;
+
+	struct index_reg_8 slave_mode_table[] = {
+		{0x04A0,0x08}, // External Fsync mode
+		{0x04AF,0x9F}, // GMSL 2 type Fsync shared on every links 
+
+		// mfp_trig_in = Trig_In ( default MFP10)
+		{ offset_linkA+(3*mfp_trig_in), 0xc3}, // Link A: Output driver disabled, gmsl transmission enabled 
+		{ offset_linkA+(3*mfp_trig_in)+1, 0x10}, // Link A: gmsl transmission address = 0x10	
+		{ offset_linkB+(3*mfp_trig_in), 0x30}, // Link B: gmsl transmission enabled, gmsl transmission address = 0x10
+		{ offset_linkC+(3*mfp_trig_in), 0x30}, // Link C: gmsl transmission enabled, gmsl transmission address = 0x10
+		{ offset_linkD+(3*mfp_trig_in), 0x30}, // Link D: gmsl transmission enabled, gmsl transmission address = 0x10
+		{MAX96724_TABLE_END, 0x00},
+	};
+
+	if(mfp_trig_in < 0 || mfp_trig_in > MAX96724_NB_MFP){
+		return -EINVAL;
+	}
+
+	if(size < sizeof(slave_mode_table)){
+		return -ENOMEM;
+	}
+
+	memcpy(table, slave_mode_table, sizeof(slave_mode_table));
+
+	return err;
+}
+
 static struct index_reg_8 max96724_csi_b[] = {
 	{ 0x092D, 0x2A}, // All mappings to controller 2 (port E)
 	{ 0x096D, 0x2A}, // All mappings to controller 2 (port E)
@@ -642,8 +709,8 @@ enum
 	ZEDX,
 	ZEDONEGS,
 	ZEDONE4K,
-	ZEDONEPRO,
-	ZEDXPRO,
+	ZEDONEHDR,
+	ZEDXHDR,
 	/* Don't add a camera type bellow N_CAM_TYPE, it will not be parsed*/
 	N_CAM_TYPE,
 };
@@ -652,16 +719,16 @@ static u8 cam_pipes[] = {
 	[ZEDX] = 0x3,
 	[ZEDONEGS] = 0x1,
 	[ZEDONE4K] = 0x2,
-	[ZEDONEPRO] = 0x1,
-	[ZEDXPRO] = 0x3,
+	[ZEDONEHDR] = 0x1,
+	[ZEDXHDR] = 0x3,
 };
 
 static const char *camera_names[] = {
 	[ZEDX] = "zedx",
 	[ZEDONEGS] = "zedonegs",
 	[ZEDONE4K] = "zedone4k",
-	[ZEDONEPRO] = "zedonepro",
-	[ZEDXPRO] = "zedxpro",
+	[ZEDONEHDR] = "zedonehdr",
+	[ZEDXHDR] = "zedxhdr",
 };
 
 
@@ -669,8 +736,8 @@ static struct index_reg_8 *pipeline_table[] = {
 	[ZEDX] = zedx_mappings,
 	[ZEDONEGS] = zedonegs_mappings,
 	[ZEDONE4K] = zedone4k_mappings,
-	[ZEDONEPRO] = zedonepro_mappings,
-	[ZEDXPRO] = zedxpro_mappings,
+	[ZEDONEHDR] = zedonehdr_mappings,
+	[ZEDXHDR] = zedxhdr_mappings,
 };
 
 
@@ -678,24 +745,24 @@ static struct i2c_fingerprint *fingerprint_table[] = {
 	[ZEDX] = zedx_fingerprint,
 	[ZEDONEGS] = zedonegs_fingerprint,
 	[ZEDONE4K] = zedone4k_fingerprint,
-	[ZEDONEPRO] = zedonepro_fingerprint,
-	[ZEDXPRO] = zedxpro_fingerprint,
+	[ZEDONEHDR] = zedonehdr_fingerprint,
+	[ZEDXHDR] = zedxhdr_fingerprint,
 };
 
-static struct i2c_fingerprint *fingerprint_alt_table[] = {
-	[ZEDX] = zedx_alt_fingerprint,
-	[ZEDONEGS] = zedonegs_alt_fingerprint,
-	[ZEDONE4K] = zedone4k_alt_fingerprint,
-	[ZEDONEPRO] = zedonepro_alt_fingerprint,
-	[ZEDXPRO] = zedxpro_alt_fingerprint,
+static i2c_fingerprint_func get_fingerprint_alt_table[] = {
+	[ZEDX] = get_zedx_alt_fingerprint,
+	[ZEDONEGS] = get_zedonegs_alt_fingerprint,
+	[ZEDONE4K] = get_zedone4k_alt_fingerprint,
+	[ZEDONEHDR] = get_zedonehdr_alt_fingerprint,
+	[ZEDXHDR] = get_zedxhdr_alt_fingerprint,
 };
 
 static struct i2c_fingerprint *reset_table[] = {
 	[ZEDX] = zedx_sensor_reset,
 	[ZEDONEGS] = zedonegs_sensor_reset,
 	[ZEDONE4K] = zedone4k_sensor_reset,
-	[ZEDONEPRO] = zedonepro_sensor_reset,
-	[ZEDXPRO] = zedxpro_sensor_reset,
+	[ZEDONEHDR] = zedonehdr_sensor_reset,
+	[ZEDXHDR] = zedxhdr_sensor_reset,
 };
 
 enum

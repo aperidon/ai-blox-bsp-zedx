@@ -30,6 +30,8 @@
 /**
  * Image sensor registers as described in the IMX678 register map
  */
+#define IMX678_ID_REG 0x3028
+#define IMX678_ID_VAL 0xCA
 
 #define STANDBY 0x3000
 #define REGHOLD 0x3001

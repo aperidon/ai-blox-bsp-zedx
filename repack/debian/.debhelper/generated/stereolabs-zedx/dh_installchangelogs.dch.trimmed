@@ -1,4 +1,4 @@
-stereolabs-zedx (1.3.0-L4T36.4.0) stable; urgency=low
+stereolabs-zedx (1.4.0-L4T36.4.0) stable; urgency=low
 
   * Bump to L4T 36.4.0
   * ZED X multi-carrier board support

@@ -1,0 +1,9 @@
+config SL_IMU_BMI088
+	tristate "BMI088 IMU support"
+	depends on I2C
+	help
+	  This enables support for the Bosch BMI088 IMU sensor.
+	  The driver communicates over I2C and registers as a virtual device.
+
+	  To compile this driver as a module, choose M here: the module
+	  will be called bmi088.

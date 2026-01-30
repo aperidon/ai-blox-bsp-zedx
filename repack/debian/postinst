@@ -68,16 +68,46 @@ if [[ $l4t_version -eq 36 && $l4t_minor -eq 4 ]]; then
 	elif [ $l4t_rev -eq 0 ]; then 
 		mv /tmp/R36.4.0/libnvisppg.so /usr/lib/aarch64-linux-gnu/tegra/libnvisppg.so
 	else
-		echo "Failed to patch nvargus : Please update your system with : 'sudo apt update && sudo apt upgrade'"
+		if [ $l4t_rev -lt 3 ]; then
+			echo "Failed to patch nvargus : Please update your system with : 'sudo apt update && sudo apt upgrade'"
+		fi
+	fi
+
+	## Backup and update NVIDIA capture/IVC modules
+	MODULES_BASE="/lib/modules/$(uname -r)/updates"
+
+	CAPTURE_IVC_PATH="$MODULES_BASE/drivers/platform/tegra/rtcpu/capture-ivc.ko"
+	NVHOST_VI5_PATH="$MODULES_BASE/drivers/video/tegra/host/vi/nvhost-vi5.ko"
+
+	# Backup originals once
+	if [[ -f "$CAPTURE_IVC_PATH" && ! -f "${CAPTURE_IVC_PATH}.sl-backup" ]]; then
+		cp "$CAPTURE_IVC_PATH" "${CAPTURE_IVC_PATH}.sl-backup"
+	fi
+	if [[ -f "$NVHOST_VI5_PATH" && ! -f "${NVHOST_VI5_PATH}.sl-backup" ]]; then
+		cp "$NVHOST_VI5_PATH" "${NVHOST_VI5_PATH}.sl-backup"
+	fi
+
+	# Replace with patched modules from /tmp/nvidia-capture-patches if present
+	if [[ -f "/tmp/nvidia-capture-patches/capture-ivc.ko" ]]; then
+		mv "/tmp/nvidia-capture-patches/capture-ivc.ko" "$CAPTURE_IVC_PATH"
+	fi
+
+	if [[ -f "/tmp/nvidia-capture-patches/nvhost-vi5.ko" ]]; then
+		mv "/tmp/nvidia-capture-patches/nvhost-vi5.ko" "$NVHOST_VI5_PATH"
 	fi
 fi
 
 ## Move service from /tmp/ to /etc/systemd/system
 mv /tmp/zed_x_daemon.service /etc/systemd/system/zed_x_daemon.service
+mv /tmp/driver_zed_loader.service /etc/systemd/system/driver_zed_loader.service
+mv /tmp/IMU_Daemon.service /etc/systemd/system/IMU_Daemon.service
 ## enable service
 sudo systemctl enable zed_x_daemon.service
+sudo systemctl enable driver_zed_loader.service
+sudo systemctl enable IMU_Daemon.service
+
+rm /tmp/stereolabs_preinst_passed &> /dev/null
 
 sync
 
 exit 0
-

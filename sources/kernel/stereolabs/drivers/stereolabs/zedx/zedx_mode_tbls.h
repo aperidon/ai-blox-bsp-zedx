@@ -26,7 +26,7 @@
 
 /// Driver Version ///
 #define ZEDX_DRIVER_VERSION_MAJOR 1
-#define ZEDX_DRIVER_VERSION_MINOR 3
+#define ZEDX_DRIVER_VERSION_MINOR 4
 #define ZEDX_DRIVER_VERSION_PATCH 0
 
 #define EXTCLK 27000000
@@ -47,6 +47,8 @@
 #define AR0234_VT_SYS_CLK_DIV 0x302C
 #define AR0234_PRE_PLL_CLK_DIV 0x302E
 #define AR0234_PLL_MULTIPLIER 0x3030
+#define AR0234_ID_REG 0x3000
+#define AR0234_ID_VAL 0xa56
 
 #define AR0234_EEPROM_ADDRESS 0x54
 #define AR0234_EEPROM_ADDRESS_R 0x58
@@ -428,6 +430,8 @@ static struct index_reg_8 ar0234_1920x1200_native_60fps[] = {
 static struct index_reg_8 ar0234_960x600_binning_120fps[] = {
 	//{0x06, 0x301A, 0x00D9}, //RESET_REGISTER [11011001]
 	//{0x06, AR0234_TABLE_WAIT_MS, 100},
+	{0x06, 0x301A, 0x205C},
+	{0x06, AR0234_TABLE_WAIT_MS, 100},
 	{0x06, 0x3F4C, 0x121F},
 	{0x06, 0x3F4E, 0x121F},
 	{0x06, 0x3F50, 0x0B81},
@@ -477,6 +481,8 @@ static struct index_reg_8 ar0234_960x600_binning_120fps[] = {
 	{0x06, 0x3060, 0x000D},
 	{0x06, 0x3ED2, 0xAA00},
 	{0x06, 0x3EEE, 0xA4AA},
+	{0x06, 0x301a, 0x2058},
+
 	{0x00, AR0234_TABLE_END, 0x00},
 };
 

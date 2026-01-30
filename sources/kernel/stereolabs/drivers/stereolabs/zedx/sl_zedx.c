@@ -406,7 +406,7 @@ struct zedx
 	bool sync_slave;
 	u32 sync_sensor_index;
 	int zedx_id;
-	u8 gmsl_port;
+	int gmsl_port;
 	u8 i2c_cc;
 	NvCamSyncSensorCalibData EepromCalib;
 	unsigned long serial_number;
@@ -542,48 +542,11 @@ static int zedx_write_reg(struct zedx *priv,
 #ifdef DEBUG
 	if (err)
 		dev_dbg(&priv->i2c_client->dev,
-				"%s:i2c write failed: dev. 0x%x, reg. 0x%x, val. 0x%x\n",
-				__func__, priv->i2c_client->addr, addr, val);
+				"%s:i2c write failed: dev. 0x%x, reg. 0x%x, val. 0x%x - %d\n",
+				__func__, priv->i2c_client->addr, addr, val,err);
 #endif
 	return err;
 }
-
-#if 0
-/**
- * zedx_links_check() - Check the status of the GMSL links.
- * @priv: Driver private data.
- * @addr: Table of u8, each entry is the indice of a connected cable.
- *
- * Get the connected GMSL links and return their indices with the u8 table
- * provided as an argument. This table must have a size of 4, for a quad
- * deserializer.
- *
- * Context: Non critical function, can sleep.
- * Return: The number of detected links in case of success,
- * or 5 if it a slave device calls the function,
- * and a negative errno in case of error.
- */
-static int zedx_links_check(struct zedx *priv, u8 *links)
-{
-	struct tegracam_device *tc_dev = priv->tc_dev;
-	struct device *dev = tc_dev->dev;
-	int ret = 0;
-
-	// This functions returns the number of connected GMSL links,
-	// and their indices in the links pointer
-	ret = links_check_Dser(priv->channel, links);
-
-	dev_info(dev, "%s: %d link(s) detected\n", __func__, ret);
-
-	if (ret < 0)
-	{
-		dev_warn(dev, "%s: fail while reading the GMSL links state\n", __func__);
-		return -ENODEV;
-	}
-
-	return ret;
-}
-#endif
 
 /**
  * zedx_write_table() - Write in the registers.
@@ -626,9 +589,9 @@ static int zedx_write_table(struct zedx *priv,
 			if (ret)
 			{
 				if (j == retry - 1)
-					return -1;
+					return ret;
 #ifdef DEBUG
-				dev_dbg(dev, "%s: try %d\n", __func__, j);
+				dev_dbg(dev, "%s: try %d - %d\n", __func__, j, ret);
 #endif
 				msleep(4);
 				continue;
@@ -939,7 +902,9 @@ static int zedx_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
 	{
 		if (err == 0xEEEE)
 		{
-			dev_dbg(dev, "%s: Unsupported value (%lld)\n", __func__, val);
+			if (verbosity_level)
+				dev_warn(dev, "%s: Unsupported value\n", __func__);
+
 			return 0;
 		}
 		if (err == 0xFFFF)
@@ -952,7 +917,8 @@ static int zedx_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
 	if (priv->sync_slave)
 	{
 		priv->frame_length_line = (u32) atomic_read(&master_frame_length);
-		dev_dbg(dev, "%s: serializer in slave mode, FLL = %d\n", __func__, priv->frame_length_line);
+		if (verbosity_level)
+			dev_info(dev, "%s: serializer in slave mode, FLL = %d\n", __func__, priv->frame_length_line);
 	}
 
 	/* To differentiate the 1200p or 600p binned mode */
@@ -992,8 +958,6 @@ static int zedx_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
 	priv->total_frame_length = vertical_blanking/priv->line_length_pck+(row_stop-row_start+1)/bin_coeff;
 
 	priv->fps = val;
-
-	zedx_set_exposure(tc_dev, AR0234_DEFAULT_EXP*100000);
 
 	if (verbosity_level)
 	{
@@ -1250,8 +1214,6 @@ static int zedx_set_mode(struct tegracam_device *tc_dev)
 
 	err = zedx_set_frame_rate( tc_dev, priv->fps );
 
-	err = zedx_set_exposure( tc_dev, AR0234_DEFAULT_EXP*100000 );
-
 	return 0;
 }
 
@@ -1268,6 +1230,9 @@ static int zedx_start_streaming(struct tegracam_device *tc_dev)
 {
 	struct zedx *priv = (struct zedx *)tegracam_get_privdata(tc_dev);
 	int err;
+
+	dev_dbg(tc_dev->dev, "%s\n", __func__);
+
 	err = zedx_write_table(priv, mode_table[AR0234_MODE_START_STREAM]);
 	return err;
 }
@@ -1286,9 +1251,19 @@ static int zedx_stop_streaming(struct tegracam_device *tc_dev)
 	struct zedx *priv = (struct zedx *)tegracam_get_privdata(tc_dev);
 	int err;
 
+	dev_dbg(tc_dev->dev, "%s\n", __func__);
 	err = zedx_write_table(priv, mode_table[AR0234_MODE_STOP_STREAM]);
-	if (err)
+	// Write table will return -EREMOTEIO if the i2c device is disconnected
+	// This return does not seem well handled by the application so we ignore it here
+	if(err == -EREMOTEIO){
+		dev_dbg(tc_dev->dev, "%s: i2c device disconnected, ignoring stop streaming error\n", __func__);
+		return 0;
+	}
+	
+	if (err){
+		dev_err(tc_dev->dev, "%s: failed to stop streaming %d\n", __func__, err);
 		return err;
+	}
 
 	return 0;
 }
@@ -1392,12 +1367,6 @@ int custom_s_ctrl(struct v4l2_ctrl *ctrl){
 
 			memcpy(tmp,&ctrl->p_new.p_char[i*2],2);
 
-			if(&priv->eeprom_buf[(AR0234_EEPROM_SIZE/2)+i] == NULL){
-				dev_err(&priv->i2c_client->dev,"Exceeding buffer size\r\n");
-				priv->ioctl_updated = false;
-				return err;
-			}
-
 			err = kstrtou8(tmp,16,&tmp_eeprom_buff[i]);
 
 			if (err){
@@ -1432,7 +1401,8 @@ static int subdev_register(struct v4l2_subdev *sd){
 	struct camera_common_data *s_data = to_camera_common_data(&client->dev);
 	struct zedx *priv = (struct zedx *)s_data->priv;
 	struct v4l2_ctrl *ctrl;
-	int err, i, num_ctrls;
+	int err = 0;
+	int i, j, num_ctrls;
 
 	num_ctrls = ARRAY_SIZE(cfg_list);
 	v4l2_ctrl_handler_init(&priv->ctrl_handler, num_ctrls);
@@ -1445,15 +1415,18 @@ static int subdev_register(struct v4l2_subdev *sd){
 				cfg_list[i].name);
 			continue;
 		}
-		if (err)
-			return err;
+		
+		if (priv->ctrl_handler.error) {
+			dev_err(&client->dev, "Failed to init controls: %d\n", priv->ctrl_handler.error);
+			return priv->ctrl_handler.error;
+		}
 
 		if(ctrl->id == ZED_CAMERA_CID_EEPROM_DATA){ // Initialize eeprom ctrl string value
 			char tmp [((AR0234_EEPROM_SIZE/2)*2)+1] = {};
 			int index = 0;
 
-			for (i = 0; i < AR0234_EEPROM_SIZE/2; i++) { // We make only the 2nd 256 bytes accessible
-				index += scnprintf(&tmp[index],sizeof(tmp)-index,"%02x",priv->eeprom_buf[(AR0234_EEPROM_SIZE/2)+i]);
+			for (j = 0; j < AR0234_EEPROM_SIZE/2; j++) { // We make only the 2nd 256 bytes accessible
+				index += scnprintf(&tmp[index],sizeof(tmp)-index,"%02x",priv->eeprom_buf[(AR0234_EEPROM_SIZE/2)+j]);
 			}
 
 			v4l2_ctrl_s_ctrl_string(ctrl,tmp);
@@ -1512,11 +1485,6 @@ static int zedx_eeprom_device_init(struct zedx *priv)
 		return -EINVAL;
 
 	for (i = 0; i < AR0234_EEPROM_NUM_BLOCKS; i++) {
-		
-		if (&priv->eeprom[i]==NULL)
-		{
-			return 0;
-		}
 
 		priv->eeprom[i].adap = i2c_get_adapter(
 				priv->i2c_client->adapter->nr);
@@ -1539,7 +1507,7 @@ static int zedx_eeprom_device_init(struct zedx *priv)
 		if (IS_ERR_OR_NULL(priv->eeprom[i].i2c_client)) {
 			dev_dbg(dev, "%s: Failed to probe EEPROM at addr = 0x%x \n",
 					__func__, priv->eeprom[i].brd.addr);
-			return -ENODEV;
+			return -1;
 		}
 		priv->eeprom[i].regmap = devm_regmap_init_i2c(
 				priv->eeprom[i].i2c_client, &eeprom_regmap_config);
@@ -1570,11 +1538,10 @@ static int zedx_read_eeprom(struct zedx *priv)
 	}
 #ifdef DEBUG
 	for (i = AR0234_EEPROM_BLOCK_SIZE; i < AR0234_EEPROM_BLOCK_SIZE*2; i+=8) {
-		dev_dbg(dev, "%s: %02x(%c) %02x(%c) %02x(%c) %02x(%c) %02x(%c) %02x(%c) %02x(%c) %02x(%c)",__func__,
-			priv->eeprom_buf[i+0], priv->eeprom_buf[i+0]+'0',priv->eeprom_buf[i+1], priv->eeprom_buf[i+1]+'0',priv->eeprom_buf[i+2],priv->eeprom_buf[i+2]+'0',
-			priv->eeprom_buf[i+3], priv->eeprom_buf[i+3]+'0',priv->eeprom_buf[i+4], priv->eeprom_buf[i+4]+'0',priv->eeprom_buf[i+5],priv->eeprom_buf[i+5]+'0',
-			priv->eeprom_buf[i+6], priv->eeprom_buf[i+6]+'0',priv->eeprom_buf[i+7], priv->eeprom_buf[i+7]+'0');
-		dev_dbg(dev, "\n");
+		dev_dbg(dev, "%s: %02x %02x %02x %02x %02x %02x %02x %02x",__func__,
+			priv->eeprom_buf[i+0], priv->eeprom_buf[i+1], priv->eeprom_buf[i+2],
+			priv->eeprom_buf[i+3], priv->eeprom_buf[i+4], priv->eeprom_buf[i+5],
+			priv->eeprom_buf[i+6], priv->eeprom_buf[i+7]);
 	}
 #endif
 	err = zedx_get_eeprom_info(priv);
@@ -1605,14 +1572,13 @@ static int zedx_board_setup(struct zedx *priv)
 	if (verbosity_level>=1)
 		dev_dbg(dev, "%s++\n", __func__);
 
-	dev_info(dev,"Enable gmsl for channel %d and id %d\n", priv->channel,priv->zedx_id);
 	priv->gmsl_port = dser_enable_gmsl_link(priv->channel,priv->zedx_id);
 	if(priv->gmsl_port < 0){
-		dev_err(dev,"Error %d setting gmsl link\n", err);
-		return err;
+		dev_err(dev,"Error %d setting gmsl link\n", priv->gmsl_port);
+		return priv->gmsl_port;
 	}
 
-	msleep(500);
+	msleep(100);
 
 	/* eeprom interface */
 	err = zedx_eeprom_device_init(priv);
@@ -1646,7 +1612,6 @@ static int zedx_board_setup(struct zedx *priv)
 	}
 
 	err = dser_open_all_gmsl_link(priv->channel);
-	dev_dbg(dev, "%s: ALL GMSL OPENED\n", __func__);
 	msleep(100);
 
     return err | !eeprom_ctrl;
@@ -1661,32 +1626,30 @@ static int zedx_probe_ar0234(struct zedx *priv)
 	const char *video_name;
     int err;
 
-	// Check if the camera is already present
-
-	if (priv == NULL)
-	{
-		dev_dbg(dev, "%s: zedx not connected, unloading the driver\n",__func__);
-		return -ENODEV;
-	}
-
 	tc_dev = devm_kzalloc(dev,
 						  sizeof(struct tegracam_device), GFP_KERNEL);
 	if (!tc_dev)
 		return -ENOMEM;
 
 	err = of_property_read_string(node, "devnode", &video_name);
-	if (err)
-		dev_err(dev, "devnode not found\n");
+	if (err){
+		dev_err(dev, "Property devnode is missing from the device tree\n");
+		return err;
+	}
 
 	err = of_property_read_u32(node, "sync_sensor_index",
 							   &priv->sync_sensor_index);
 	if (err)
+	{
 		dev_err(dev, "sync name index not in DT\n");
+		return -EINVAL;
+	}
 
 	tc_dev->client = client;
-
 	tc_dev->dev = dev;
-	strncpy(tc_dev->name, video_name, sizeof(tc_dev->name));
+	if(video_name != NULL){
+		strncpy(tc_dev->name, video_name, sizeof(tc_dev->name));
+	}
 	tc_dev->dev_regmap_config = &sensor_regmap_config;
 	tc_dev->sensor_ops = &zedx_common_ops;
 	tc_dev->v4l2sd_internal_ops = &zedx_subdev_internal_ops;
@@ -1703,12 +1666,12 @@ static int zedx_probe_ar0234(struct zedx *priv)
 	priv->subdev = &tc_dev->s_data->subdev;
 	tegracam_set_privdata(tc_dev, (void *)priv);
 
+	/* might need to stop stream at power up */
 	err = zedx_write_table(priv, mode_table[AR0234_MODE_STOP_STREAM]);
 	if (err)
 	{
-		dev_info(&client->dev, "ZED-X detect error\n");
 		tegracam_device_unregister(tc_dev);
-		return err;
+		return -EINVAL;
 	}
 
 	err = of_property_read_u32(node, "eeprom-addr", &priv->zed_sysfs.eeprom_id_addr);
@@ -1743,7 +1706,6 @@ static int zedx_probe_ar0234(struct zedx *priv)
 		}
 	}
 
-	dev_dbg(dev, "%s: start tegracam_v4l2subdev_register \n", __func__);
 	err = tegracam_v4l2subdev_register(tc_dev, true);
 	if (err)
 	{
@@ -1753,7 +1715,7 @@ static int zedx_probe_ar0234(struct zedx *priv)
 		return err;
 	}
 
-	dev_info(&client->dev, "Detected ZED-X sensor\n");
+	dev_info(&client->dev, "ZED-X sensor initialisation done\n");
 
 	return 0;
 }
@@ -1764,12 +1726,46 @@ static int duplicate_priv_info(struct zedx *priv) {
 	priv->zed_sysfs.sync_sensor_index = priv->sync_sensor_index;
 	priv->zed_sysfs.name = priv->s_data->subdev.name;
 	priv->zed_sysfs.gmsl_port =  priv->gmsl_port;
-
+	priv->zed_sysfs.channel =  priv->channel;
+	priv->zed_sysfs.video_lock =  0;
+	priv->zed_sysfs.zedx_id =  priv->zedx_id;
 	priv->zed_sysfs.acc_addr = priv->acc_addr;
 	priv->zed_sysfs.gyro_addr = priv->gyro_addr;
 
 	return 0;
 }
+
+static int zedx_i2c_read(struct i2c_client *client, u16 reg, u16 *val)
+{
+    struct i2c_msg msgs[2];
+    u8 reg_buf[2];
+    u8 data[2];
+    int ret;
+
+    reg_buf[0] = reg >> 8;
+    reg_buf[1] = reg & 0xff;
+
+    /* Write register address */
+    msgs[0].addr  = client->addr;
+    msgs[0].flags = 0;
+    msgs[0].len   = 2;
+    msgs[0].buf   = reg_buf;
+
+    /* Read 16-bit value */
+    msgs[1].addr  = client->addr;
+    msgs[1].flags = I2C_M_RD;
+    msgs[1].len   = 2;
+    msgs[1].buf   = data;
+
+    ret = i2c_transfer(client->adapter, msgs, 2);
+    if (ret != 2)
+        return ret < 0 ? ret : -EIO;
+
+    /* Most sensors are big-endian on the wire */
+    *val = (data[0] << 8) | data[1];
+
+    return 0;
+};
 
 /**
  * zedx_probe() - Initialize the zedx camera.
@@ -1784,11 +1780,11 @@ static int duplicate_priv_info(struct zedx *priv) {
  * Context: Can sleep.
  * Return: 0 in case of success, and a negative errno otherwise.
  */
-#if defined(NV_I2C_DRIVER_STRUCT_PROBE_WITHOUT_I2C_DEVICE_ID_ARG) /* Linux 6.3 */
-static int zedx_ ar0234_probe(struct i2c_client *client)
-#else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int zedx_probe(struct i2c_client *client,
 		const struct i2c_device_id *id)
+#else
+static int zedx_probe(struct i2c_client *client)
 #endif
 {
 	struct device *dev = &client->dev;
@@ -1796,9 +1792,7 @@ static int zedx_probe(struct i2c_client *client,
 	struct zedx *priv;
 	const char *str = NULL;
 	int err;
-
-	dev_info(dev, "Driver Version : v%s\n",DRV_STR_VERSION);
-	dev_info(dev, "Probing v4l2 sensor.\n");
+	u16 val;
 
 	if (!IS_ENABLED(CONFIG_OF) || !node)
 		return -EINVAL;
@@ -1812,6 +1806,10 @@ static int zedx_probe(struct i2c_client *client,
 	}
 
     priv->i2c_client = client;
+
+	err = zedx_i2c_read(client, AR0234_ID_REG, &val);
+	if(err || val != AR0234_ID_VAL)
+		return -ENODEV;
 
 	err = of_property_read_string(node, "channel", &str);
 	if (err)
@@ -1828,8 +1826,6 @@ static int zedx_probe(struct i2c_client *client,
         return -EINVAL;
     }
 
-	if (verbosity_level>=1)
-		dev_dbg(dev, "%s: channel %d\n", __func__, priv->channel);
 
 	err = of_property_read_string(node, "zedx-id", &str);
 	if (err)
@@ -1840,32 +1836,20 @@ static int zedx_probe(struct i2c_client *client,
 
 	err = kstrtoint(str,10,&priv->zedx_id);
 
-    if (priv->zedx_id < 0)
-    {
-        dev_err(dev, "%s: zedx-id %d is out of range\n", __func__, priv->zedx_id);
-        return -EINVAL;
-    }
+	//If dummy entry, don't continue probe - no verbose
+    if (priv->zedx_id < 0) {
+        return -ENODEV;
+	}
 
-	if (verbosity_level>=1)
-		dev_dbg(dev, "%s: zedx-id is %d\n", __func__, priv->zedx_id);
-
-
-	err = of_property_read_string(node, "mode", &str);
-	if (err)
-    {
-        dev_err(dev, "%s: mode not found in dts\n",__func__);
-        return -EINVAL;
-    }
-
+	dev_info(dev, "Driver Version : v%d.%d.%d\n",ZEDX_DRIVER_VERSION_MAJOR,ZEDX_DRIVER_VERSION_MINOR,ZEDX_DRIVER_VERSION_PATCH);
+	
 	priv->master = false;
 	priv->ioctl_updated = false;
 
 	err = zedx_probe_ar0234(priv);
 	if (err)
-	{
-		dev_warn(dev, "%s: ar0234 initialization failed\n",__func__);
 		return err;
-	}
+	
 
 	dev_info(dev, "%s: Serial Number : %lu",__func__,priv->serial_number);
 
@@ -1873,8 +1857,6 @@ static int zedx_probe(struct i2c_client *client,
 	priv->zed_sysfs.tc_dev = priv->tc_dev;
 
 	priv->zed_sysfs.serial_number = priv->serial_number;
-
-	dev_info(dev, "%s: CHANNEL: %d ID: %d\n",__func__,priv->channel, priv->zedx_id);
 
 	priv->acc_addr = ser_get_acc_addr(priv->zedx_id);
 	if(priv->acc_addr < 0){
@@ -1918,6 +1900,8 @@ static int zedx_probe(struct i2c_client *client,
 	zedx_array[priv->probe_counter] = priv;
 	zedx_probe_count++;
 	
+    dev_info(dev, "%s: success\n", __func__);
+
 	return 0;
 }
 
@@ -1952,6 +1936,13 @@ static void zedx_shutdown(struct i2c_client *client){
 	}
 
 	err = dser_enable_gmsl_link(priv->channel,priv->zedx_id);
+	if(err < 0){
+		dev_info(&priv->i2c_client->dev,"Failed to enable gmsl link %d\r\n",err);
+		err = zedx_eeprom_device_release(priv);
+		return;
+	}
+
+	msleep(100);
 
 	err = regmap_bulk_read(priv->eeprom[1].regmap, 0, &buff, 4);
 	if(err){
@@ -2004,51 +1995,42 @@ static void zedx_shutdown(struct i2c_client *client){
  * Context: Can sleep.
  * Return: 0 in case of success.
  */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int zedx_remove(struct i2c_client *client)
+#else
+static void zedx_remove(struct i2c_client *client)
+#endif
 {
 	struct device *dev = &client->dev;
 	struct camera_common_data *s_data = NULL;
 	struct zedx *priv = NULL;
-
-#if 0
-	// If it is the serializer, we have the deserializer to manage
-	if (dev->driver_data != NULL)
-	{
-
-		priv = (struct zedx *) dev->driver_data;
-		if (priv->master)
-		{
-			//disconnect_Dser(priv->channel, priv->gmsl_port);
-			dev_info(dev, "ZED-X serializer successfully removed\n");
-			dev->driver_data = NULL;
-			return 0;
-		}
-	}
-#endif
-
-	// Else we are removing an actual camera sensor, we need to unbind the
-	// the device from nvidia's stack.
 
 	s_data = to_camera_common_data(&client->dev);
 	priv = (struct zedx *)s_data->priv;
 
 	zedx_shutdown(client);
 
-	kobject_del(&priv->zed_sysfs.info_kobj);
-	tegracam_v4l2subdev_unregister(priv->tc_dev);
+	kobject_put(&priv->zed_sysfs.info_kobj);
+
+	if (priv->tc_dev){
+		tegracam_v4l2subdev_unregister(priv->tc_dev);
+		tegracam_device_unregister(priv->tc_dev);
+	}
+
 	zedx_eeprom_device_release(priv);
-	tegracam_device_unregister(priv->tc_dev);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+	v4l2_ctrl_handler_free(&priv->ctrl_handler);
+#endif
 
 	zedx_probe_count--;
 	if (zedx_probe_count < 0)
-		dev_alert(&client->dev,
-		"%s: You did not keep track of the number "
-		"of module insertion correctly : %d\n",
-		__func__, zedx_probe_count);
+		dev_alert(&client->dev,"%s: zedx_probe_count < 0\n", __func__);
 
 	dev_dbg(dev, " ZED-X sensor successfully removed\n");
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 	return 0;
+#endif
 }
 
 /**

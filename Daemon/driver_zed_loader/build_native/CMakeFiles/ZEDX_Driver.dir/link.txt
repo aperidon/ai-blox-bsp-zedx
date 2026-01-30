@@ -1,0 +1,1 @@
+/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++ -no-pie CMakeFiles/ZEDX_Driver.dir/src/mainDriverLoad.cpp.o CMakeFiles/ZEDX_Driver.dir/src/mainProcessDriverLoad.cpp.o -o ZEDX_Driver  -lpthread 

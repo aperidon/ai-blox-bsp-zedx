@@ -1,6 +1,7 @@
 [Unit]
 Description=ZED-X Daemon service
-After=nvargus-daemon.service
+After=nvargus-daemon.service driver_zed_loader.service 
+Requires=driver_zed_loader.service
 StartLimitIntervalSec=0
 
 [Service]
@@ -8,11 +9,11 @@ Type=simple
 Restart=always
 RestartSec=1
 User=root
-StandardOutput=syslog
+StandardOutput=journal
 ExecStart=/usr/sbin/ZEDX_Daemon
-Port=20026 
-PortSub=20027
-VICBooster=0
+
+# 0 = no sync(Default), 1 = master/slave mode, 2 = slave mode only
+sync_mode=0 
 
 [Install]
 WantedBy=multi-user.target

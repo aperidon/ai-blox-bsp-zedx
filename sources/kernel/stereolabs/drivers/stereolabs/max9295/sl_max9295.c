@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#define DEBUG 0
+// #define DEBUG 1
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/gpio.h>
@@ -37,9 +37,9 @@
 
 extern int fps_set_Dser(int channel, s64 val);
 int set_bitrate_Ser(int channel, u8 val);
-extern bool isSecondCamFromI2C(int channel, int zedx_id);
-extern int getCamPipeIndex(int channel, int zedx_id);
-//static int index_ser = 0;
+extern int isSecondCamFromI2C(int channel, int zedx_id);
+
+static int index_ser = 0;
 static int index_serializer = 0;
 int ser_get_acc_addr(int zedx_id);
 int ser_get_gyro_addr(int zedx_id);
@@ -80,7 +80,7 @@ struct sl_max9295
 	int zedx_id;
 	int channel;
 	int camera_model;
-	struct bmi_device bmi_array[4]; // bmi-array preset in the DT
+	struct bmi_device bmi_array[2]; // bmi-array preset in the DT
 	int acc_addr;
 	int gyro_addr;
 };
@@ -265,7 +265,7 @@ static int ser_write_reg(struct sl_max9295 *priv, u16 addr, u8 val)
 	return err;
 }
 
-static int ser_reset_onepro(struct sl_max9295 *priv)
+static int ser_reset_zedxhdr(struct sl_max9295 *priv)
 {
 	int err;
 	struct i2c_client *client = priv->i2c_client;
@@ -352,13 +352,11 @@ static int ser_write_table(struct sl_max9295 *priv,
 	return 0;
 }
 
-static int translate_imu(struct sl_max9295 *priv, int imu_index){
-	struct device *dev = &priv->i2c_client->dev;
+static int translate_imu(struct sl_max9295 *priv, u8 gyro_base_addr, u8 acc_base_addr){
+	int index = isSecondCamFromI2C(priv->channel, priv->zedx_id);
 	int err = 0;
-	u8 gyro_base_addr = priv->gyro_addr;
-	u8 acc_base_addr = priv->acc_addr;
-	u8 gyro_addr = priv->bmi_array[imu_index].gyro_addr;
-	u8 acc_addr = priv->bmi_array[imu_index].acc_addr;
+	u8 gyro_addr = (index == 0)?priv->bmi_array[0].gyro_addr:priv->bmi_array[1].gyro_addr;
+	u8 acc_addr = (index == 0)?priv->bmi_array[0].acc_addr:priv->bmi_array[1].acc_addr;
 
 	struct index_reg_8 i2c_translate_table[] = {
 		{MAX9295D_ADDRESS_BASE, 0x0042, gyro_addr*2}, // When the ser receive at x58... eeprom i2c map eeporm have two i2c address
@@ -373,10 +371,6 @@ static int translate_imu(struct sl_max9295 *priv, int imu_index){
 	priv->gyro_addr = gyro_addr;
 	priv->acc_addr = acc_addr;
 
-	dev_info(dev,"%s: Associate IMU %d ( 0x%x / 0x%x )",__func__,imu_index,gyro_addr,acc_addr);
-
-	ser_global_priv[index_serializer] = priv;
-
 	return err;
 }
 
@@ -385,9 +379,8 @@ static int probe_serializer(struct sl_max9295 *priv){
 	struct device_node *np = priv->i2c_client->dev.of_node;
 	int err = 0;
 	const char *str;
-	//struct index_reg_8** table = mode_table_A;
-	//bool second_cam = isSecondCamFromI2C(priv->channel, priv->zedx_id);
-	int pipe_index = getCamPipeIndex(priv->channel, priv->zedx_id);
+	struct index_reg_8** table = mode_table_A;
+	int second_cam = isSecondCamFromI2C(priv->channel, priv->zedx_id);
 	int acc_addr = 0;
 	int gyro_addr = 0;
     static int index_serializer = 0;
@@ -398,101 +391,77 @@ static int probe_serializer(struct sl_max9295 *priv){
         return -1;
     }
 
-	// if (index_ser > 0)
-	// {
-	// 	table = mode_table_B;
-	// 	/* < doing configuration this way 
-	// 		implies serializers are correctly declared in device trees i.e serializer 
-	// 		using pipe Z/U should be declared later in file than serializer using pipe
-	// 		X/Y, to prevent this error, we should probably add	a parameter to the 
-	// 		serializer telling which pair of pipe should be used - also solve issues 
-	// 		when having more than 2 serializers (e.g: 8 cameras) if max96712 isnt 
-	// 		affected by this change */
-	// } 
+	if (index_ser > 0)
+	{
+		table = mode_table_B;
+		/* < doing configuration this way 
+			implies serializers are correctly declared in device trees i.e serializer 
+			using pipe Z/U should be declared later in file than serializer using pipe
+			X/Y, to prevent this error, we should probably add	a parameter to the 
+			serializer telling which pair of pipe should be used - also solve issues 
+			when having more than 2 serializers (e.g: 8 cameras) if max96712 isnt 
+			affected by this change */
+	} 
 
 	if (strcmp(str, "zedx") == 0)
 	{
-		static struct index_reg_8 tmp[ZEDX_TAB_SIZE];
-		memcpy(tmp, mode_table[AR0234_9295D_SER], sizeof(tmp));
-		tmp[1].val = ((1<<(pipe_index+1))<<4 | 1<<pipe_index);
-		tmp[2].val = (0x70 | (0xf & ~(1 << pipe_index) ));
-
-		dev_info(dev, "%s: pipe index : %d -> (0x%x , 0x%x) (0x%x , 0x%x)\n",
-				__func__, pipe_index,tmp[1].addr, tmp[1].val,tmp[2].addr, tmp[2].val);
-
-		err = ser_write_table(priv, tmp);
-
+		if( !second_cam){
+			err = ser_write_table(priv, mode_table_A[AR0234_9295D_SER]);
+		}
+		else
+		{
+			err = ser_write_table(priv, mode_table_B[AR0234_9295D_SER]);
+		}
 		gyro_addr = ZED_STEREO_GYRO_BASE_ADDR;
 		acc_addr = ZED_STEREO_ACC_BASE_ADDR;
 		priv->camera_model = ZEDX;
-	}
-	else if (strcmp(str, "zedonegs")==0)
-	{
-		static struct index_reg_8 tmp[ZEDXONEGS_TAB_SIZE];
-		memcpy(tmp, mode_table[AR0234_9295A_SER], sizeof(tmp));
-		tmp[1].val = ((1<<pipe_index)<<4);
-		tmp[2].val = (0x70 | (1 << pipe_index));
-
-		dev_info(dev, "%s: pipe index : %d -> (0x%x , 0x%x) (0x%x , 0x%x)\n",
-				__func__, pipe_index,tmp[1].addr, tmp[1].val,tmp[2].addr, tmp[2].val);
-		
-		err = ser_write_table(priv, tmp);
-			
-		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
-		acc_addr = ZED_MONO_ACC_BASE_ADDR;
-		priv->camera_model = ZEDONEGS;
+		// err = ser_write_table(priv, table[AR0234_9295D_SER]);
 	}
 	else if (strcmp(str, "zedone4k")==0)
 	{
-		static struct index_reg_8 tmp[ZEDXONE4K_TAB_SIZE];
-		memcpy(tmp, mode_table[IMX678_9295A_SER], sizeof(tmp));
-		pipe_index=1;
-		tmp[7].val = (((1<<pipe_index) | 1<<(pipe_index-1))<<4);
-		tmp[8].val = (0x60 | (1<<pipe_index) | 1<<(pipe_index-1));
-
-		dev_info(dev, "%s: pipe index : %d -> (0x%x , 0x%x) (0x%x , 0x%x)\n",
-				__func__, pipe_index,tmp[7].addr, tmp[7].val,tmp[8].addr, tmp[8].val);
-
-		err = ser_write_table(priv, tmp);
+		if( !second_cam)
+			err = ser_write_table(priv, mode_table_A[IMX678_9295A_SER]);
+		else
+			err = ser_write_table(priv, mode_table_B[IMX678_9295A_SER]);
 
 		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
 		acc_addr = ZED_MONO_ACC_BASE_ADDR;
 		priv->camera_model = ZEDONE4K;
 	}
-	else if (strcmp(str, "zedonepro")==0)
+	else if (strcmp(str, "zedonegs")==0)
 	{
-		static struct index_reg_8 tmp[ZEDXONEHDR_TAB_SIZE];
-
-		(void) ser_reset_onepro;
-
-		memcpy(tmp, mode_table[ISX031_9295A_SER], sizeof(tmp));
-		tmp[4].val = ((1<<pipe_index)<<4);
-		tmp[5].val = (0x70 | (1 << pipe_index));
-
-		dev_info(dev, "%s: pipe index : %d -> (0x%x , 0x%x) (0x%x , 0x%x)\n",
-				__func__, pipe_index, tmp[4].addr, tmp[4].val, tmp[5].addr, tmp[5].val);
-		
-		err = ser_write_table(priv, tmp);
+		if( !second_cam)
+			err = ser_write_table(priv, mode_table_A[AR0234_9295A_SER]);
+		else
+			err = ser_write_table(priv, mode_table_B[AR0234_9295A_SER]);
 
 		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
 		acc_addr = ZED_MONO_ACC_BASE_ADDR;
-		priv->camera_model = ZEDONEPRO;
+		priv->camera_model = ZEDONEGS;
+		// err = ser_write_table(priv, table[AR0234_9295A_SER]);
 	}
-	else if (strcmp(str, "zedxpro")==0)
+	else if (strcmp(str, "zedonehdr")==0)
 	{
-		static struct index_reg_8 tmp[ZEDXHDR_TAB_SIZE];
-		memcpy(tmp, mode_table[ISX031_9295D_SER], sizeof(tmp));
-		tmp[5].val = ((1<<(pipe_index+1))<<4 | 1<<pipe_index);
-		tmp[6].val = (0x70 | (0xf & ~(1 << pipe_index) ));
+		(void) ser_reset_zedxhdr;
+		if( !second_cam)
+			err = ser_write_table(priv, mode_table_A[ISX031_9295A_SER]);
+		else
+			err = ser_write_table(priv, mode_table_B[ISX031_9295A_SER]);
 
-		dev_info(dev, "%s: pipe index : %d -> (0x%x , 0x%x) (0x%x , 0x%x)\n",
-				__func__, pipe_index, tmp[5].addr, tmp[5].val, tmp[6].addr, tmp[6].val);
-
-		err = ser_write_table(priv, tmp);
+		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
+		acc_addr = ZED_MONO_ACC_BASE_ADDR;
+		priv->camera_model = ZEDONEHDR;
+	}
+	else if (strcmp(str, "zedxhdr")==0)
+	{
+		if( !second_cam )
+			err = ser_write_table(priv, mode_table_A[ISX031_9295D_SER]);
+		else
+			err = ser_write_table(priv, mode_table_B[ISX031_9295D_SER]);
 
 		gyro_addr = ZED_STEREO_GYRO_BASE_ADDR;
 		acc_addr = ZED_STEREO_ACC_BASE_ADDR;
-		priv->camera_model = ZEDXPRO;
+		priv->camera_model = ZEDXHDR;
 	}
 	else
 	{
@@ -506,14 +475,16 @@ static int probe_serializer(struct sl_max9295 *priv){
 		return err;
 	}
 
+	dev_info(dev, "%s: Serializer pipeline operational",__func__);
+
+	err = translate_imu(priv, gyro_addr,acc_addr);
+
 	if (err){
-		dev_dbg(dev, "%s: serializer initialization failed\n",__func__);
+		dev_err(dev, "%s: IMU addr translation failed\n",__func__);
 		return err;
 	}
 
 	dev->driver_data = priv;
-	priv->gyro_addr = gyro_addr;
-	priv->acc_addr = acc_addr;
 
 	if(index_serializer >= MAX_NB_SER){
 		dev_err(dev, "%s: Index_serializer value out of range\n",__func__);
@@ -538,8 +509,12 @@ static int probe_serializer(struct sl_max9295 *priv){
  * Context: Can sleep.
  * Return: 0 in case of success, and a negative errno otherwise.
  */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int sl_max9295_probe(struct i2c_client *client,
 		const struct i2c_device_id *id)
+#else
+static int sl_max9295_probe(struct i2c_client *client)
+#endif
 {
 	struct device *dev = &client->dev;
 	struct device_node *node = dev->of_node;
@@ -547,12 +522,10 @@ static int sl_max9295_probe(struct i2c_client *client,
 	struct sl_max9295 *priv;
 	const char *str;
 	int n_imu = 0;
-	int imu_index=-1;
 	int i = 0;
 	int err;
+	u8 val;
 
-	dev_info(dev, "Driver Version : v%d.%d.%d\n",MAX9295_DRIVER_VERSION_MAJOR,MAX9295_DRIVER_VERSION_MINOR,MAX9295_DRIVER_VERSION_PATCH);
-	dev_info(dev, "Probing v4l2 sensor.\n");
 
 	if (!IS_ENABLED(CONFIG_OF) || !node)
 		return -EINVAL;
@@ -575,6 +548,14 @@ static int sl_max9295_probe(struct i2c_client *client,
 			"%s: regmap init failed: %ld\n", __func__, PTR_ERR(priv->ser_regmap));
 		return -1;
 	}
+
+	err = ser_read_reg(priv, MAX9295_ID_REG, &val);
+	if(err)
+	{
+		return -ENODEV;
+	}
+
+	dev_info(dev, "Driver Version : v%d.%d.%d\n",MAX9295_DRIVER_VERSION_MAJOR,MAX9295_DRIVER_VERSION_MINOR,MAX9295_DRIVER_VERSION_PATCH);
 
 	err = of_property_read_string(node, "channel", &str);
 	if(err){
@@ -601,15 +582,15 @@ static int sl_max9295_probe(struct i2c_client *client,
 	}
 
 	err = kstrtoint(str, 10, &priv->zedx_id);
-
-	if (err || priv->zedx_id < 0)
+	if (err)
 	{
-		dev_err(dev, "%s: zedx-id %d is out of range\n", __func__, priv->zedx_id);
+		dev_err(dev, "%s: zedx-id is missing\n", __func__);
 		return -EINVAL;
 	}
 
-	if (verbosity_level>=1)
-		dev_dbg(dev, "%s: zedx-id is %d\n", __func__, priv->zedx_id);
+	//If dummy entry, don't continue probe - no verbose
+	if (priv->zedx_id < 0)
+		return -ENODEV;
 
 	n_imu = of_count_phandle_with_args(node, "imu", NULL);
 
@@ -645,29 +626,14 @@ static int sl_max9295_probe(struct i2c_client *client,
 	err = probe_serializer(priv);
 
 	if (err)
-	{
-		dev_err(dev, "%s: serializer initialization failed\n",__func__);
 		return err;
-	}
 
 	if(index_serializer >= MAX_NB_SER){
 		dev_err(dev, "%s: Index_serializer value out of range\n",__func__);
 		return ENOMEM;
 	}
 
-	// dev_info(dev, "%s: Index_serializer %d\n", __func__, index_serializer);
 	ser_global_priv[index_serializer++] = priv;
-
-	for(i=0; i<index_serializer; i++)
-		if(priv->channel == ser_global_priv[i]->channel)
-			imu_index++;
-
-	err = translate_imu(priv, imu_index);
-	if (err)
-	{
-		dev_err(dev, "%s: IMU translation failed !\n",__func__);
-		return err;
-	}
 
 	return 0;
 }
@@ -684,13 +650,19 @@ static int sl_max9295_probe(struct i2c_client *client,
  * Context: Can sleep.
  * Return: 0 in case of success.
  */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int sl_max9295_remove(struct i2c_client *client)
+#else
+static void sl_max9295_remove(struct i2c_client *client)
+#endif
 {
 	struct device *dev = &client->dev;
 
 	dev_info(dev, "ZED-X serializer successfully removed\n");
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 	return 0;
+#endif
 }
 
 /**

@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* #define DEBUG */
+// #define DEBUG 1
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/gpio.h>
@@ -111,7 +111,7 @@ extern int set_bitrate_Ser(int channel, u8 val);
 extern int ser_translate_addr(int zedx_id, unsigned int src_addr, unsigned int dest_addr);
 extern int ser_reset_translate(int zedx_id);
 int dser_get_gmsl_port(int channel, int zedx_id);
-//extern int dser_enable_gmsl_link(int channel,int zedx_id);
+extern int dser_enable_gmsl_link(int channel,int zedx_id);
 extern int dser_open_all_gmsl_link(int channel);
 
 int custom_s_ctrl(struct v4l2_ctrl *ctrl);
@@ -689,7 +689,7 @@ retry_sensor:
 					msleep(4);
 					goto retry_sensor;
 				}
-				return -1;
+				return ret;
 			}
 			else
 			{
@@ -1617,31 +1617,34 @@ static int imx678_start_streaming(struct tegracam_device *tc_dev)
 
 	return 0;
 exit:
-	dev_err(dev, "%s: error starting stream\n", __func__);
+	dev_dbg(dev, "%s: error starting stream\n", __func__);
 	return err;
 }
 
 static int imx678_stop_streaming(struct tegracam_device *tc_dev)
 {
 	struct imx678 *priv = (struct imx678 *)tegracam_get_privdata(tc_dev);
-	struct camera_common_data *s_data = tc_dev->s_data;
-
-	struct device *dev = s_data->dev;
 	int err;
+
+	dev_dbg(tc_dev->dev, "%s\n", __func__);
 
 	mutex_lock(&priv->streaming_lock);
 	err = imx678_write_table(priv, mode_table[IMX678_MODE_STOP_STREAM]);
-	if (err) {
-		mutex_unlock(&priv->streaming_lock);
-		goto exit;
-	} else {
-		mutex_unlock(&priv->streaming_lock);
+	mutex_unlock(&priv->streaming_lock);
+
+	// Write table will return -EREMOTEIO if the i2c device is disconnected
+	// This return does not seem well handled by the application so we ignore it here
+	if(err == -EREMOTEIO){
+		dev_dbg(tc_dev->dev, "%s: i2c device disconnected, ignoring stop streaming error\n", __func__);
+		return 0;
+	}
+	
+	if (err){
+		dev_err(tc_dev->dev, "%s: failed to stop streaming %d\n", __func__, err);
+		return err;
 	}
 
 	return 0;
-exit:
-	dev_err(dev, "%s: error stopping stream\n", __func__);
-	return err;
 }
 
 static struct camera_common_sensor_ops imx678_common_ops = {
@@ -1714,11 +1717,6 @@ static int imx678_eeprom_device_init(struct imx678 *priv)
 		return -EINVAL;
 
 	for (i = 0; i < IMX678_EEPROM_NUM_BLOCKS; i++) {
-		
-		if (&priv->eeprom[i]==NULL)
-		{
-			return 0;
-		}
 
 		priv->eeprom[i].adap = i2c_get_adapter(
 				priv->i2c_client->adapter->nr);
@@ -1741,7 +1739,7 @@ static int imx678_eeprom_device_init(struct imx678 *priv)
 		if (IS_ERR_OR_NULL(priv->eeprom[i].i2c_client)) {
 			dev_dbg(dev, "%s: Failed to probe EEPORM at addr = 0x%x \n",
 					__func__, priv->eeprom[i].brd.addr);
-			return -ENODEV;
+			return -EINVAL;
 		}
 		priv->eeprom[i].regmap = devm_regmap_init_i2c(
 				priv->eeprom[i].i2c_client, &eeprom_regmap_config);
@@ -1777,7 +1775,6 @@ static int imx678_read_eeprom(struct imx678 *priv)
 			priv->eeprom_buf[i+0], priv->eeprom_buf[i+1], priv->eeprom_buf[i+2],
 			priv->eeprom_buf[i+3], priv->eeprom_buf[i+4], priv->eeprom_buf[i+5],
 			priv->eeprom_buf[i+6], priv->eeprom_buf[i+7]);
-		dev_dbg(dev, "\n");
 	}
 #endif
 
@@ -1787,31 +1784,27 @@ static int imx678_read_eeprom(struct imx678 *priv)
 	return 0;
 }
 
-
-
 static int imx678_board_setup(struct imx678 *priv)
 {
 	struct camera_common_data *s_data = priv->s_data;
 	struct device *dev = s_data->dev;
-	//struct device_node *node = dev->of_node;
-	//const char *str;
 	int err = 0;
-	bool eeprom_ctrl = 0;
 
-	priv->zed_sysfs.gmsl_port = dser_get_gmsl_port(priv->channel,priv->zedx_id);
+	priv->zed_sysfs.gmsl_port = dser_enable_gmsl_link(priv->channel,priv->zedx_id);
 	if(priv->zed_sysfs.gmsl_port < 0){
-		dev_err(dev,"Error %d setting gmsl link\n", err);
-		return err;
+		dev_err(dev,"Error %d setting gmsl link\n", priv->zed_sysfs.gmsl_port);
+		return priv->zed_sysfs.gmsl_port;
 	}
 
-	msleep(500);
+	msleep(100);
 
 	/* eeprom interface */
 	err = imx678_eeprom_device_init(priv);
-	if (err && s_data->pdata->has_eeprom)
+	if (err && s_data->pdata->has_eeprom){
 		dev_warn(dev,
 				"Failed to allocate eeprom reg map: %d\n", err);
-	eeprom_ctrl = !err;
+		return err;
+	}
 
 	err = camera_common_mclk_enable(s_data);
 	if (err) {
@@ -1820,34 +1813,18 @@ static int imx678_board_setup(struct imx678 *priv)
 		return err;
 	}
 
-	err = imx678_power_on(s_data);
+	err = imx678_read_eeprom(priv);
 	if (err) {
+		dev_dbg(dev, "Error %d reading eeprom\n", err);
+		imx678_power_off(s_data);
 		camera_common_mclk_disable(s_data);
-		dev_err(dev,
-			"Error %d during power on sensor\n", err);
-		goto error;
+		return err;
 	}
-
-	if (eeprom_ctrl) {
-		err = imx678_read_eeprom(priv);
-		if (err) {
-			dev_dbg(dev, "Error %d reading eeprom\n", err);
-			imx678_power_off(s_data);
-			camera_common_mclk_disable(s_data);
-			return err;
-		}
-	}
-
-
-	imx678_power_off(s_data);
-	camera_common_mclk_disable(s_data);
 	
-	return err | !eeprom_ctrl;
+	err = dser_open_all_gmsl_link(priv->channel);
+	msleep(100);
 
-error:
-	dev_err(dev, "board setup failed\n");
-	imx678_eeprom_device_release(priv);
-	return err;
+    return err;
 }
 
 // static int imx678_board_setup(struct imx678 *priv)
@@ -1896,12 +1873,6 @@ int custom_s_ctrl(struct v4l2_ctrl *ctrl){
 
 			memcpy(tmp,&ctrl->p_new.p_char[i*2],2);
 
-			if(&priv->eeprom_buf[(IMX678_EEPROM_SIZE/2)+i] == NULL){
-				dev_err(&priv->i2c_client->dev,"Exceeding buffer size\r\n");
-				priv->ioctl_updated = false;
-				return err;
-			}
-
 			err = kstrtou8(tmp,16,&tmp_eeprom_buff[i]);
 
 			if (err){
@@ -1936,7 +1907,8 @@ static int subdev_register(struct v4l2_subdev *sd){
 	struct camera_common_data *s_data = to_camera_common_data(&client->dev);
 	struct imx678 *priv = (struct imx678 *)s_data->priv;
 	struct v4l2_ctrl *ctrl;
-	int err, i, num_ctrls;
+	int err = 0;
+	int i, j, num_ctrls;
 
 	num_ctrls = ARRAY_SIZE(cfg_list);
 	v4l2_ctrl_handler_init(&priv->ctrl_handler, num_ctrls);
@@ -1949,15 +1921,18 @@ static int subdev_register(struct v4l2_subdev *sd){
 				cfg_list[i].name);
 			continue;
 		}
-		if (err)
-			return err;
+		
+		if (priv->ctrl_handler.error) {
+			dev_err(&client->dev, "Failed to init controls: %d\n", priv->ctrl_handler.error);
+			return priv->ctrl_handler.error;
+		}
 
 		if(ctrl->id == ZED_CAMERA_CID_EEPROM_DATA){ // Initialize eeprom ctrl string value
 			char tmp [((IMX678_EEPROM_SIZE/2)*2)+1] = {};
 			int index = 0;
 
-			for (i = 0; i < IMX678_EEPROM_SIZE/2; i++) { // We make only the 2nd 256 bytes accessible
-				index += scnprintf(&tmp[index],sizeof(tmp)-index,"%02x",priv->eeprom_buf[(IMX678_EEPROM_SIZE/2)+i]);
+			for (j = 0; j < IMX678_EEPROM_SIZE/2; j++) { // We make only the 2nd 256 bytes accessible
+				index += scnprintf(&tmp[index],sizeof(tmp)-index,"%02x",priv->eeprom_buf[(IMX678_EEPROM_SIZE/2)+j]);
 			}
 
 			v4l2_ctrl_s_ctrl_string(ctrl,tmp);
@@ -2000,11 +1975,42 @@ static int duplicate_priv_info(struct imx678 *priv) {
 	priv->zed_sysfs.name = priv->s_data->subdev.name;
 	priv->zed_sysfs.acc_addr = priv->acc_addr;
 	priv->zed_sysfs.gyro_addr = priv->gyro_addr;
+	priv->zed_sysfs.channel =  priv->channel;
+	priv->zed_sysfs.video_lock =  0;
+	priv->zed_sysfs.zedx_id =  priv->zedx_id;
+
 	return 0;
 }
 
+static int imx678_i2c_read(struct i2c_client *client, u16 reg, u8 *val)
+{
+    struct i2c_msg msgs[2];
+    u8 reg_buf[2];
+    int ret;
+
+    reg_buf[0] = (reg >> 8) & 0xFF;
+    reg_buf[1] = reg & 0xFF;
+	
+    msgs[0].addr = client->addr;
+    msgs[0].flags = 0; /* Write */
+    msgs[0].len = 2;
+    msgs[0].buf = reg_buf;
+
+    msgs[1].addr = client->addr;
+    msgs[1].flags = I2C_M_RD; /* Read */
+    msgs[1].len = 1;
+    msgs[1].buf = val;
+
+    ret = i2c_transfer(client->adapter, msgs, 2);
+    return (ret == 2) ? 0 : -EIO;
+}
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int imx678_probe(struct i2c_client *client,
 			const struct i2c_device_id *id)
+#else
+static int imx678_probe(struct i2c_client *client)
+#endif
 {
 	struct device *dev = &client->dev;
 	struct device_node *node = dev->of_node;
@@ -2014,6 +2020,7 @@ static int imx678_probe(struct i2c_client *client,
 	const char *video_name;
 	const char *str;
 	int err;
+	u8 val;
 
 	if (!IS_ENABLED(CONFIG_OF) || !node)
 		return -EINVAL;
@@ -2027,6 +2034,11 @@ static int imx678_probe(struct i2c_client *client,
 
 	priv->i2c_client = client;
 
+	err = imx678_i2c_read(client, IMX678_ID_REG, &val);
+	if(err || val != IMX678_ID_VAL)
+		return -ENODEV;
+
+	dev_info(dev, "Driver Version : v%d.%d.%d\n",IMX678_DRIVER_VERSION_MAJOR,IMX678_DRIVER_VERSION_MINOR,IMX678_DRIVER_VERSION_PATCH);
 
 	err = of_property_read_string(node, "channel", &str);
 	if (err)
@@ -2050,32 +2062,25 @@ static int imx678_probe(struct i2c_client *client,
 
 	err = kstrtoint(str,10,&priv->zedx_id);
 
+	//If dummy entry, don't continue probe - no verbose
 	if (priv->zedx_id < 0)
-	{
-		dev_err(dev, "%s: zedx-id %d is out of range\n", __func__, priv->zedx_id);
-		return -EINVAL;
-	}
+		return -ENODEV;
+	
 
 	priv->master=false;
 	priv->ioctl_updated = false;
-
-	err = of_property_read_string(node, "mode", &str);
-	if (err)
-	{
-		dev_err(dev, "%s: Mode not found, slave mode defined\n", __func__);
-	}
 
 	tc_dev = devm_kzalloc(dev,
 		sizeof(struct tegracam_device), GFP_KERNEL);
 	if (!tc_dev)
 		return -ENOMEM;
 
-	priv->i2c_client = tc_dev->client = client;
-	tc_dev->dev = dev;
 
 	err = of_property_read_string(node, "devnode", &video_name);
-	if (err)
-		dev_err(dev, "devnode not found\n");
+	if (err){
+		dev_err(dev, "Property devnode is missing from the device tree\n");
+		return err;
+	}
 
 	mux_node = of_get_parent(node);
 
@@ -2085,15 +2090,20 @@ static int imx678_probe(struct i2c_client *client,
 	of_property_read_u32(mux_node, "reg", &priv->i2c_bus);
 
 	dev_dbg(dev, "%s: i2c bus associated to the cam = %d\n", __func__, priv->i2c_bus);
-
-	of_node_put(mux_node);
+	
+	if (mux_node)
+		of_node_put(mux_node);
 
 	err = of_property_read_u32(node, "sync_sensor_index",
 			&priv->sync_sensor_index);
 	if (err)
 		dev_err(dev, "sync name index not in DT\n");
 
-	strncpy(tc_dev->name, video_name, sizeof(tc_dev->name));
+	tc_dev->client = priv->i2c_client;
+	tc_dev->dev = &priv->i2c_client->dev;
+	if(video_name != NULL){
+		strncpy(tc_dev->name, video_name, sizeof(tc_dev->name));
+	}
 
 	tc_dev->dev_regmap_config = &sensor_regmap_config;
 	tc_dev->sensor_ops = &imx678_common_ops;
@@ -2129,7 +2139,6 @@ static int imx678_probe(struct i2c_client *client,
 		mutex_destroy(&priv->streaming_lock);
 		imx678_eeprom_device_release(priv);
 
-		dev_info(dev, "%s: ZED One UHD detection error\n", __func__);
 		return -1;
 	}
 	else if ( err == 1 )
@@ -2211,6 +2220,8 @@ static int imx678_probe(struct i2c_client *client,
 	zed4k_array[priv->probe_counter] = priv;
 	zed4k_probe_count++;
 
+    dev_info(dev, "%s: success\n", __func__);
+
 	return 0;
 }
 
@@ -2289,35 +2300,42 @@ static void imx678_shutdown(struct i2c_client *client){
 }
 
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int imx678_remove(struct i2c_client *client)
+#else
+static void imx678_remove(struct i2c_client *client)
+#endif
 {
 	struct device *dev = &client->dev;
 	struct camera_common_data *s_data = NULL;
-	struct imx678 *priv = NULL; 
+	struct imx678 *priv = NULL;
 
 	s_data = to_camera_common_data(&client->dev);
+	priv = (struct imx678 *)s_data->priv;
 
 	imx678_shutdown(client);
 
-	priv = (struct imx678 *)s_data->priv;
+	kobject_put(&priv->zed_sysfs.info_kobj);
 
-	if (&priv->streaming_lock)
-		mutex_destroy(&priv->streaming_lock);
-
-	kobject_del(&priv->zed_sysfs.info_kobj);
 	if (priv->tc_dev){
 		tegracam_v4l2subdev_unregister(priv->tc_dev);
-		imx678_eeprom_device_release(priv);
 		tegracam_device_unregister(priv->tc_dev);
 	}
 
-	priv = NULL;
+	imx678_eeprom_device_release(priv);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+	v4l2_ctrl_handler_free(&priv->ctrl_handler);
+#endif
 
 	zed4k_probe_count--;
+	if (zed4k_probe_count < 0)
+		dev_alert(&client->dev,"%s: zed4k_probe_count < 0\n", __func__);
 
-	dev_info(dev, " ZEDX-ONE-UHD sensor successfully removed\n");
+	dev_dbg(dev, " ZED-X sensor successfully removed\n");
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 	return 0;
+#endif
 }
 
 static const struct i2c_device_id imx678_id[] = {

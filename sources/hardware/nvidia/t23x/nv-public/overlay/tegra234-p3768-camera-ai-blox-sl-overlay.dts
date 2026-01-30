@@ -7,6 +7,7 @@
 /plugin/;
 
 #include "aiblox-onx16-camera.dtsi"
+#include "Utils/camera-clks.dtsi"
 #include "dt-bindings/clock/tegra234-clock.h"
 #include "dt-bindings/gpio/tegra234-gpio.h"
 #include <dt-bindings/tegra234-p3767-0000-common.h>
@@ -25,7 +26,7 @@
 	overlay-name = "Jetson Camera ZED-X + AI-Blox";
 	jetson-header-name = "Jetson 24pin CSI Connector";
 	compatible = JETSON_COMPATIBLE_P3768;
-
+	
 	
 	fragment-camera-zedx-aiblox@0 {
 		target-path = "/";
@@ -33,293 +34,262 @@
 			bus@0 {
 				/* i2c-1 */
 				i2c@c240000{
-
+					
 					max96724_a@2e {
 						compatible = "stereolabs,sl_max96724";
 						reg = <0x2e>;  /* deserializer i2c_address */
 						channel = "a"; /* deserializer channel: one per deser */
-						sync_mode = "master";
-						n_lanes = "2";
-						camera-serializers = <  
-												&zedxone_gs_ser0 &zedxone_gs_ser1 &zedxone_gs_ser2 &zedxone_gs_ser3
-												&zedxone_pro_ser0 &zedxone_pro_ser1 &zedxone_pro_ser2 &zedxone_pro_ser3 >;
-						pwdn-gpio =
-						<&gpio CAM0_PWDN GPIO_ACTIVE_HIGH>;
-					};		
+						pwdn-gpio =	<&gpio CAM0_PWDN GPIO_ACTIVE_HIGH>;
+						
+						camera-serializers = <
+						/* GMSL 0 */&zedxone_gs_ser0 &zedxone_hdr_ser0
+						/* GMSL 1 */&zedxone_gs_ser1 &zedxone_hdr_ser1
+						/* GMSL 2 */&zedxone_gs_ser2 &zedxone_hdr_ser2
+						/* GMSL 3 */&zedxone_gs_ser3 &zedxone_hdr_ser3 >;
+						
+					};
 					
 					max96724_b@27 {
 						compatible = "stereolabs,sl_max96724";
 						reg = <0x27>;  /* deserializer i2c_address */
 						channel = "b"; /* deserializer channel: one per deser */
-						sync_mode = "master";
-						n_lanes = "2";
-						camera-serializers = < 	
-												&zedxone_gs_ser4 &zedxone_gs_ser5 &zedxone_gs_ser6 &zedxone_gs_ser7
-												&zedxone_pro_ser4 &zedxone_pro_ser5 &zedxone_pro_ser6 &zedxone_pro_ser7 >;
-						pwdn-gpio =
-						<&gpio CAM0_PWDN GPIO_ACTIVE_HIGH>;
+						pwdn-gpio =	<&gpio CAM0_PWDN GPIO_ACTIVE_HIGH>;
+						
+						camera-serializers = <
+						/* GMSL 0 */&zedxone_gs_ser4 &zedxone_hdr_ser4
+						/* GMSL 1 */&zedxone_gs_ser5 &zedxone_hdr_ser5
+						/* GMSL 2 */&zedxone_gs_ser6 &zedxone_hdr_ser6
+						/* GMSL 3 */&zedxone_gs_ser7 &zedxone_hdr_ser7 >;
 					};
 				};
-
+				
 				/* i2c-2 */
 				i2c@3180000{
-
-				/* Channel A */
-
-					/* ZEDX One GS 0 Cam*/
-					zedxone_gs0:zedxone_gs_0@10 {
-						status = "okay";
-						def-addr = <0x10>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
+					
+					/* Channel A */
+					
+					/* ZEDX One GS 0 Cam */
+					zedxone_gs0: zedxone_gs_0@10 {
+						compatible = "stereolabs,zedx";
+						reg = <0x10>;
+						
+						ZED_ORIN_CLKS
+						
 						zedx-id = "4";
-						channel = "a";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
+						channel = "a"; /* deserializer channel */
+						
 						has-eeprom;
-					};
-
-					/* ZEDX One GS 1 Cam*/
-					zedxone_gs1:zedxone_gs_1@11 {
-						status = "okay";
-						def-addr = <0x11>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						zedx-id = "5";
-						channel = "a";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
-						has-eeprom;
-					};
-
-					/* ZEDX One GS 2 Cam*/
-					zedxone_gs2:zedxone_gs_2@12 {
-						status = "okay";
-						def-addr = <0x12>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						zedx-id = "6";
-						channel = "a";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
-						has-eeprom;
-					};
-
-					/* ZEDX One GS 3 Cam*/
-					zedxone_gs3:zedxone_gs_3@13 {
-						status = "okay";
-						def-addr = <0x13>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						zedx-id = "7";
-						channel = "a";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
-						has-eeprom;
-					};
-
-		
-					/* ZEDX One pro Cam 0 */
-					zedxone_pro0: zedxone_pro_0@3c {
-						status = "okay";
-						def-addr = <0x3c>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						channel = "a";  /* deserializer channel */
-						zedx-id = "16";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
-						eeprom-addr = <0x52>;
-						has-eeprom;
-					};
-
-					/* ZEDX One pro Cam 1 */
-					zedxone_pro1: zedxone_pro_1@3d {
-						status = "okay";
-						def-addr = <0x3d>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						channel = "a";  /* deserializer channel */
-						zedx-id = "17";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
-						eeprom-addr = <0x52>;
-						has-eeprom;
-					};
-
-					/* ZEDX One pro Cam 2 */
-					zedxone_pro2: zedxone_pro_2@3e {
-						status = "okay";
-						def-addr = <0x3e>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						channel = "a";  /* deserializer channel */
-						zedx-id = "18";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
-						eeprom-addr = <0x52>;
-						has-eeprom;
-					};
-
-					/* ZEDX One pro Cam 3 */
-					zedxone_pro3: zedxone_pro_3@3f {
-						status = "okay";
-						def-addr = <0x3f>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						channel = "a";  /* deserializer channel */
-						zedx-id = "19";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
-						eeprom-addr = <0x52>;
-						has-eeprom;
+						eeprom-addr=<0x56>;
 					};
 					
-
+					/* ZEDX One GS 1 Cam */
+					zedxone_gs1: zedxone_gs_1@11 {
+						compatible = "stereolabs,zedx";
+						reg = <0x11>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "5";
+						channel = "a"; /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr=<0x56>;
+					};
+					
+					/* ZEDX One GS 2 Cam */
+					zedxone_gs2: zedxone_gs_2@12 {
+						compatible = "stereolabs,zedx";
+						reg = <0x12>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "6";
+						channel = "a";   /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr=<0x56>;
+					};
+					
+					/* ZEDX One GS 3 Cam */
+					zedxone_gs3: zedxone_gs_3@13 {
+						compatible = "stereolabs,zedx";
+						reg = <0x13>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "7";
+						channel = "a";   /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr=<0x56>;
+					};
+					
+					/* ZEDX One pro Cam 0 */
+					zedxone_hdr0: zedxone_hdr_0@3c {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x3c>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "14";
+						channel = "a";  /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr = <0x52>;
+					};
+					
+					/* ZEDX One pro Cam 1 */
+					zedxone_hdr1: zedxone_hdr_1@3d {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x3d>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "15";
+						channel = "a";  /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr = <0x52>;
+					};
+					
+					/* ZEDX One pro Cam 2 */
+					zedxone_hdr2: zedxone_hdr_2@3e {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x3e>;
+						
+						ZED_ORIN_CLKS
+						
+						channel = "a";  /* deserializer channel */
+						zedx-id = "16";
+						
+						has-eeprom;
+						eeprom-addr = <0x52>;
+					};
+					
+					/* ZEDX One pro Cam 3 */
+					zedxone_hdr3: zedxone_hdr_3@3f {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x3f>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "17";
+						channel = "a";  /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr = <0x52>;
+					};
+					
+					
 					/* Serializers */
-
-
-					zedxone_gs_ser0:zedxone_gs_ser_0@20 {
+					
+					
+					zedxone_gs_ser0: zedxone_gs_ser_0@20 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x20>;
-						channel = "a";
-						camera_model = "zedonegs";
-						mode = "master";
+						
 						zedx-id = "4";
+						channel = "a";
+						mode = "master";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs0>;
-						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
+						imu = <&bmi088_a &bmi088_b>;
 					};
-
-					zedxone_gs_ser1:zedxone_gs_ser_1@21 {
+					
+					zedxone_gs_ser1: zedxone_gs_ser_1@21 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x21>;
-						channel = "a";
-						camera_model = "zedonegs";
-						mode = "master";
+						
 						zedx-id = "5";
+						channel = "a";
+						mode = "master";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs1>;
-						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
+						imu = <&bmi088_a &bmi088_b>;
 					};
-
-					zedxone_gs_ser2:zedxone_gs_ser_2@22 {
+					
+					zedxone_gs_ser2: zedxone_gs_ser_2@22 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x22>;
-						channel = "a";
-						camera_model = "zedonegs";
-						mode = "master";
+						
 						zedx-id = "6";
+						channel = "a";
+						mode = "master";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs2>;
 						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
 					};
-
-					zedxone_gs_ser3:zedxone_gs_ser_3@23 {
+					
+					zedxone_gs_ser3: zedxone_gs_ser_3@23 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x23>;
-						channel = "a";
-						camera_model = "zedonegs";
-						mode = "master";
+						
 						zedx-id = "7";
+						channel = "a";
+						mode = "master";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs3>;
 						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
 					};
-
-
-					zedxone_pro_ser0: zedxone_pro_ser_0@4c {
+					
+					
+					zedxone_hdr_ser0: zedxone_hdr_ser_0@4c {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4c>;
+						
+						zedx-id = "14";
 						channel = "a";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "16";
-						camera-sensors = <&zedxone_pro0>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr0>;
 						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
-
 					};
-
-					zedxone_pro_ser1: zedxone_pro_ser_1@4d {
+					
+					zedxone_hdr_ser1: zedxone_hdr_ser_1@4d {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4d>;
+						
+						zedx-id = "15";
 						channel = "a";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "17";
-						camera-sensors = <&zedxone_pro1>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr1>;
 						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
-
+						
 					};
-
-					zedxone_pro_ser2: zedxone_pro_ser_2@4e {
+					
+					zedxone_hdr_ser2: zedxone_hdr_ser_2@4e {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4e>;
+						
+						zedx-id = "16";
 						channel = "a";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "18";
-						camera-sensors = <&zedxone_pro2>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr2>;
 						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
-
 					};
-
-					zedxone_pro_ser3: zedxone_pro_ser_3@4f {
+					
+					zedxone_hdr_ser3: zedxone_hdr_ser_3@4f {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4f>;
+						
+						zedx-id = "17";
 						channel = "a";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "19";
-						camera-sensors = <&zedxone_pro3>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr3>;
 						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
-
 					};
-
+					
 					/* IMU A*/
 					bmi088_a: bmi088_a_@60 {
 						//compatible = "bmi,bmi088";
@@ -328,7 +298,7 @@
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
 						gyro_matrix        = [01 00 00 00 01 00 00 00 01];
 					};
-
+					
 					/* IMU B*/
 					bmi088_b: bmi088_b_@61 {
 						//compatible = "bmi,bmi088";
@@ -337,7 +307,7 @@
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
 						gyro_matrix        = [01 00 00 00 01 00 00 00 01];
 					};
-
+					
 					/* IMU C*/
 					bmi088_c: bmi088_c_@62 {
 						//compatible = "bmi,bmi088";
@@ -346,7 +316,7 @@
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
 						gyro_matrix        = [01 00 00 00 01 00 00 00 01];
 					};
-
+					
 					/* IMU D*/
 					bmi088_d: bmi088_d_@63 {
 						//compatible = "bmi,bmi088";
@@ -355,263 +325,229 @@
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
 						gyro_matrix        = [01 00 00 00 01 00 00 00 01];
 					};
-
-				/* Channel B */
-
-					/* ZEDX One GS 4 Cam*/
-					zedxone_gs4:zedxone_gs_4@30 {
-						status = "okay";
-						def-addr = <0x30>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
+					
+					/* Channel B */
+					
+					/* ZEDX One GS 4 Cam */
+					zedxone_gs4: zedxone_gs_4@30 {
+						compatible = "stereolabs,zedx";
+						reg = <0x30>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "22";
+						channel = "b";   /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr=<0x56>;
+					};
+					
+					/* ZEDX One GS 5 Cam */
+					zedxone_gs5: zedxone_gs_5@31 {
+						compatible = "stereolabs,zedx";
+						reg = <0x31>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "23";
+						channel = "b";   /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr=<0x56>;
+					};
+					
+					/* ZEDX One GS 6 Cam */
+					zedxone_gs6: zedxone_gs_6@32 {
+						compatible = "stereolabs,zedx";
+						reg = <0x32>;
+						
+						ZED_ORIN_CLKS
+						
 						zedx-id = "24";
 						channel = "b";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
+						
 						has-eeprom;
+						eeprom-addr=<0x56>;
 					};
-
-					/* ZEDX One GS 5 Cam*/
-					zedxone_gs5:zedxone_gs_5@31 {
-						status = "okay";
-						def-addr = <0x31>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
+					
+					/* ZEDX One GS 3 Cam */
+					zedxone_gs7: zedxone_gs_7@33 {
+						compatible = "stereolabs,zedx";
+						reg = <0x33>;
+						
+						ZED_ORIN_CLKS
+						
 						zedx-id = "25";
 						channel = "b";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
+						
 						has-eeprom;
+						eeprom-addr=<0x56>;
 					};
-
-					/* ZEDX One GS 6 Cam*/
-					zedxone_gs6:zedxone_gs_6@32 {
-						status = "okay";
-						def-addr = <0x32>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						zedx-id = "26";
-						channel = "b";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
-						has-eeprom;
-					};
-
-					/* ZEDX One GS 7 Cam*/
-					zedxone_gs7:zedxone_gs_7@33 {
-						status = "okay";
-						def-addr = <0x33>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						zedx-id = "27";
-						channel = "b";   /* deserializer channel */
-						mode = "slave"; /* the master role is to initialize */
-						/* all the serializers connected to the same */
-						/* deserializer. -> one per ZEDX*/
-						/* This master initializes the serializers */
-						/* of ZEDX 0 and ZEDX 1. */
-						eeprom-addr = <0x56>;
-						has-eeprom;
-					};
-
-
+					
 					/* ZEDX One pro Cam 4 */
-					zedxone_pro4: zedxone_pro_4@5c {
-						status = "okay";
-						def-addr = <0x5c>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
+					zedxone_hdr4: zedxone_hdr_4@5c {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x5c>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "32";
 						channel = "b";  /* deserializer channel */
-						zedx-id = "36";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
-						eeprom-addr = <0x52>;
-						has-eeprom;
-					};
-
-					/* ZEDX One pro Cam 5 */
-					zedxone_pro5: zedxone_pro_5@5d {
-						status = "okay";
-						def-addr = <0x5d>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						channel = "b";  /* deserializer channel */
-						zedx-id = "37";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
-						eeprom-addr = <0x52>;
-						has-eeprom;
-					};
-
-					/* ZEDX One pro Cam 6 */
-					zedxone_pro6: zedxone_pro_6@5e {
-						status = "okay";
-						def-addr = <0x5e>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						channel = "b";  /* deserializer channel */
-						zedx-id = "38";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
-						eeprom-addr = <0x52>;
-						has-eeprom;
-					};
-
-					/* ZEDX One pro Cam 7 */
-					zedxone_pro7: zedxone_pro_7@5f {
-						status = "okay";
-						def-addr = <0x5f>;
-						/* Define any required hw resources needed by driver */
-						/* ie. clocks, io pins, power sources */
-						clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>,
-						<&bpmp TEGRA234_CLK_EXTPERIPH1>;
-						clock-names = "extperiph1", "pllp_grtba";
-						mclk = "extperiph1";
-						channel = "b";  /* deserializer channel */
-						zedx-id = "39";
-						mode = "slave"; /* the serializer of the ZED is already */
-						/* initialized */
+						
 						eeprom-addr = <0x52>;
 						has-eeprom;
 					};
 					
-
+					/* ZEDX One pro Cam 5 */
+					zedxone_hdr5: zedxone_hdr_5@5d {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x5d>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "33";
+						channel = "b";  /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr = <0x52>;
+					};
+					
+					/* ZEDX One pro Cam 6 */
+					zedxone_hdr6: zedxone_hdr_6@5e {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x5e>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "34";
+						channel = "b";  /* deserializer channel */
+						
+						eeprom-addr = <0x52>;
+						has-eeprom;
+					};
+					
+					/* ZEDX One pro Cam 7 */
+					zedxone_hdr7: zedxone_hdr_7@5f {
+						compatible = "stereolabs,zedxhdr";
+						reg = <0x5f>;
+						
+						ZED_ORIN_CLKS
+						
+						zedx-id = "35";
+						channel = "b";  /* deserializer channel */
+						
+						has-eeprom;
+						eeprom-addr = <0x52>;
+					};
+					
 					/* Serializers */
-
-					zedxone_gs_ser4:zedxone_gs_ser_4@40 {
+					
+					zedxone_gs_ser4: zedxone_gs_ser_4@40 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x40>;
+						
+						zedx-id = "22";
 						channel = "b";
-						camera_model = "zedonegs";
 						mode = "master";
-						zedx-id = "24";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs4>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
 					};
-
-					zedxone_gs_ser5:zedxone_gs_ser_5@41 {
+					
+					zedxone_gs_ser5: zedxone_gs_ser_5@41 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x41>;
+						
+						zedx-id = "23";
 						channel = "b";
-						camera_model = "zedonegs";
 						mode = "master";
-						zedx-id = "25";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs5>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
 					};
-
-					zedxone_gs_ser6:zedxone_gs_ser_6@42 {
+					
+					zedxone_gs_ser6: zedxone_gs_ser_6@42  {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x42>;
+						
+						zedx-id = "24";
 						channel = "b";
-						camera_model = "zedonegs";
 						mode = "master";
-						zedx-id = "26";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs6>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
 					};
-
-					zedxone_gs_ser7:zedxone_gs_ser_7@43 {
+					
+					zedxone_gs_ser7: zedxone_gs_ser_7@43 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x43>;
+						
+						zedx-id = "25";
 						channel = "b";
-						camera_model = "zedonegs";
 						mode = "master";
-						zedx-id = "27";
+						
+						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs7>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
 					};
-
-
-					zedxone_pro_ser4: zedxone_pro_ser_4@6c {
+					
+					
+					zedxone_hdr_ser4: zedxone_hdr_ser_4@6c {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6c>;
+						
+						zedx-id = "32";
 						channel = "b";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "36";
-						camera-sensors = <&zedxone_pro4>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr4>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
-
 					};
-
-					zedxone_pro_ser5: zedxone_pro_ser_5@6d {
+					
+					zedxone_hdr_ser5: zedxone_hdr_ser_5@6d {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6d>;
+						
+						zedx-id = "33";
 						channel = "b";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "37";
-						camera-sensors = <&zedxone_pro5>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr5>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
-
 					};
-
-					zedxone_pro_ser6: zedxone_pro_ser_6@6e {
+					
+					zedxone_hdr_ser6: zedxone_hdr_ser_6@6e {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6e>;
+						
+						zedx-id = "34";
 						channel = "b";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "38";
-						camera-sensors = <&zedxone_pro6>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr6>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
-
 					};
-
-					zedxone_pro_ser7: zedxone_pro_ser_7@6f {
+					
+					zedxone_hdr_ser7: zedxone_hdr_ser_7@6f {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6f>;
+						
+						zedx-id = "35";
 						channel = "b";
-						camera_model = "zedonepro";
 						mode = "master";
-						zedx-id = "39";
-						camera-sensors = <&zedxone_pro7>;
+						
+						camera_model = "zedonehdr";
+						camera-sensors = <&zedxone_hdr7>;
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
-
 					};
-
-
+					
+					
 					/* IMU A*/
 					bmi088_e: bmi088_e_@64 {
 						//compatible = "bmi,bmi088";
@@ -620,7 +556,7 @@
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
 						gyro_matrix        = [01 00 00 00 01 00 00 00 01];
 					};
-
+					
 					/* IMU B*/
 					bmi088_f: bmi088_f_@65 {
 						//compatible = "bmi,bmi088";
@@ -629,7 +565,7 @@
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
 						gyro_matrix        = [01 00 00 00 01 00 00 00 01];
 					};
-
+					
 					/* IMU C*/
 					bmi088_g: bmi088_g_@66 {
 						//compatible = "bmi,bmi088";
@@ -638,7 +574,7 @@
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
 						gyro_matrix        = [01 00 00 00 01 00 00 00 01];
 					};
-
+					
 					/* IMU D*/
 					bmi088_h: bmi088_h_@67 {
 						//compatible = "bmi,bmi088";

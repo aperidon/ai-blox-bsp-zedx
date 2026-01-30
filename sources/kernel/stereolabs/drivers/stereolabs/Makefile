@@ -14,7 +14,10 @@ obj-$(CONFIG_SL_VIDEO_ZEDX) += zedx/
 # The driver of the ZED-X camera.
 obj-$(CONFIG_SL_VIDEO_ZEDONE4K) += zedone4k/
 
-obj-$(CONFIG_SL_VIDEO_ZEDXPRO) += zedxpro/
+obj-$(CONFIG_SL_VIDEO_ZEDXHDR) += zedxhdr/
+
+# The driver of the BMI088 IMU.
+obj-$(CONFIG_SL_IMU_BMI088) += bmi088/
 
 # Just if necessary
 # ccflags-y += -I$(src)/../../include

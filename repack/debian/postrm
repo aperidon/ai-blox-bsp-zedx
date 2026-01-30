@@ -35,9 +35,33 @@ if [[ -f "$DAEMON_FILE" ]]; then
     sudo systemctl disable zed_x_daemon
     sudo rm $DAEMON_FILE
 fi
+DRIVER_FILE=/etc/systemd/system/driver_zed_loader.service
+if [[ -f "$DRIVER_FILE" ]]; then
+    sudo systemctl stop driver_zed_loader
+    sudo systemctl disable driver_zed_loader
+    sudo rm $DRIVER_FILE
+fi
+DRIVER_FILE=/etc/systemd/system/IMU_Daemon.service
+if [[ -f "$DRIVER_FILE" ]]; then
+    sudo systemctl stop IMU_Daemon
+    sudo systemctl disable IMU_Daemon
+    sudo rm $DRIVER_FILE
+fi
 
 if [ -f "/usr/lib/aarch64-linux-gnu/tegra/libnvisppg.so.sl-backup" ]; then
 	mv /usr/lib/aarch64-linux-gnu/tegra/libnvisppg.so.sl-backup /usr/lib/aarch64-linux-gnu/tegra/libnvisppg.so
+fi
+
+MODULES_BASE="/lib/modules/$(uname -r)/updates"
+CAPTURE_IVC_PATH="$MODULES_BASE/drivers/platform/tegra/rtcpu/capture-ivc.ko"
+NVHOST_VI5_PATH="$MODULES_BASE/drivers/video/tegra/host/vi/nvhost-vi5.ko"
+
+if [ -f "${CAPTURE_IVC_PATH}.sl-backup" ]; then
+	mv "${CAPTURE_IVC_PATH}.sl-backup" "$CAPTURE_IVC_PATH"
+fi
+
+if [ -f "${NVHOST_VI5_PATH}.sl-backup" ]; then
+	mv "${NVHOST_VI5_PATH}.sl-backup" "$NVHOST_VI5_PATH"
 fi
 
 popd &> /dev/null

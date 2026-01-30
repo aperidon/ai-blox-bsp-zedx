@@ -1,0 +1,179 @@
+#define STR(x) #x
+#define XSTR(x) STR(x)
+
+#define ISX031_MODES(VC_ID, OPT_CSI_SERIAL, LANE_POLARITY) \
+    /* Physical dimensions of sensor */ \
+    physical_w = "15.0"; \
+    physical_h = "12.5"; \
+    /* Defines number of frames to be dropped by driver internally after applying */ \
+    /* sensor crop settings. Some sensors send corrupt frames after applying */ \
+    /* crop co-ordinates */ \
+    post_crop_frame_drop = "0"; \
+    /* Convert Gain to unit of dB (decibel) befor passing to kernel driver */ \
+    use_decibel_gain = "true"; \
+    /* enable CID_SENSOR_MODE_ID for sensor modes selection */ \
+    use_sensor_mode_id = "false"; \
+    mode0 { \
+        mclk_khz = "24000"; \
+        num_lanes = XSTR(NUM_LANES); \
+        tegra_sinterface = OPT_CSI_SERIAL; \
+        lane_polarity = LANE_POLARITY; \
+        vc_id = VC_ID; \
+        phy_mode = "DPHY"; \
+        discontinuous_clk = "no"; \
+        dpcm_enable = "false"; \
+        cil_settletime = "0"; \
+        dynamic_pixel_bit_depth = "16"; \
+        csi_pixel_bit_depth = "16"; \
+        mode_type = "yuv"; \
+        pixel_phase = "yuyv"; \
+        active_w = "1920"; \
+        active_h = "1536"; \
+        readout_orientation = "0"; \
+        line_length = "2200"; \
+        inherent_gain = "1"; \
+        mclk_multiplier = "3.09"; \
+        pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */ \
+        serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */ \
+        gain_factor = "10"; \
+        min_gain_val = "10"; /* dB */ \
+        max_gain_val = "300"; /* dB */ \
+        step_gain_val = "3"; /* 0.3 */ \
+        default_gain = "10"; \
+        min_hdr_ratio = "1"; \
+        max_hdr_ratio = "1"; \
+        framerate_factor = "1000000"; \
+        min_framerate = "15000000"; \
+        max_framerate = "30000000"; \
+        step_framerate = "1"; \
+        default_framerate = "30000000"; \
+        exposure_factor = "1000000"; \
+        min_exp_time = "59"; /*us, 2 lines*/ \
+        max_exp_time = "16657"; \
+        step_exp_time = "1"; \
+        default_exp_time = "16657";/* us */ \
+        embedded_metadata_height = "0"; \
+    }; \
+    mode1 { \
+        mclk_khz = "24000"; \
+        num_lanes = XSTR(NUM_LANES); \
+        tegra_sinterface = OPT_CSI_SERIAL; \
+        lane_polarity = LANE_POLARITY; \
+        vc_id = VC_ID; \
+        phy_mode = "DPHY"; \
+        discontinuous_clk = "no"; \
+        dpcm_enable = "false"; \
+        cil_settletime = "0"; \
+        dynamic_pixel_bit_depth = "16"; \
+        csi_pixel_bit_depth = "16"; \
+        mode_type = "yuv"; \
+        pixel_phase = "yuyv"; \
+        active_w = "1920"; \
+        active_h = "1080"; \
+        readout_orientation = "0"; \
+        line_length = "2200"; \
+        inherent_gain = "1"; \
+        mclk_multiplier = "3.09"; \
+        pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */ \
+        serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */ \
+        gain_factor = "10"; \
+        min_gain_val = "10"; /* dB */ \
+        max_gain_val = "300"; /* dB */ \
+        step_gain_val = "3"; /* 0.3 */ \
+        default_gain = "10"; \
+        min_hdr_ratio = "1"; \
+        max_hdr_ratio = "1"; \
+        framerate_factor = "1000000"; \
+        min_framerate = "15000000"; \
+        max_framerate = "30000000"; \
+        step_framerate = "1"; \
+        default_framerate = "15000000"; \
+        exposure_factor = "1000000"; \
+        min_exp_time = "59"; /*us, 2 lines*/ \
+        max_exp_time = "16657"; \
+        step_exp_time = "1"; \
+        default_exp_time = "16657";/* us */ \
+        embedded_metadata_height = "0"; \
+    }; \
+    mode2 { \
+        mclk_khz = "24000"; \
+        num_lanes = XSTR(NUM_LANES); \
+        tegra_sinterface = OPT_CSI_SERIAL; \
+        lane_polarity = LANE_POLARITY; \
+        vc_id = VC_ID; \
+        phy_mode = "DPHY"; \
+        discontinuous_clk = "no"; \
+        dpcm_enable = "false"; \
+        cil_settletime = "0"; \
+        dynamic_pixel_bit_depth = "16"; \
+        csi_pixel_bit_depth = "16"; \
+        mode_type = "yuv"; \
+        pixel_phase = "yuyv"; \
+        active_w = "960"; \
+        active_h = "600"; \
+        readout_orientation = "0"; \
+        line_length = "1100"; \
+        inherent_gain = "1"; \
+        mclk_multiplier = "3.09"; \
+        pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */ \
+        serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */ \
+        gain_factor = "10"; \
+        min_gain_val = "10"; /* dB */ \
+        max_gain_val = "300"; /* dB */ \
+        step_gain_val = "3"; /* 0.3 */ \
+        default_gain = "10"; \
+        min_hdr_ratio = "1"; \
+        max_hdr_ratio = "1"; \
+        framerate_factor = "1000000"; \
+        min_framerate = "15000000"; \
+        max_framerate = "30000000"; \
+        step_framerate = "1"; \
+        default_framerate = "30000000"; \
+        exposure_factor = "1000000"; \
+        min_exp_time = "59"; /*us, 2 lines*/ \
+        max_exp_time = "16657"; \
+        step_exp_time = "1"; \
+        default_exp_time = "16657";/* us */ \
+        embedded_metadata_height = "0"; \
+    }; \
+    mode3 { \
+        mclk_khz = "24000"; \
+        num_lanes = XSTR(NUM_LANES); \
+        tegra_sinterface = OPT_CSI_SERIAL; \
+        lane_polarity = LANE_POLARITY; \
+        vc_id = VC_ID; \
+        phy_mode = "DPHY"; \
+        discontinuous_clk = "no"; \
+        dpcm_enable = "false"; \
+        cil_settletime = "0"; \
+        dynamic_pixel_bit_depth = "16"; \
+        csi_pixel_bit_depth = "16"; \
+        mode_type = "yuv"; \
+        pixel_phase = "yuyv"; \
+        active_w = "1280"; \
+        active_h = "720"; \
+        readout_orientation = "0"; \
+        line_length = "1467"; \
+        inherent_gain = "1"; \
+        mclk_multiplier = "3.09"; \
+        pix_clk_hz = "180000000";/* legacy: 120 Mhz. can go up to 187 Mhz before crash */ \
+        serdes_pix_clk_hz = "186000000";/* can go up to 187 Mhz before crash */ \
+        gain_factor = "10"; \
+        min_gain_val = "10"; /* dB */ \
+        max_gain_val = "300"; /* dB */ \
+        step_gain_val = "3"; /* 0.3 */ \
+        default_gain = "10"; \
+        min_hdr_ratio = "1"; \
+        max_hdr_ratio = "1"; \
+        framerate_factor = "1000000"; \
+        min_framerate = "15000000"; \
+        max_framerate = "30000000"; \
+        step_framerate = "1"; \
+        default_framerate = "30000000"; \
+        exposure_factor = "1000000"; \
+        min_exp_time = "59"; /*us, 2 lines*/ \
+        max_exp_time = "16657"; \
+        step_exp_time = "1"; \
+        default_exp_time = "16657";/* us */ \
+        embedded_metadata_height = "0"; \
+    }; \

@@ -17,11 +17,11 @@ Changes:
    * Bump to L4T 36.4.0
    * ZED X multi-carrier board support
 Checksums-Sha1:
- 52539bb33a146dae756def267f6bc0b4228f351f 6100 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.buildinfo
- 4525f27aacc6e316c64f4d0e3936f503a8c17155 12397252 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.deb
+ 15e52e9d7525bc3894d126e83002f0b293bc77d3 6100 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.buildinfo
+ 71f56caef193e876a52e581861a394ae7d9c794c 12396866 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.deb
 Checksums-Sha256:
- 1b0db5246e57dac2cbf457918f12583d324aa4b22f404f583589a722d43e2997 6100 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.buildinfo
- d001541e35fb8b8851e1b4f541fa682736e8b296189985227e04926db170f0a3 12397252 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.deb
+ 048c9440e5c900bacc6d5095acb5b6d69569e1d3ef7d851310634067434af253 6100 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.buildinfo
+ 37da43986cfdfb9f7d1d28d2768e05b7345736270c864e2b9253b28a7bce94c4 12396866 stereolabs-zedx_1.3.0-L4T36.4.0_arm64.deb
 Files:
- 90dbed1c37b54f07bf3c86b35301098a 6100 kernel standard stereolabs-zedx_1.3.0-L4T36.4.0_arm64.buildinfo
- 7137c6c082b67a61806f1f4731e5df4e 12397252 kernel standard stereolabs-zedx_1.3.0-L4T36.4.0_arm64.deb
+ 0dfc1c06fb0a58617d8d042d61a7753f 6100 kernel standard stereolabs-zedx_1.3.0-L4T36.4.0_arm64.buildinfo
+ 2f3d1d81d8b711753d0332950328b0c8 12396866 kernel standard stereolabs-zedx_1.3.0-L4T36.4.0_arm64.deb
