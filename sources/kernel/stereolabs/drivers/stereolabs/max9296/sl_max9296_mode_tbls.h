@@ -20,7 +20,7 @@
 
 /// Driver Version ///
 #define DESER_DRIVER_VERSION_MAJOR 1
-#define DESER_DRIVER_VERSION_MINOR 3
+#define DESER_DRIVER_VERSION_MINOR 4
 #define DESER_DRIVER_VERSION_PATCH 0
 
 
@@ -44,27 +44,36 @@ struct i2c_fingerprint
 
 #define GMSL_LINKS_EN_REG 0x0006
 #define GMSL_LINK_CTRL_REG 0x0010
+#define GMSL_LINK_RATE_CTRL 0x0001
 #define GMSL_PIPES_01_REG 0x00F0
 #define GMSL_PIPES_23_REG 0x00F1
 #define GMSL_LINKS_CC_REG 0x0003
 #define GMSL_CC_X_OVR_REG 0x0007
 
-#define GMSL_VID_ST_MAP 0x044d
-#define GMSL_12BIT_MODE   0x2C
-#define GMSL_10BIT_MODE   0x2B
+#define GMSL_VID_ST_MAP 	0x044d
+#define GMSL_12BIT_MODE   	0x2C
+#define GMSL_10BIT_MODE   	0x2B
+#define MAX9296_GMSL_6GBPS_MODE	0x02
+#define MAX9296_GMSL_3GBPS_MODE	0x01
+#define MAX9295_GMSL_6GBPS_MODE 0x08
+#define MFP5_REG			0x2BF
+#define VIDEO_LOCK_STATUS_REG 		0x1DC // Video lock status register are 0x1DC, 0x1FC, 0x21C, 0x23C for pipe 0,1,2,3
 
 #define PIPES_XZ_MASK 0x20
 
 #define NB_GMSL 2
 
-#define ZEDXPRO_SEN1_BASE_ADDR 0x2e
-#define ZEDXPRO_SEN2_BASE_ADDR 0x3e
+#define ZED_ONE_SER_DFLT_ADDR 0x42
+#define ZEDXHDR_SEN1_BASE_ADDR 0x2e
+#define ZEDXHDR_SEN2_BASE_ADDR 0x3e
 
 #define ZED_ONE_GS_SER_ADDR_A 	0x42
 #define ZED_ONE_UHD_SER_ADDR_A 	0x44
 #define ZED_ONE_GS_SER_ADDR_B 	(ZED_ONE_GS_SER_ADDR_A+1)
 #define ZED_ONE_UHD_SER_ADDR_B 	(ZED_ONE_UHD_SER_ADDR_A+1)
 #define NB_MAX_SERIALIZERS 16
+#define MAX9296_NB_MFP 12
+#define MAX9296_GPIO_ADDR 0x02B0
 
 //values not used as registers in 9296
 #define RIGHT_SENSOR_ADDR 0xff02
@@ -80,10 +89,13 @@ typedef struct serializer_devices{
     bool is_second_ser_from_i2c;
 	int vc_id[2];
 	int phy_index;
+	int dsr_pipe;
+	int serial;
 }serializer_devices;
 
 struct max9296
 {
+	bool intialized;
 	struct i2c_client *i2c_client;
 	struct regmap *regmap;
 	u32 i2c_address; // MAX deser address from dts (required to update addr in tables)
@@ -96,6 +108,8 @@ struct max9296
 	serializer_devices current_ser_device[NB_GMSL]; //struct that stores the data of the current connected serializer
 	const char *cam_name;
 	int gmsl_link; // this value is instantiated with the detection of the cameras, it is used to enable the gmsl right number of gmsl links
+	int mfp_trig_info; // Mfp used for slave mode detection (-1 if not used)
+	int mfp_trig_in; // Mfp used as trigger input (default MFP1)
 };
 
 typedef enum
@@ -109,8 +123,8 @@ typedef void (*i2c_fingerprint_func)(struct i2c_fingerprint* table,int ser_addr,
 void get_zedx_alt_fingerprint(struct i2c_fingerprint* table, int ser_addr, int left_sensor_addr, int right_sensor_addr, int gmsl_index);
 void get_zedonegs_alt_fingerprint(struct i2c_fingerprint* table, int ser_addr, int left_sensor_addr, int right_sensor_addr,int gmsl_index);
 void get_zedone4k_alt_fingerprint(struct i2c_fingerprint* table, int ser_addr, int left_sensor_addr, int right_sensor_addr,int gmsl_index);
-void get_zedxpro_alt_fingerprint(struct i2c_fingerprint* table, int ser_addr, int left_sensor_addr, int right_sensor_addr,int gmsl_index);
-void get_zedonepro_alt_fingerprint(struct i2c_fingerprint* table, int ser_addr, int left_sensor_addr, int right_sensor_addr,int gmsl_index);
+void get_zedxhdr_alt_fingerprint(struct i2c_fingerprint* table, int ser_addr, int left_sensor_addr, int right_sensor_addr,int gmsl_index);
+void get_zedonehdr_alt_fingerprint(struct i2c_fingerprint* table, int ser_addr, int left_sensor_addr, int right_sensor_addr,int gmsl_index);
 
 // Link status registers
 static struct index_reg_8 max9296_link_regs[] = {
@@ -307,7 +321,7 @@ void get_zedone4k_alt_fingerprint(struct i2c_fingerprint* table,
 	}
 }
 
-static struct i2c_fingerprint zedxpro_sensor_reset[]= {
+static struct i2c_fingerprint zedxhdr_sensor_reset[]= {
 	// {0x60, 0x02D3, 0x90}, /* Power on sensor MFP */
 	// {0x60, 0x02D6, 0x90}, /* Power on sensor MFP */
 
@@ -326,17 +340,17 @@ static struct i2c_fingerprint zedxpro_sensor_reset[]= {
 	{MAX9296_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedxpro_fingerprint[] = {
+static struct i2c_fingerprint zedxhdr_fingerprint[] = {
 	{0x60, 0x000D, 0x95}, /* Serializer device ID */
 	//{0x1A, 0x8A54, 0x1A}, // Image sensor device i2c address 
 	{MAX9296_TABLE_END, 0x00, 0x00}
 };
 
-// static struct i2c_fingerprint zedxpro_alt_fingerprint[] = {
+// static struct i2c_fingerprint zedxhdr_alt_fingerprint[] = {
 // 	{MAX9296_TABLE_END, 0x00, 0x00},
 // };
 
-void get_zedxpro_alt_fingerprint(struct i2c_fingerprint* table,
+void get_zedxhdr_alt_fingerprint(struct i2c_fingerprint* table,
 	int ser_addr, int left_sensor_addr, int right_sensor_addr,
 	int gmsl_index){
 	int i = 0;
@@ -417,7 +431,7 @@ void get_zedxpro_alt_fingerprint(struct i2c_fingerprint* table,
 	}
 }
 
-static struct i2c_fingerprint zedonepro_sensor_reset[]= {
+static struct i2c_fingerprint zedonehdr_sensor_reset[]= {
 	// #if IS_ENABLED(CONFIG_TEGRA_STREAMERBOX_ADDR_FIX)
 	// {0x46, 0x0000, 0x84}, /* Reset address to default: 0x42 */
 	// #else
@@ -440,13 +454,13 @@ static struct i2c_fingerprint zedonepro_sensor_reset[]= {
 	{MAX9296_TABLE_END, 0x00, 0x00}
 };
 
-static struct i2c_fingerprint zedonepro_fingerprint[] = {
+static struct i2c_fingerprint zedonehdr_fingerprint[] = {
 	{0x42, 0x000D, 0x91}, /* Serializer device ID */
 	// {0x1A, 0x8A54, 0x1A}, // Image sensor device i2c address 
 	{MAX9296_TABLE_END, 0x00, 0x00}
 };
 
-// static struct i2c_fingerprint zedonepro_alt_fingerprint[] = {
+// static struct i2c_fingerprint zedonehdr_alt_fingerprint[] = {
 // 	#if IS_ENABLED(CONFIG_TEGRA_STREAMERBOX_ADDR_FIX)
 // 	{0x42, 0x0000, 0x8C}, /* Serializer addr change */
 // 	#else
@@ -455,7 +469,7 @@ static struct i2c_fingerprint zedonepro_fingerprint[] = {
 // 	{MAX9296_TABLE_END, 0x00, 0x00},
 // };
 
-void get_zedonepro_alt_fingerprint(struct i2c_fingerprint* table,
+void get_zedonehdr_alt_fingerprint(struct i2c_fingerprint* table,
 	int ser_addr, int left_sensor_addr, int right_sensor_addr,
 	int gmsl_index){
 	int i = 0;
@@ -666,18 +680,27 @@ static struct index_reg_8 default_pipe_conf[] = {
 	{ 0x048A, 0x40}, // From the datasheet, 2 datalanes //lane count - 4 lanes striping on controller 2 (Port B master in 2x1x4 mode).
 	{ 0x04CA, 0x00}, // lane count - 0 lanes striping on controller 3 (Port B slave in 2x1x4 mode).
 
+	//{ 0x443, 0x80}, // Enable Deskew 
+
 	{MAX9296_TABLE_END, 0x00}
 };
 
 static struct index_reg_8 default_misc_conf[] = {
 	{ 0x0005, 0x00}, // Disable lock output, disable errb
 
-	{0x02b3,0x83},// MFP1 GPIO TX output driver disabled
-	{0x02b4,0x10},// TX address = 0x10
+	// MFP0 - Fsync Out
+	{0x02b0,0x01},// Disable output drivers
+	{0x02b1,0x00},// MFP1 GPIO TX output driver enabled
+	// MFP1
+	{0x02b3,0x01}, // Disable output drivers
+	{0x02b4,0x00}, // Open drain output driver type
+	// MFP4
 	{0x02bc,0x04},
 	{0x02be,0x11},
-	{0x02bf,0x04},
-	{0x02c1,0x12},
+	// MFP5
+	{0x02bf,0x01}, // Disable output drivers
+	{0x02c0,0xA0}, // Enable pull-down
+
 	{0x0003, 0x40}, // Disable UART1
 
 	{0x03EF,0xC0},   // AUTO_FS_LINKS = 0, FS_USE_XTAL = 1, FS_LINK_[3:0] = 0
@@ -685,15 +708,45 @@ static struct index_reg_8 default_misc_conf[] = {
 	{0x03EA,0x00},   // OVLP window = 0
 	{0x03EB,0x00},   // OVLP window = 0
 
-	//FSYNC --> overwrite when fps set
+	//FSYNC > overwrite when fps set
+	//		> ununsed when slave mode (mfp5 == HIGH)
 	{0x03E5,0x9A}, // 60Hz FSYNC LVal of period
 	{0x03E6,0x5B}, // Mval of period
 	{0x03E7,0x06}, // Hval of period
 	{0x03F1,0x80}, // FSYNC TX ID = 0x10
-	{0x03E0,0x04}, // Enable manual frame sync, output on GPIO --> drive slave devices
+	{0x03E0,0x24}, // Internal Frame sync mode, manual frame sync, output on MFP0
 
 	{MAX9296_TABLE_END, 0x00},
 };
+
+static int get_max9296_slave_mode_table(int mfp_trig_in, struct index_reg_8* table, const size_t size){
+	int err = 0;
+	int mfp_trig_out = 0x00; // MFP0 is default trigger output
+
+	struct index_reg_8 slave_mode_table[] = {
+		// mfp_trig_out = fsync_out (default MFP0)
+		{ MAX9296_GPIO_ADDR+(3*mfp_trig_out), 0x01}, // Disable output drivers
+		{ MAX9296_GPIO_ADDR+(3*mfp_trig_out)+1, 0x00}, // Open drain output driver type
+		// mfp_trig_in = fsync_in (default MFP1)
+		{ MAX9296_GPIO_ADDR+(3*mfp_trig_in), 0xc3}, // Output driver disabled, gmsl transmission enabled 
+		{ MAX9296_GPIO_ADDR+(3*mfp_trig_in)+1, 0x30}, // gmsl transmission address = 0x10
+
+		{0x03E0,0x08}, // External Fsync mode
+		{MAX9296_TABLE_END, 0x00},
+	};
+
+	if(mfp_trig_in < 0 || mfp_trig_in > MAX9296_NB_MFP){
+		return -EINVAL;
+	}
+
+	if(size < sizeof(slave_mode_table)){
+		return -ENOMEM;
+	}
+
+	memcpy(table, slave_mode_table, sizeof(slave_mode_table));
+
+	return err;
+}
 
 static struct index_reg_8 max9296_test2[] = {
 	// route data from serializer 1 stream 0x00(X) 0x02(Z) -> 0x00(X) 0x01(Y) -> DPHY1 
@@ -1307,8 +1360,8 @@ typedef enum
 	ZEDX = 0,
 	ZEDONEGS,
 	ZEDONE4K,
-	ZEDONEPRO,
-	ZEDXPRO,
+	ZEDONEHDR,
+	ZEDXHDR,
 	/* Don't add a camera type bellow N_CAM_TYPE, it will not be parsed*/
 	N_CAM_TYPE,
 }CamType;
@@ -1317,8 +1370,8 @@ static const char *camera_names[] = {
 	[ZEDX] = "zedx",
 	[ZEDONEGS] = "zedonegs",
 	[ZEDONE4K] = "zedone4k",
-	[ZEDONEPRO] = "zedonepro",
-	[ZEDXPRO] = "zedxpro",
+	[ZEDONEHDR] = "zedonehdr",
+	[ZEDXHDR] = "zedxhdr",
 };
 
 static struct index_reg_8 *reset_table[] = {
@@ -1332,40 +1385,40 @@ static struct i2c_fingerprint *reset_fingerprint_table[] = {
 	[ZEDX] = zedx_sensor_reset,
 	[ZEDONEGS] = zedonegs_sensor_reset,
 	[ZEDONE4K] = zedone4k_sensor_reset,
-	[ZEDONEPRO] = zedonepro_sensor_reset,
-	[ZEDXPRO] = zedxpro_sensor_reset,
+	[ZEDONEHDR] = zedonehdr_sensor_reset,
+	[ZEDXHDR] = zedxhdr_sensor_reset,
 };
 
 // static struct i2c_fingerprint_func *fingerprint_alt_table_func[] = {
 // 	[ZEDX] = zedx_alt_fingerprint,
 // 	[ZEDONEGS] = zedonegs_alt_fingerprint,
 // 	[ZEDONE4K] = zedone4k_alt_fingerprint,
-// 	[ZEDONEPRO] = zedonepro_alt_fingerprint,
-// 	[ZEDXPRO] = zedxpro_alt_fingerprint,
+// 	[ZEDONEHDR] = zedzedxhdr_alt_fingerprint,
+// 	[ZEDXHDR] = zedxhdr_alt_fingerprint,
 // };
 
 static i2c_fingerprint_func get_fingerprint_alt_table[] = {
 	[ZEDX] = get_zedx_alt_fingerprint,
 	[ZEDONEGS] = get_zedonegs_alt_fingerprint,
 	[ZEDONE4K] = get_zedone4k_alt_fingerprint,
-	[ZEDONEPRO] = get_zedonepro_alt_fingerprint,
-	[ZEDXPRO] = get_zedxpro_alt_fingerprint,
+	[ZEDONEHDR] = get_zedonehdr_alt_fingerprint,
+	[ZEDXHDR] = get_zedxhdr_alt_fingerprint,
 };
 
 static struct i2c_fingerprint *fingerprint_table[] = {
 	[ZEDX] = zedx_fingerprint,
 	[ZEDONEGS] = zedonegs_fingerprint,
 	[ZEDONE4K] = zedone4k_fingerprint,
-	[ZEDONEPRO] = zedonepro_fingerprint,
-	[ZEDXPRO] = zedxpro_fingerprint,
+	[ZEDONEHDR] = zedonehdr_fingerprint,
+	[ZEDXHDR] = zedxhdr_fingerprint,
 };
 
 static int speed_table[] = {
 	[ZEDX] = 0x30,
 	[ZEDONEGS] = 0x30,
 	[ZEDONE4K] = 0x32,
-	[ZEDONEPRO] = 0x2f,
-	[ZEDXPRO] = 0x32,
+	[ZEDONEHDR] = 0x2f,
+	[ZEDXHDR] = 0x32,
 };
 
 enum

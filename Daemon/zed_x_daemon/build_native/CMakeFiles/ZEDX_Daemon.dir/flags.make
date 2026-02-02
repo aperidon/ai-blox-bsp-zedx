@@ -3,13 +3,13 @@
 
 # compile C with /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc
 # compile CXX with /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++
-C_DEFINES = -DL4T_VERSION=L4T36.4
+C_DEFINES = -DL4T_VERSION=364
 
 C_INCLUDES = -I/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/zed_x_daemon/include -I/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/zed_x_daemon/include/zmq -I/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/zed_x_daemon/../include
 
 C_FLAGS =   -fpermissive -O3 -Wendif-labels -Werror=return-type -Werror=uninitialized -Werror=switch -Werror=strict-overflow=1
 
-CXX_DEFINES = -DL4T_VERSION=L4T36.4
+CXX_DEFINES = -DL4T_VERSION=364
 
 CXX_INCLUDES = -I/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/zed_x_daemon/include -I/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/zed_x_daemon/include/zmq -I/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/zed_x_daemon/../include
 

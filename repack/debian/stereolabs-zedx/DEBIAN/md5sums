@@ -29,7 +29,7 @@ d41d8cd98f00b204e9800998ecf8427e  boot/stereolabs/utils/Utils/__init__.py
 21b4140509d39d54dbd640f2a33c715f  boot/stereolabs/utils/extlinux.py
 7bda5078a06892aee1eda4ce32c5c072  boot/stereolabs/utils/fio.py
 8d3968ef14457e755dc27a87a74fd6b8  boot/stereolabs/utils/zlconfig
-df1079ac401fc1b880ed680dbdd2ea71  boot/tegra234-p3768-camera-ai-blox-sl-overlay.dtbo
+193d3876c06c72e45c809f6baa03cb06  boot/tegra234-p3768-camera-ai-blox-sl-overlay.dtbo
 71aebc6039f382c0a4132adf00db45b3  tmp/IMU_Daemon.service
 ab51a7ee3a33d501dbb1de058dd8b1df  tmp/R36.4.0/libnvisppg.so
 3b6e4876845700a7cccce835687b6973  tmp/R36.4.3/libnvisppg.so
@@ -39,10 +39,11 @@ cea32444ba0a688cf2580d1e7ef3520f  tmp/zed_x_daemon.service
 8fbb62eec6c0d710d3a88f1a54a45981  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max96724/sl_max96724.ko
 7ab21e71bf68af57d52faf2d1a502289  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedone4k/sl_zedxone_uhd.ko
 3b3530d406db4a5440e09c795312b6fb  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedx/sl_zedx.ko
+c76f6f5923f30f0e60c638ed386ccc79  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxhdr/sl_zedxhdr.ko
 3439a2e1c82602e3a3f28d7eedda6b6e  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxpro/sl_zedxpro.ko
 c464fb2117308c32a12c84e340da06dc  usr/sbin/IMU_Daemon
 02a0927f62613d5d04fb0cc9f4003cac  usr/sbin/ZEDX_Daemon
-3705a057bc002cecadc5ab65a1d14579  usr/sbin/ZEDX_Driver
+3eb98e0231185e55c9256e9efd85d1ad  usr/sbin/ZEDX_Driver
 e5c0900dbb98a09c16bf46fd6e126fb2  usr/share/doc/stereolabs-zedx/changelog.Debian.gz
 9818f840b6d211be486e6b89670b8e62  var/nvidia/nvcam/settings/zedx_ar0234.isp
 5dcfc043c6800cbb1ed8f3a806b0a757  var/nvidia/nvcam/settings/zedx_ar0234_l4t327.isp

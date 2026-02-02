@@ -56,7 +56,7 @@ rm  $REPACK_TARGET/boot/tegra*.dtbo || true
 ### Get L4T version
 V_JETPACK=$(awk '/X-Jetpack_Base:/ { print $2 }' $DEBIAN_ROOT_TARGET/control)
 V_JETPACK_NUM=$(echo "$V_JETPACK" | sed -E 's/^L4T([0-9]+)\.([0-9]+)(\.[0-9]+)?$/\1\2/')
-./build_Daemon_CC.sh $V_JETPACK
+./build_Daemon_CC.sh $V_JETPACK_NUM
 
 
 ### Copy Daemon bin in repack

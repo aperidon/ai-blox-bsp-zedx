@@ -6,7 +6,7 @@ menu "Stereolabs Drivers"
   source "drivers/stereolabs/max96712/Kconfig"
   source "drivers/stereolabs/zedx/Kconfig"
   source "drivers/stereolabs/zedone4k/Kconfig"
-  source "drivers/stereolabs/zedxpro/Kconfig"
+  source "drivers/stereolabs/zedxhdr/Kconfig"
 endmenu
 
 endif

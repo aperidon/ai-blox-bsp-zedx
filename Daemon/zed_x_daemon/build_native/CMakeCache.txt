@@ -231,7 +231,7 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //No help, variable specified on the command line.
-RT_L4T_VERSION:UNINITIALIZED=L4T36.4
+RT_L4T_VERSION:UNINITIALIZED=364
 
 //Value Computed by CMake
 ZEDX_Daemon_BINARY_DIR:STATIC=/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/zed_x_daemon/build_native
