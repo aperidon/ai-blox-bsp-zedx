@@ -49,6 +49,7 @@ int dser_open_all_gmsl_link(int channel);
 int isSecondCamFromI2C(int channel, int zedx_id);
 int dser_read_video_lock(int channel, int zedx_id);
 int dser_read_link_lock(int channel, int zedx_id);
+int getCamPipeIndex(int channel, int zedx_id);
 
 struct sensor
 {
@@ -666,14 +667,17 @@ static int sl_max96724_pipes_setup(struct max96724 *priv, struct sensor *sp,
     //second cam use Z U pipes
     //uses i2c_bus as conflicting values because is_second_cam used for IMU and pipping
     //comes from limitation from max9296
-    for(i=0; i < priv->n_cam; i++)
-    {
-        if(sp->i2c_bus == priv->detected_sensors[i].i2c_bus)
-        {
-            sp->is_second_cam_from_i2c = true;
-            cam_pipping = cam_pipping<<2;
-        }
-    }
+    // for(i=0; i < priv->n_cam; i++)
+    // {
+    //     if(sp->i2c_bus == priv->detected_sensors[i].i2c_bus)
+    //     {
+    //        // sp->is_second_cam_from_i2c = true;
+    //         cam_pipping = cam_pipping<<2;
+    //     }
+    // }
+
+    for(i=0; i < priv->avail_pipe; i++)
+        cam_pipping = cam_pipping<<1;
             
 
     dev_dbg(&client->dev, "%s: n_cam = %d ->  cam_pipping = 0x%x\n",
@@ -754,8 +758,14 @@ static int sl_max96724_pipes_setup(struct max96724 *priv, struct sensor *sp,
         /**
          * get next sensor of this camera, since we filled the list in the right order,
          * we just need to get next element */
-        sp = list_entry(sp->list.next, struct sensor, list);
+        //sp = list_entry(sp->list.next, struct sensor, list);
 
+        if (sp->list.next != &priv->sensor_list) {
+            sp = list_entry(sp->list.next, struct sensor, list);
+        } else {
+            dev_warn(&client->dev,"%s: No more sensor",__func__);
+            break;
+        }
     }
 
 	dev_info(&client->dev, "%s: camera pipeline operational\n", __func__);
@@ -787,8 +797,8 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
     bool cam_found, config_supported;
     int cam_model_count;
     u8 i,j;
-    //int reg_gmsl_ctrl_addr = 0;
-    //int gmsl_3gbps_mode = 0;
+    int reg_gmsl_ctrl_addr = 0;
+    int gmsl_3gbps_mode = 0;
     int active_gmsl=0;
     priv->n_cam = 0;
 
@@ -796,6 +806,52 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
 	dev_dbg(&client->dev, "%s: client addr = 0x%x\n",
 			__func__, client->addr);
+
+    for (i = 0; i < N_GMSL_PORTS; i++)
+    {
+        priv->port_to_i2c[i]=-1;
+
+        err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
+
+        msleep(SLEEP_TIME);
+
+        if (err)
+            return -1;
+
+        err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
+
+        if (err)
+            return -1;
+
+        /* Bit mask to get the essential information: is link i connected?*/
+        link = (link & 0x08) >> 3;
+
+        // If the link is not detected, we check if it is a 3Gbps GMSL port
+        if (!link)
+		{
+            reg_gmsl_ctrl_addr = (i == 0 || i == 1) ? 0x10 : 0x11;
+            gmsl_3gbps_mode = (i == 0 || i == 2) ? 0x21 : 0x12;
+            
+            // Set deserializer at 3Gpbs gmsl speed 
+            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
+            dev_dbg(&client->dev, "%s: %d %x %x %02x\n",
+                __func__, err,client->addr,reg_gmsl_ctrl_addr,gmsl_3gbps_mode);
+            msleep(150);
+            
+            // Read the link status again
+            err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
+            link = (link & 0x08) >> 3;
+
+            // Set deserializer at 6Gbps gmsl speed
+            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
+            msleep(150);
+        }
+
+        if(link)
+            active_gmsl++;    
+    }
+
+    dev_info(&client->dev,"%s: Active GMSL ports : %d",__func__, active_gmsl);
 
     for (i = 0; i < N_GMSL_PORTS; i++)
     {
@@ -821,16 +877,39 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
         /* Bit mask to get the essential information: is link i connected?*/
         link = (link & 0x08) >> 3;
 
+        // If the link is not detected, we check if it is a 3Gbps GMSL port
         if (!link)
 		{
-			dev_info(&client->dev, "%s: No camera connected to GMSL port %d\n",
-					__func__, i);
-			continue;
-		}
+            dev_dbg(&client->dev, "%s: No camera connected to 6Gbps GMSL port %d\n",
+                    __func__, i);
+            
+            reg_gmsl_ctrl_addr = (i == 0 || i == 1) ? 0x10 : 0x11;
+            gmsl_3gbps_mode = (i == 0 || i == 2) ? 0x21 : 0x12;
+            
+            // Set deserializer at 3Gpbs gmsl speed 
+            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
+
+            msleep(150);
+            
+            // Read the link status again
+            err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
+            link = (link & 0x08) >> 3;
+
+            if (!link)
+            {
+                dev_info(&client->dev, "%s: No camera connected to GMSL port %d\n",
+                        __func__, i);
+
+                // Set deserializer at 6Gbps gmsl speed
+                err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
+                msleep(150);
+
+                continue;
+            }
+        }
         
         dev_info(&client->dev, "%s: Camera connected to GMSL port %d\n",
 				__func__, i);
-        active_gmsl++;
 
         for (j = 0; j < N_MAX_TOTAL_SER; j++){
             struct i2c_fingerprint reset_table[] = {
@@ -851,7 +930,7 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
         client->addr = deser_addr;
 
         /* Configure 3Gpbs serializer (one hdr) to 6Gbps*/
-    //    configure_3Gbps_cameras_to_6Gbps(priv, i);
+        configure_3Gbps_cameras_to_6Gbps(priv, i);
 
         /* read the camera fingerprint and return its ID */
         model = sl_max96724_get_camera_model(priv);
@@ -1290,6 +1369,32 @@ int set_bitrate_Dser(int channel, u32 i2c_bus, u8 val)
 	return err;
 }
 EXPORT_SYMBOL(set_bitrate_Dser);
+
+int getCamPipeIndex(int channel, int zedx_id)
+{
+    struct sensor *sp;
+    u8 i,j = 0;
+
+
+    for( i=0; i < global_priv[channel]->n_cam; i++)
+    {
+        sp = &global_priv[channel]->detected_sensors[i];
+        printk("%s: compare input id : %d and zedx_id %d\n",__func__,zedx_id,sp->zedx_id);
+        if( zedx_id == sp->zedx_id)
+        {
+            printk("%s: pipes [%d %d %d %d]",__func__,sp->pipes[0],sp->pipes[1],sp->pipes[2],sp->pipes[3]);
+
+            for( j=0; j<N_SER_PIPES; j++)
+            {
+                if(sp->pipes[j] >= 0)
+                    return j;
+            }
+            break;
+        }
+    }
+    return -1;
+}
+EXPORT_SYMBOL(getCamPipeIndex);
 
 int isSecondCamFromI2C(int channel, int zedx_id)
 {

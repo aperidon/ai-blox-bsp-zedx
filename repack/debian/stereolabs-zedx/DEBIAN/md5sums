@@ -36,11 +36,11 @@ ab51a7ee3a33d501dbb1de058dd8b1df  tmp/R36.4.0/libnvisppg.so
 cea32444ba0a688cf2580d1e7ef3520f  tmp/zed_x_daemon.service
 cc170080be2154259f4d462002d3f123  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/bmi088/bmi088.ko
 ffbc8f0116cc749672c4e8df0c354137  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/bmi088/bmi_spsc.ko
-7108d706a0bfc13770e4181fbf7cf090  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max9295/sl_max9295.ko
-d0f3dfdbb04292b0f561d8e4669afbce  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max96724/sl_max96724.ko
+ee331900c17adc3b6ec5a170e015d9d8  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max9295/sl_max9295.ko
+fc5cf51a901dcf6d61df190663369e62  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max96724/sl_max96724.ko
 7ab21e71bf68af57d52faf2d1a502289  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedone4k/sl_zedxone_uhd.ko
 3b3530d406db4a5440e09c795312b6fb  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedx/sl_zedx.ko
-c76f6f5923f30f0e60c638ed386ccc79  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxhdr/sl_zedxhdr.ko
+9c538b58ce9ea1fcd1a127dcfd4bb552  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxhdr/sl_zedxhdr.ko
 3439a2e1c82602e3a3f28d7eedda6b6e  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxpro/sl_zedxpro.ko
 c464fb2117308c32a12c84e340da06dc  usr/sbin/IMU_Daemon
 02a0927f62613d5d04fb0cc9f4003cac  usr/sbin/ZEDX_Daemon

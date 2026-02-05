@@ -38,6 +38,7 @@
 extern int fps_set_Dser(int channel, s64 val);
 int set_bitrate_Ser(int channel, u8 val);
 extern int isSecondCamFromI2C(int channel, int zedx_id);
+extern int getCamPipeIndex(int channel, int zedx_id);
 
 static int index_ser = 0;
 static int index_serializer = 0;
@@ -386,8 +387,9 @@ static int probe_serializer(struct sl_max9295 *priv){
 	struct device_node *np = priv->i2c_client->dev.of_node;
 	int err = 0;
 	const char *str;
-	struct index_reg_8** table = mode_table_A;
-	int second_cam = isSecondCamFromI2C(priv->channel, priv->zedx_id);
+	//struct index_reg_8** table = mode_table_A;
+	//int second_cam = isSecondCamFromI2C(priv->channel, priv->zedx_id);
+	int pipe_index = getCamPipeIndex(priv->channel, priv->zedx_id);
 	int acc_addr = 0;
 	int gyro_addr = 0;
     static int index_serializer = 0;
@@ -400,7 +402,7 @@ static int probe_serializer(struct sl_max9295 *priv){
 
 	if (index_ser > 0)
 	{
-		table = mode_table_B;
+		//table = mode_table_B;
 		/* < doing configuration this way 
 			implies serializers are correctly declared in device trees i.e serializer 
 			using pipe Z/U should be declared later in file than serializer using pipe
@@ -410,66 +412,73 @@ static int probe_serializer(struct sl_max9295 *priv){
 			affected by this change */
 	} 
 
-	if (strcmp(str, "zedx") == 0)
-	{
-		if( !second_cam){
-			err = ser_write_table(priv, mode_table_A[AR0234_9295D_SER]);
-		}
-		else
-		{
-			err = ser_write_table(priv, mode_table_B[AR0234_9295D_SER]);
-		}
-		gyro_addr = ZED_STEREO_GYRO_BASE_ADDR;
-		acc_addr = ZED_STEREO_ACC_BASE_ADDR;
-		priv->camera_model = ZEDX;
-		// err = ser_write_table(priv, table[AR0234_9295D_SER]);
-	}
-	else if (strcmp(str, "zedone4k")==0)
-	{
-		if( !second_cam)
-			err = ser_write_table(priv, mode_table_A[IMX678_9295A_SER]);
-		else
-			err = ser_write_table(priv, mode_table_B[IMX678_9295A_SER]);
+	// if (strcmp(str, "zedx") == 0)
+	// {
+	// 	if( !second_cam){
+	// 		err = ser_write_table(priv, mode_table_A[AR0234_9295D_SER]);
+	// 	}
+	// 	else
+	// 	{
+	// 		err = ser_write_table(priv, mode_table_B[AR0234_9295D_SER]);
+	// 	}
+	// 	gyro_addr = ZED_STEREO_GYRO_BASE_ADDR;
+	// 	acc_addr = ZED_STEREO_ACC_BASE_ADDR;
+	// 	priv->camera_model = ZEDX;
+	// 	// err = ser_write_table(priv, table[AR0234_9295D_SER]);
+	// }
+	// else if (strcmp(str, "zedone4k")==0)
+	// {
+	// 	if( !second_cam)
+	// 		err = ser_write_table(priv, mode_table_A[IMX678_9295A_SER]);
+	// 	else
+	// 		err = ser_write_table(priv, mode_table_B[IMX678_9295A_SER]);
 
-		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
-		acc_addr = ZED_MONO_ACC_BASE_ADDR;
-		priv->camera_model = ZEDONE4K;
-	}
-	else if (strcmp(str, "zedonegs")==0)
-	{
-		if( !second_cam)
-			err = ser_write_table(priv, mode_table_A[AR0234_9295A_SER]);
-		else
-			err = ser_write_table(priv, mode_table_B[AR0234_9295A_SER]);
+	// 	gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
+	// 	acc_addr = ZED_MONO_ACC_BASE_ADDR;
+	// 	priv->camera_model = ZEDONE4K;
+	// }
+	// else if (strcmp(str, "zedonegs")==0)
+	// {
+	// 	if( !second_cam)
+	// 		err = ser_write_table(priv, mode_table_A[AR0234_9295A_SER]);
+	// 	else
+	// 		err = ser_write_table(priv, mode_table_B[AR0234_9295A_SER]);
 
-		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
-		acc_addr = ZED_MONO_ACC_BASE_ADDR;
-		priv->camera_model = ZEDONEGS;
-		// err = ser_write_table(priv, table[AR0234_9295A_SER]);
-	}
-	else if (strcmp(str, "zedonehdr")==0)
+	// 	gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
+	// 	acc_addr = ZED_MONO_ACC_BASE_ADDR;
+	// 	priv->camera_model = ZEDONEGS;
+	// 	// err = ser_write_table(priv, table[AR0234_9295A_SER]);
+	// }
+	/*else*/ if (strcmp(str, "zedonehdr")==0)
 	{
+
+		static struct index_reg_8 tmp[ZEDXONEHDR_TAB_SIZE];
 		(void) ser_reset_zedxhdr;
-		if( !second_cam)
-			err = ser_write_table(priv, mode_table_A[ISX031_9295A_SER]);
-		else
-			err = ser_write_table(priv, mode_table_B[ISX031_9295A_SER]);
+		
+		memcpy(tmp, mode_table[ISX031_9295A_SER], sizeof(tmp));
+		tmp[4].val = ((1<<pipe_index)<<4);
+		tmp[5].val = (0x70 | (1 << pipe_index));
+
+		dev_info(dev, "%s: pipe index : %d -> (0x%x , 0x%x) (0x%x , 0x%x)\n",
+				__func__, pipe_index, tmp[4].addr, tmp[4].val, tmp[5].addr, tmp[5].val);
+		
+		err = ser_write_table(priv, tmp);
 
 		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
 		acc_addr = ZED_MONO_ACC_BASE_ADDR;
 		priv->camera_model = ZEDONEHDR;
 	}
-	else if (strcmp(str, "zedxhdr")==0)
-	{
-		if( !second_cam )
-			err = ser_write_table(priv, mode_table_A[ISX031_9295D_SER]);
-		else
-			err = ser_write_table(priv, mode_table_B[ISX031_9295D_SER]);
+	// else if (strcmp(str, "zedxhdr")==0)
+	// {
+	// 	if( !second_cam )
+	// 		err = ser_write_table(priv, mode_table_A[ISX031_9295D_SER]);
+	// 	else
+	// 		err = ser_write_table(priv, mode_table_B[ISX031_9295D_SER]);
 
-		gyro_addr = ZED_STEREO_GYRO_BASE_ADDR;
-		acc_addr = ZED_STEREO_ACC_BASE_ADDR;
-		priv->camera_model = ZEDXHDR;
-	}
+	// 	gyro_addr = ZED_STEREO_GYRO_BASE_ADDR;
+	// 	acc_addr = ZED_STEREO_ACC_BASE_ADDR;
+	// 	priv->camera_model = ZEDXHDR;
+	// }
 	else
 	{
 		dev_err(dev, "%s: Camera model unrecognized\n",
@@ -598,7 +607,6 @@ static int sl_max9295_probe(struct i2c_client *client)
 		dev_err(dev, "%s: IMU missing in serializer id %d", __func__, priv->zedx_id);
 		return -EINVAL; 
 	}
-	dev_info(dev, "%s: Found %d IMU",__func__,n_imu);
 
 	for(i=0;i<n_imu;i++){
 		bmi = of_parse_phandle(node, "imu" , i);
@@ -620,8 +628,6 @@ static int sl_max9295_probe(struct i2c_client *client)
 			dev_err(dev, "%s: accel_i2c_addr not found in dts\n",__func__);
 			return err;
 		}
-
-		dev_info(dev, "%s: Parse BMI %d (0x%x / 0x%x)",__func__,i,priv->bmi_array[i].gyro_addr,priv->bmi_array[i].acc_addr);
 		
 		of_node_put(bmi);
 	}

@@ -2,7 +2,7 @@ Package: stereolabs-zedx
 Version: 1.4.0-L4T36.4.0
 Architecture: arm64
 Maintainer: NVIDIA Corporation, Stereolabs Inc.
-Installed-Size: 5649
+Installed-Size: 5651
 Pre-Depends: nvidia-l4t-core (>> 36.4-0), nvidia-l4t-core (<< 36.5-0), libqt5core5a
 Depends: device-tree-compiler, nvidia-l4t-kernel (>= 5.15.148-tegra-36.4.0-20240912212859), nvidia-l4t-kernel (<= 5.15.148-tegra-36.4.4-20250616085344)
 Section: kernel

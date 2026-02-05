@@ -202,8 +202,8 @@ static const int zedxhdr_120fps[] = {
 };
 
 static const struct camera_common_frmfmt zedxhdr_frmfmt[] = {
-	{{1920, 1080}, zedxhdr_30fps, 1, 0, ISX031_MODE_1920X1080_CROP_30FPS},
 	{{1920, 1536}, zedxhdr_30fps, 1, 0, ISX031_MODE_1920X1536_30FPS},
+	{{1920, 1080}, zedxhdr_30fps, 1, 0, ISX031_MODE_1920X1080_CROP_30FPS},
 	{{960, 600}, zedxhdr_30fps, 1, 0, ISX031_MODE_960X600_30FPS},
 	{{1280, 720}, zedxhdr_30fps, 1, 0, ISX031_MODE_1280X720_30FPS},
 };
