@@ -32,7 +32,7 @@
 						status = "okay";
 						ar0234_vi_in1: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <1>;
 							port-index = <0>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&ar0234_csi_out1>;
@@ -54,7 +54,7 @@
 						status = "okay";
 						ar0234_vi_in3: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <1>;
 							port-index = <1>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&ar0234_csi_out3>;
@@ -76,7 +76,7 @@
 						status = "okay";
 						ar0234_vi_in5: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <1>;
 							port-index = <2>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&ar0234_csi_out5>;
@@ -98,7 +98,7 @@
 						status = "okay";
 						ar0234_vi_in7: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <1>;
 							port-index = <3>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&ar0234_csi_out7>;
@@ -110,7 +110,7 @@
 						status = "okay";
 						zedxonehdr_vi_in0: endpoint {
 							status = "okay";
-							vc-id = <0>;
+							vc-id = <2>;
 							port-index = <0>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out0>;
@@ -121,7 +121,7 @@
 						status = "okay";
 						zedxonehdr_vi_in1: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <3>;
 							port-index = <0>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out1>;
@@ -132,7 +132,7 @@
 						status = "okay";
 						zedxonehdr_vi_in2: endpoint {
 							status = "okay";
-							vc-id = <0>;
+							vc-id = <2>;
 							port-index = <1>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out2>;
@@ -143,7 +143,7 @@
 						status = "okay";
 						zedxonehdr_vi_in3: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <3>;
 							port-index = <1>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out3>;
@@ -154,7 +154,7 @@
 						status = "okay";
 						zedxonehdr_vi_in4: endpoint {
 							status = "okay";
-							vc-id = <0>;
+							vc-id = <2>;
 							port-index = <2>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out4>;
@@ -165,7 +165,7 @@
 						status = "okay";
 						zedxonehdr_vi_in5: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <3>;
 							port-index = <2>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out5>;
@@ -176,7 +176,7 @@
 						status = "okay";
 						zedxonehdr_vi_in6: endpoint {
 							status = "okay";
-							vc-id = <0>;
+							vc-id = <2>;
 							port-index = <3>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out6>;
@@ -187,7 +187,7 @@
 						status = "okay";
 						zedxonehdr_vi_in7: endpoint {
 							status = "okay";
-							vc-id = <2>;
+							vc-id = <3>;
 							port-index = <3>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out7>;
@@ -626,12 +626,12 @@
 					/* ZEDX One GS 0 camera sensor */
 					zedxone_gs0: zedxone_gs_0@10 {
 						
-						devnode = "video4";
+						devnode = "video0";
 						
 						sync_sensor = "ZEDXONE_CAM0";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("0", "serial_a", "0")
+						AR0234_MODES("0", "serial_a", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -641,9 +641,9 @@
 								ar0234_ar0234_out0: endpoint {
 									vc-id = <0>;
 									port-index = <0>;
-									opt-csi-port = "c";
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in0>;
 								};
 							};
@@ -653,12 +653,12 @@
 					/* ZEDX One GS 1 camera sensor */
 					zedxone_gs1: zedxone_gs_1@11 {
 						
-						devnode = "video5";
+						devnode = "video1";
 						
 						sync_sensor = "ZEDXONE_CAM2";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("0", "serial_b", "0")
+						AR0234_MODES("1", "serial_a", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -666,11 +666,11 @@
 							port@0 {
 								reg = <0>;
 								ar0234_ar0234_out1: endpoint {
-									vc-id = <0>;
-									port-index = <1>;
-									opt-csi-port = "d";
+									vc-id = <1>;
+									port-index = <0>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in1>;
 								};
 							};
@@ -680,12 +680,12 @@
 					/* ZEDX One GS 2 camera sensor */
 					zedxone_gs2: zedxone_gs_2@12 {
 						
-						devnode = "video17";
+						devnode = "video2";
 						
 						sync_sensor = "ZEDXONE_CAM1";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("0", "serial_c", "0")
+						AR0234_MODES("0", "serial_b", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -694,10 +694,10 @@
 								reg = <0>;
 								ar0234_ar0234_out2: endpoint {
 									vc-id = <0>;
-									port-index = <2>;
-									opt-csi-port = "e";
+									port-index = <1>;
+									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in2>;
 								};
 							};
@@ -707,12 +707,12 @@
 					/* ZEDX One GS 3 camera sensor */
 					zedxone_gs3: zedxone_gs_3@13 {
 						
-						devnode = "video18";
+						devnode = "video3";
 						
 						sync_sensor = "ZEDXONE_CAM3";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("0", "serial_d", "0")
+						AR0234_MODES("1", "serial_b", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -720,11 +720,11 @@
 							port@0 {
 								reg = <0>;
 								ar0234_ar0234_out3: endpoint {
-									vc-id = <0>;
-									port-index = <3>;
+									vc-id = <1>;
+									port-index = <1>;
 									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in3>;
 								};
 							};
@@ -734,12 +734,12 @@
 					
 					zedxone_hdr0: zedxone_hdr_0@3c {
 						
-						devnode = "video11";
+						devnode = "video4";
 						
 						sync_sensor = "ZEDXONE_CAM6";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("0", "serial_a", "0")
+						ISX031_MODES("2", "serial_a", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -747,11 +747,11 @@
 							port@0 {
 								reg = <0>;
 								zedxonehdr_isx031_out0: endpoint {
-									vc-id = <0>;
+									vc-id = <2>;
 									port-index = <0>;
-									opt-csi-port = "c";
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in0>;
 								};
 							};
@@ -760,12 +760,12 @@
 					
 					zedxone_hdr1: zedxone_hdr_1@3d {
 						
-						devnode = "video12";
+						devnode = "video5";
 						
 						sync_sensor = "ZEDXONE_CAM8";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("0", "serial_b", "0")
+						ISX031_MODES("3", "serial_a", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -773,11 +773,11 @@
 							port@0 {
 								reg = <0>;
 								zedxonehdr_isx031_out1: endpoint {
-									vc-id = <0>;
-									port-index = <1>;
-									opt-csi-port = "d";
+									vc-id = <3>;
+									port-index = <0>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in1>;
 								};
 							};
@@ -786,12 +786,12 @@
 					
 					zedxone_hdr2: zedxone_hdr_2@3e {
 						
-						devnode = "video24";
+						devnode = "video6";
 						
 						sync_sensor = "ZEDXONE_CAM7";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("0", "serial_c", "0")
+						ISX031_MODES("2", "serial_b", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -799,11 +799,11 @@
 							port@0 {
 								reg = <0>;
 								zedxonehdr_isx031_out2: endpoint {
-									vc-id = <0>;
-									port-index = <2>;
-									opt-csi-port = "e";
+									vc-id = <2>;
+									port-index = <1>;
+									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in2>;
 								};
 							};
@@ -812,12 +812,12 @@
 					
 					zedxone_hdr3: zedxone_hdr_3@3f {
 						
-						devnode = "video25";
+						devnode = "video7";
 						
 						sync_sensor = "ZEDXONE_CAM9";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("0", "serial_d", "0")
+						ISX031_MODES("3", "serial_b", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -825,11 +825,11 @@
 							port@0 {
 								reg = <0>;
 								zedxonehdr_isx031_out3: endpoint {
-									vc-id = <0>;
-									port-index = <3>;
+									vc-id = <3>;
+									port-index = <1>;
 									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in3>;
 								};
 							};
@@ -842,12 +842,12 @@
 					/* ZEDX One GS 4 camera sensor */
 					zedxone_gs4: zedxone_gs_4@30 {
 						
-						devnode = "video30";
+						devnode = "video8";
 						
 						sync_sensor = "ZEDXONE_CAM10";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("0", "serial_e", "0")
+						AR0234_MODES("0", "serial_c", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -856,10 +856,10 @@
 								reg = <0>;
 								ar0234_ar0234_out4: endpoint {
 									vc-id = <0>;
-									port-index = <4>;
-									opt-csi-port = "c";
+									port-index = <2>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in4>;
 								};
 							};
@@ -869,12 +869,12 @@
 					/* ZEDX One GS 5 camera sensor */
 					zedxone_gs5: zedxone_gs_5@31 {
 						
-						devnode = "video31";
+						devnode = "video9";
 						
 						sync_sensor = "ZEDXONE_CAM12";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("2", "serial_e", "0")
+						AR0234_MODES("1", "serial_c", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -882,11 +882,11 @@
 							port@0 {
 								reg = <0>;
 								ar0234_ar0234_out5: endpoint {
-									vc-id = <2>;
-									port-index = <4>;
-									opt-csi-port = "c";
+									vc-id = <1>;
+									port-index = <2>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in5>;
 								};
 							};
@@ -896,12 +896,12 @@
 					/* ZEDX One GS 6 camera sensor */
 					zedxone_gs6: zedxone_gs_6@32 {
 						
-						devnode = "video43";
+						devnode = "video10";
 						
 						sync_sensor = "ZEDXONE_CAM11";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("0", "serial_g", "0")
+						AR0234_MODES("0", "serial_d", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -910,10 +910,10 @@
 								reg = <0>;
 								ar0234_ar0234_out6: endpoint {
 									vc-id = <0>;
-									port-index = <6>;
-									opt-csi-port = "e";
+									port-index = <3>;
+									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in6>;
 								};
 							};
@@ -923,12 +923,12 @@
 					/* ZEDX One GS 7 camera sensor */
 					zedxone_gs7: zedxone_gs_7@33 {
 						
-						devnode = "video44";
+						devnode = "video11";
 						
 						sync_sensor = "ZEDXONE_CAM13";
 						sync_sensor_index = <1>;
 						
-						AR0234_MODES("2", "serial_g", "0")
+						AR0234_MODES("1", "serial_d", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -936,11 +936,11 @@
 							port@0 {
 								reg = <0>;
 								ar0234_ar0234_out7: endpoint {
-									vc-id = <2>;
-									port-index = <6>;
-									opt-csi-port = "e";
+									vc-id = <1>;
+									port-index = <3>;
+									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&ar0234_csi_in7>;
 								};
 							};
@@ -949,12 +949,12 @@
 					
 					zedxone_hdr4: zedxone_hdr_4@5c {
 						
-						devnode = "video37";
+						devnode = "video12";
 						
 						sync_sensor = "ZEDXONE_CAM16";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("0", "serial_e", "0")
+						ISX031_MODES("2", "serial_c", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -963,10 +963,10 @@
 								reg = <0>;
 								zedxonehdr_isx031_out4: endpoint {
 									vc-id = <0>;
-									port-index = <4>;
-									opt-csi-port = "c";
+									port-index = <2>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in4>;
 								};
 							};
@@ -975,12 +975,12 @@
 					
 					zedxone_hdr5: zedxone_hdr_5@5d {
 						
-						devnode = "video38";
+						devnode = "video13";
 						
 						sync_sensor = "ZEDXONE_CAM18";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("2", "serial_e", "0")
+						ISX031_MODES("3", "serial_c", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -988,11 +988,11 @@
 							port@0 {
 								reg = <0>;
 								zedxonehdr_isx031_out5: endpoint {
-									vc-id = <2>;
-									port-index = <4>;
-									opt-csi-port = "c";
+									vc-id = <3>;
+									port-index = <2>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in5>;
 								};
 							};
@@ -1001,12 +1001,12 @@
 					
 					zedxone_hdr6: zedxone_hdr_6@5e {
 						
-						devnode = "video50";
+						devnode = "video14";
 						
 						sync_sensor = "ZEDXONE_CAM17";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("0", "serial_g", "0")
+						ISX031_MODES("2", "serial_d", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -1014,11 +1014,11 @@
 							port@0 {
 								reg = <0>;
 								zedxonehdr_isx031_out6: endpoint {
-									vc-id = <0>;
-									port-index = <6>;
-									opt-csi-port = "e";
+									vc-id = <2>;
+									port-index = <3>;
+									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in6>;
 								};
 							};
@@ -1027,12 +1027,12 @@
 					
 					zedxone_hdr7: zedxone_hdr_7@5f {
 						
-						devnode = "video51";
+						devnode = "video15";
 						
 						sync_sensor = "ZEDXONE_CAM19";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("2", "serial_g", "0")
+						ISX031_MODES("3", "serial_d", "0")
 						
 						ports {
 							#address-cells = <1>;
@@ -1040,11 +1040,11 @@
 							port@0 {
 								reg = <0>;
 								zedxonehdr_isx031_out7: endpoint {
-									vc-id = <2>;
-									port-index = <6>;
-									opt-csi-port = "e";
+									vc-id = <3>;
+									port-index = <3>;
+									opt-csi-port = "f";
 									bus-width = <NUM_LANES>;
-									i2c-cc = <0>;
+									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in7>;
 								};
 							};

@@ -360,6 +360,7 @@ static inline int model_reset(struct max96724 *priv, u8 model)
 
 
 		msleep(6);
+		msleep(100);
 
 		j++;
 	}
@@ -518,7 +519,7 @@ static int sl_max96724_i2c_setup(struct max96724 *priv)
 
     for (i=0; i<N_GMSL_PORTS; i++)
     {
-        i2c_cc = priv->port_to_i2c[i]; 
+        i2c_cc = 1 ;// priv->port_to_i2c[i]; 
         dev_info(&priv->i2c_client->dev, "set GMSL %d to i2c-cc %d", i, i2c_cc);
 
         // if nothing is connected to the port, don't activate it
@@ -542,10 +543,13 @@ static int sl_max96724_i2c_setup(struct max96724 *priv)
     msleep(SLEEP_TIME);
 
     err = regmap_write(priv->regmap, GMSL_CC_X_OVR_REG, val_cx);
+    dev_dbg(&priv->i2c_client->dev,"%s: set i2c cc val_cx: 0x%x 0x%x",__func__,GMSL_CC_X_OVR_REG, val_cx);
 
     err = regmap_write(priv->regmap, GMSL_LINKS_CC_REG, val_cc);
+    dev_dbg(&priv->i2c_client->dev,"%s: set i2c cc val_cc: 0x%x 0x%x",__func__,GMSL_LINKS_CC_REG, val_cc);
 
     err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, val_port);
+    dev_dbg(&priv->i2c_client->dev,"%s: set i2c cc val_port: 0x%x 0x%x",__func__,GMSL_LINKS_EN_REG, val_port);
 
     msleep(SLEEP_TIME);
 
@@ -783,8 +787,8 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
     bool cam_found, config_supported;
     int cam_model_count;
     u8 i,j;
-    int reg_gmsl_ctrl_addr = 0;
-    int gmsl_3gbps_mode = 0;
+    //int reg_gmsl_ctrl_addr = 0;
+    //int gmsl_3gbps_mode = 0;
     int active_gmsl=0;
     priv->n_cam = 0;
 
@@ -795,54 +799,10 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
     for (i = 0; i < N_GMSL_PORTS; i++)
     {
-        priv->port_to_i2c[i]=-1;
-
         err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
 
         msleep(SLEEP_TIME);
-
-        if (err)
-            return -1;
-
-        err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
-
-        if (err)
-            return -1;
-
-        /* Bit mask to get the essential information: is link i connected?*/
-        link = (link & 0x08) >> 3;
-
-        // If the link is not detected, we check if it is a 3Gbps GMSL port
-        if (!link)
-		{
-            reg_gmsl_ctrl_addr = (i == 0 || i == 1) ? 0x10 : 0x11;
-            gmsl_3gbps_mode = (i == 0 || i == 2) ? 0x21 : 0x12;
-            
-            // Set deserializer at 3Gpbs gmsl speed 
-            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
-            dev_dbg(&client->dev, "%s: %d %x %x %02x\n",
-                __func__, err,client->addr,reg_gmsl_ctrl_addr,gmsl_3gbps_mode);
-            msleep(150);
-            
-            // Read the link status again
-            err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
-            link = (link & 0x08) >> 3;
-
-            // Set deserializer at 6Gbps gmsl speed
-            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
-            msleep(150);
-        }
-
-        if(link)
-            active_gmsl++;    
-    }
-
-    dev_info(&client->dev,"%s: Active GMSL ports : %d",__func__, active_gmsl);
-
-    for (i = 0; i < N_GMSL_PORTS; i++)
-    {
-        err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
-
+        msleep(SLEEP_TIME);
         msleep(SLEEP_TIME);
 
         if (err || verbosity_level)
@@ -851,7 +811,7 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
         err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
 
-        if (err)
+        if (err && verbosity_level)
         {
             dev_dbg(&client->dev, "%s: write addr = 0x%x, val = 0x%x, err %d\n",
                     __func__, mode_table[tab_id][i].addr, link, err);
@@ -863,36 +823,14 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
         if (!link)
 		{
-            dev_dbg(&client->dev, "%s: No camera connected to 6Gbps GMSL port %d\n",
-                    __func__, i);
-            
-            reg_gmsl_ctrl_addr = (i == 0 || i == 1) ? 0x10 : 0x11;
-            gmsl_3gbps_mode = (i == 0 || i == 2) ? 0x21 : 0x12;
-            
-            // Set deserializer at 3Gpbs gmsl speed 
-            err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
-
-            msleep(150);
-            
-            // Read the link status again
-            err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
-            link = (link & 0x08) >> 3;
-
-            if (!link)
-            {
-                dev_info(&client->dev, "%s: No camera connected to GMSL port %d\n",
-                        __func__, i);
-
-                // Set deserializer at 6Gbps gmsl speed
-                err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
-                msleep(150);
-
-                continue;
-            }
-        }
+			dev_info(&client->dev, "%s: No camera connected to GMSL port %d\n",
+					__func__, i);
+			continue;
+		}
         
-        dev_warn(&client->dev, "%s: Camera connected to GMSL port %d\n",
+        dev_info(&client->dev, "%s: Camera connected to GMSL port %d\n",
 				__func__, i);
+        active_gmsl++;
 
         for (j = 0; j < N_MAX_TOTAL_SER; j++){
             struct i2c_fingerprint reset_table[] = {
@@ -904,18 +842,16 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
             
             client->addr = reset_table[0].i2c_addr;
             err = regmap_write(priv->regmap, reset_table[0].reg_addr, reset_table[0].val);
+            dev_dbg(&client->dev, "%s: reset ser %s %d %d %x %x %02x\n",
+                    __func__,camera_names[priv->ser_devices[j].camera_model],priv->ser_devices[j].zedx_id, err,client->addr,reset_table[0].reg_addr,reset_table[0].val);
 
-            if(err == 0 )
-            {
-                msleep(100);
-                break;
-            }
             msleep(6);
         }
+        msleep(200);
         client->addr = deser_addr;
 
         /* Configure 3Gpbs serializer (one hdr) to 6Gbps*/
-        configure_3Gbps_cameras_to_6Gbps(priv, i);
+    //    configure_3Gbps_cameras_to_6Gbps(priv, i);
 
         /* read the camera fingerprint and return its ID */
         model = sl_max96724_get_camera_model(priv);
@@ -1480,6 +1416,8 @@ static int sl_max96724_parse_serializer_node(struct max96724 *priv,
                 sp->model = j;
         }
 
+        dev_dbg(&i2c_client->dev, "%s: Add %s (model : %d)",__func__, sp->camera, sp->model );
+
         /* Parse zedx-id */
         err = of_property_read_string(ser_node, "zedx-id", &str);
         if(err){
@@ -1511,6 +1449,8 @@ static int sl_max96724_parse_serializer_node(struct max96724 *priv,
         dev_dbg(&i2c_client->dev, "%s: SER ADDR = %x",__func__, sp->ser_addr);
 
         priv->ser_devices[cam_id].ser_addr = sp->ser_addr;
+        priv->ser_devices[cam_id].camera_model = sp->model;
+        priv->ser_devices[cam_id].zedx_id = sp->zedx_id;
 
         of_property_read_u32(cam_node, "reg", &sp->cam_addr);
         if(err){
@@ -1770,6 +1710,7 @@ static int sl_max96724_probe(struct i2c_client *client)
     struct device *dev = &client->dev;
     struct max96724 *priv;
     int err = 0;
+    int i;
     unsigned int pipe_sync_val;
     
 	dev_info(dev, "Driver Version : v%d.%d.%d\n",DESER_DRIVER_VERSION_MAJOR,DESER_DRIVER_VERSION_MINOR,DESER_DRIVER_VERSION_PATCH);
@@ -1788,6 +1729,10 @@ static int sl_max96724_probe(struct i2c_client *client)
         dev_err(dev,
                 "regmap init failed: %ld\n", PTR_ERR(priv->regmap));
         return -ENODEV;
+    }
+
+    for(i=0; i < N_GMSL_PORTS; i++){
+        priv->port_to_i2c[i]=-1;
     }
 
     err = sl_max96724_parse_gpios(priv);

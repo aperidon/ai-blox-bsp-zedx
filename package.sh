@@ -56,7 +56,7 @@ rm  $REPACK_TARGET/boot/tegra*.dtbo || true
 ### Get L4T version
 V_JETPACK=$(awk '/X-Jetpack_Base:/ { print $2 }' $DEBIAN_ROOT_TARGET/control)
 V_JETPACK_NUM=$(echo "$V_JETPACK" | sed -E 's/^L4T([0-9]+)\.([0-9]+)(\.[0-9]+)?$/\1\2/')
-./build_Daemon_CC.sh $V_JETPACK_NUM
+#./build_Daemon_CC.sh $V_JETPACK_NUM
 
 
 ### Copy Daemon bin in repack
@@ -113,7 +113,7 @@ if [ $? -eq 0 ]; then
 	## Copy needed
 	
 	## Image
-	cp $TEGRA_KERNEL_OUT/kernel/kernel-jammy-src/arch/arm64/boot/Image $DEST_TARGET/output/
+	#cp $TEGRA_KERNEL_OUT/kernel/kernel-jammy-src/arch/arm64/boot/Image $DEST_TARGET/output/
 	
  	cp $TEGRA_KERNEL_OUT/kernel-devicetree/generic-dts/dtbs/$DTBO_NAME $DEST_TARGET/output/
 

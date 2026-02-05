@@ -1,4 +1,3 @@
-8a42e5906dd207802611169ca40c7964  boot/stereolabs/Image
 6d7241307470affa87c5179c9573abd2  boot/stereolabs/utils/Headers/__init__.py
 2eae7e16acb0eac3c4c622236375c458  boot/stereolabs/utils/Headers/csi-agx.py
 b0acadc90ce667b193e2731f81f6dec2  boot/stereolabs/utils/Headers/csi-nano.py
@@ -29,14 +28,16 @@ d41d8cd98f00b204e9800998ecf8427e  boot/stereolabs/utils/Utils/__init__.py
 21b4140509d39d54dbd640f2a33c715f  boot/stereolabs/utils/extlinux.py
 7bda5078a06892aee1eda4ce32c5c072  boot/stereolabs/utils/fio.py
 8d3968ef14457e755dc27a87a74fd6b8  boot/stereolabs/utils/zlconfig
-193d3876c06c72e45c809f6baa03cb06  boot/tegra234-p3768-camera-ai-blox-sl-overlay.dtbo
+3844b7bbdf506d8d805efa800426b2ee  boot/tegra234-p3768-camera-ai-blox-sl-overlay.dtbo
 71aebc6039f382c0a4132adf00db45b3  tmp/IMU_Daemon.service
 ab51a7ee3a33d501dbb1de058dd8b1df  tmp/R36.4.0/libnvisppg.so
 3b6e4876845700a7cccce835687b6973  tmp/R36.4.3/libnvisppg.so
 0409989c45241a678120644c7e890346  tmp/driver_zed_loader.service
 cea32444ba0a688cf2580d1e7ef3520f  tmp/zed_x_daemon.service
-20b306fd38855e5de1aad9e2464a32a5  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max9295/sl_max9295.ko
-8fbb62eec6c0d710d3a88f1a54a45981  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max96724/sl_max96724.ko
+cc170080be2154259f4d462002d3f123  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/bmi088/bmi088.ko
+ffbc8f0116cc749672c4e8df0c354137  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/bmi088/bmi_spsc.ko
+7108d706a0bfc13770e4181fbf7cf090  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max9295/sl_max9295.ko
+d0f3dfdbb04292b0f561d8e4669afbce  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max96724/sl_max96724.ko
 7ab21e71bf68af57d52faf2d1a502289  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedone4k/sl_zedxone_uhd.ko
 3b3530d406db4a5440e09c795312b6fb  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedx/sl_zedx.ko
 c76f6f5923f30f0e60c638ed386ccc79  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxhdr/sl_zedxhdr.ko

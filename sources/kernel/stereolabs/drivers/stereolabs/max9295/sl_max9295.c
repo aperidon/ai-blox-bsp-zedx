@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// #define DEBUG 1
+#define DEBUG 1
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/gpio.h>
@@ -80,7 +80,7 @@ struct sl_max9295
 	int zedx_id;
 	int channel;
 	int camera_model;
-	struct bmi_device bmi_array[2]; // bmi-array preset in the DT
+	struct bmi_device bmi_array[4]; // bmi-array preset in the DT
 	int acc_addr;
 	int gyro_addr;
 };
@@ -352,11 +352,13 @@ static int ser_write_table(struct sl_max9295 *priv,
 	return 0;
 }
 
-static int translate_imu(struct sl_max9295 *priv, u8 gyro_base_addr, u8 acc_base_addr){
-	int index = isSecondCamFromI2C(priv->channel, priv->zedx_id);
+static int translate_imu(struct sl_max9295 *priv, int imu_index){
+	struct device *dev = &priv->i2c_client->dev;
 	int err = 0;
-	u8 gyro_addr = (index == 0)?priv->bmi_array[0].gyro_addr:priv->bmi_array[1].gyro_addr;
-	u8 acc_addr = (index == 0)?priv->bmi_array[0].acc_addr:priv->bmi_array[1].acc_addr;
+	u8 gyro_base_addr = priv->gyro_addr;
+	u8 acc_base_addr = priv->acc_addr;
+	u8 gyro_addr = priv->bmi_array[imu_index].gyro_addr;
+	u8 acc_addr = priv->bmi_array[imu_index].acc_addr;
 
 	struct index_reg_8 i2c_translate_table[] = {
 		{MAX9295D_ADDRESS_BASE, 0x0042, gyro_addr*2}, // When the ser receive at x58... eeprom i2c map eeporm have two i2c address
@@ -371,8 +373,13 @@ static int translate_imu(struct sl_max9295 *priv, u8 gyro_base_addr, u8 acc_base
 	priv->gyro_addr = gyro_addr;
 	priv->acc_addr = acc_addr;
 
+	dev_info(dev,"%s: Associate IMU %d ( 0x%x / 0x%x )",__func__,imu_index,gyro_addr,acc_addr);
+
+	ser_global_priv[index_serializer] = priv;
+
 	return err;
 }
+
 
 static int probe_serializer(struct sl_max9295 *priv){
 	struct device *dev = &priv->i2c_client->dev;
@@ -477,13 +484,6 @@ static int probe_serializer(struct sl_max9295 *priv){
 
 	dev_info(dev, "%s: Serializer pipeline operational",__func__);
 
-	err = translate_imu(priv, gyro_addr,acc_addr);
-
-	if (err){
-		dev_err(dev, "%s: IMU addr translation failed\n",__func__);
-		return err;
-	}
-
 	dev->driver_data = priv;
 
 	if(index_serializer >= MAX_NB_SER){
@@ -521,7 +521,7 @@ static int sl_max9295_probe(struct i2c_client *client)
 	struct device_node* bmi;
 	struct sl_max9295 *priv;
 	const char *str;
-	int n_imu = 0;
+	int n_imu = 0, imu_index = -1;
 	int i = 0;
 	int err;
 	u8 val;
@@ -598,6 +598,7 @@ static int sl_max9295_probe(struct i2c_client *client)
 		dev_err(dev, "%s: IMU missing in serializer id %d", __func__, priv->zedx_id);
 		return -EINVAL; 
 	}
+	dev_info(dev, "%s: Found %d IMU",__func__,n_imu);
 
 	for(i=0;i<n_imu;i++){
 		bmi = of_parse_phandle(node, "imu" , i);
@@ -618,10 +619,12 @@ static int sl_max9295_probe(struct i2c_client *client)
 			of_node_put(bmi);
 			dev_err(dev, "%s: accel_i2c_addr not found in dts\n",__func__);
 			return err;
-		}	
-	}
+		}
 
-	of_node_put(bmi);
+		dev_info(dev, "%s: Parse BMI %d (0x%x / 0x%x)",__func__,i,priv->bmi_array[i].gyro_addr,priv->bmi_array[i].acc_addr);
+		
+		of_node_put(bmi);
+	}
 
 	err = probe_serializer(priv);
 
@@ -634,6 +637,18 @@ static int sl_max9295_probe(struct i2c_client *client)
 	}
 
 	ser_global_priv[index_serializer++] = priv;
+
+	for(i=0; i<index_serializer; i++)
+		if(priv->channel == ser_global_priv[i]->channel)
+			imu_index++;
+
+	err = translate_imu(priv, imu_index);
+	if (err)
+	{
+		dev_err(dev, "%s: IMU translation failed !\n",__func__);
+		return err;
+	}
+
 
 	return 0;
 }

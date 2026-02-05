@@ -181,6 +181,8 @@ static struct i2c_fingerprint zedonegs_sensor_reset[]= {
 	//{0x43, 0x0000, 0x84}
 	{0x42, 0x02BF, 0x60}, /* Set sensor MFP to push pull */
 	{0x42, 0x02BE, 0x80}, /* Power off sensor MFP */
+	{SLEEP, 0x00, 0x00},
+	{SLEEP, 0x00, 0x00},
 	{0x42, 0x02BE, 0x90}, /* Power on sensor MFP */
 	{MAX96712_TABLE_END, 0x00, 0x00}
 };
@@ -381,6 +383,8 @@ static struct i2c_fingerprint zedone4k_sensor_reset[]= {
 	//	{0x44, 0x0000, 0x84}, /* Reset the serializer */
 	{0x42, 0x02BF, 0x60}, /* Set sensor MFP to push pull */
 	{0x42, 0x02BE, 0x80}, /* Power off sensor MFP */
+	{SLEEP, 0x00, 0x00},
+	{SLEEP, 0x00, 0x00},
 	{0x42, 0x02BE, 0x90}, /* Power on sensor MFP */
 	{MAX96712_TABLE_END, 0x00, 0x00}
 };

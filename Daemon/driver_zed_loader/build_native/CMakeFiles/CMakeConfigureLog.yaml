@@ -62,8 +62,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-w8ukpS"
-      binary: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-w8ukpS"
+      source: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-9IXEWU"
+      binary: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-9IXEWU"
     cmakeVariables:
       CMAKE_C_FLAGS: ""
       CMAKE_EXE_LINKER_FLAGS: ""
@@ -71,21 +71,21 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-w8ukpS'
+        Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-9IXEWU'
         
-        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4ae04/fast
-        /usr/bin/gmake  -f CMakeFiles/cmTC_4ae04.dir/build.make CMakeFiles/cmTC_4ae04.dir/build
-        gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-w8ukpS'
-        Building C object CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o
-        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc   -v -o CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_8d0e0/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_8d0e0.dir/build.make CMakeFiles/cmTC_8d0e0.dir/build
+        gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-9IXEWU'
+        Building C object CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o
+        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc   -v -o CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c
         Using built-in specs.
         COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc.br_real
         Target: aarch64-buildroot-linux-gnu
         Configured with: ./configure --prefix=/sources/build/build --sysconfdir=/sources/build/build/etc --enable-static --target=aarch64-buildroot-linux-gnu --with-sysroot=/sources/build/build/aarch64-buildroot-linux-gnu/sysroot --enable-__cxa_atexit --with-gnu-ld --disable-libssp --disable-multilib --disable-decimal-float --with-gmp=/sources/build/build --with-mpc=/sources/build/build --with-mpfr=/sources/build/build --with-pkgversion='Buildroot 2020.08' --with-bugurl=http://bugs.buildroot.net/ --without-zstd --disable-libquadmath --disable-libquadmath-support --enable-tls --enable-threads --without-isl --without-cloog --with-abi=lp64 --with-cpu=cortex-a53 --enable-languages=c,c++,fortran --with-build-time-tools=/sources/build/build/aarch64-buildroot-linux-gnu/bin --enable-shared --enable-libgomp
         Thread model: posix
         gcc version 9.3.0 (Buildroot 2020.08) 
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1 -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccGFJdDt.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1 -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccrjKphL.s
         GNU C17 (Buildroot 2020.08) version 9.3.0 (aarch64-buildroot-linux-gnu)
         	compiled by GNU C version 4.8.4, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version none
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
@@ -104,15 +104,15 @@ events:
         	compiled by GNU C version 4.8.4, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version none
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
         Compiler executable checksum: 4a6471b4ffd4636b0b7a6ad4a5e2b455
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-         /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o /tmp/ccGFJdDt.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+         /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o /tmp/ccrjKphL.s
         GNU assembler version 2.33.1 (aarch64-buildroot-linux-gnu) using BFD version (GNU Binutils) 2.33.1
         COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/
         LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-        Linking C executable cmTC_4ae04
-        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4ae04.dir/link.txt --verbose=1
-        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc  -v CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -o cmTC_4ae04 
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+        Linking C executable cmTC_8d0e0
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8d0e0.dir/link.txt --verbose=1
+        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc  -v CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -o cmTC_8d0e0 
         Using built-in specs.
         COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc.br_real
         COLLECT_LTO_WRAPPER=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper
@@ -122,10 +122,10 @@ events:
         gcc version 9.3.0 (Buildroot 2020.08) 
         COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/
         LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4ae04' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccx1lxFW.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_4ae04 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4ae04' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-        gmake[1]: Leaving directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-w8ukpS'
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_8d0e0' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/cc9kjJHE.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_8d0e0 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_8d0e0' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+        gmake[1]: Leaving directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-9IXEWU'
         
       exitCode: 0
   -
@@ -159,21 +159,21 @@ events:
     message: |
       Parsed C implicit link information:
         link line regex: [^( *|.*[/\\])(aarch64-buildroot-linux-gnu-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
-        ignore line: [Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-w8ukpS']
+        ignore line: [Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-9IXEWU']
         ignore line: []
-        ignore line: [Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4ae04/fast]
-        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_4ae04.dir/build.make CMakeFiles/cmTC_4ae04.dir/build]
-        ignore line: [gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-w8ukpS']
-        ignore line: [Building C object CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o]
-        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc   -v -o CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c]
+        ignore line: [Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_8d0e0/fast]
+        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_8d0e0.dir/build.make CMakeFiles/cmTC_8d0e0.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-9IXEWU']
+        ignore line: [Building C object CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o]
+        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc   -v -o CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc.br_real]
         ignore line: [Target: aarch64-buildroot-linux-gnu]
         ignore line: [Configured with: ./configure --prefix=/sources/build/build --sysconfdir=/sources/build/build/etc --enable-static --target=aarch64-buildroot-linux-gnu --with-sysroot=/sources/build/build/aarch64-buildroot-linux-gnu/sysroot --enable-__cxa_atexit --with-gnu-ld --disable-libssp --disable-multilib --disable-decimal-float --with-gmp=/sources/build/build --with-mpc=/sources/build/build --with-mpfr=/sources/build/build --with-pkgversion='Buildroot 2020.08' --with-bugurl=http://bugs.buildroot.net/ --without-zstd --disable-libquadmath --disable-libquadmath-support --enable-tls --enable-threads --without-isl --without-cloog --with-abi=lp64 --with-cpu=cortex-a53 --enable-languages=c,c++,fortran --with-build-time-tools=/sources/build/build/aarch64-buildroot-linux-gnu/bin --enable-shared --enable-libgomp]
         ignore line: [Thread model: posix]
         ignore line: [gcc version 9.3.0 (Buildroot 2020.08) ]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1 -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccGFJdDt.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1 -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot /usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -version -o /tmp/ccrjKphL.s]
         ignore line: [GNU C17 (Buildroot 2020.08) version 9.3.0 (aarch64-buildroot-linux-gnu)]
         ignore line: [	compiled by GNU C version 4.8.4  GMP version 6.1.2  MPFR version 4.0.2  MPC version 1.1.0  isl version none]
         ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
@@ -192,15 +192,15 @@ events:
         ignore line: [	compiled by GNU C version 4.8.4  GMP version 6.1.2  MPFR version 4.0.2  MPC version 1.1.0  isl version none]
         ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
         ignore line: [Compiler executable checksum: 4a6471b4ffd4636b0b7a6ad4a5e2b455]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o /tmp/ccGFJdDt.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o /tmp/ccrjKphL.s]
         ignore line: [GNU assembler version 2.33.1 (aarch64-buildroot-linux-gnu) using BFD version (GNU Binutils) 2.33.1]
         ignore line: [COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/]
         ignore line: [LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        ignore line: [Linking C executable cmTC_4ae04]
-        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4ae04.dir/link.txt --verbose=1]
-        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc  -v CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -o cmTC_4ae04 ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o' '-c' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        ignore line: [Linking C executable cmTC_8d0e0]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8d0e0.dir/link.txt --verbose=1]
+        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc  -v CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -o cmTC_8d0e0 ]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-gcc.br_real]
         ignore line: [COLLECT_LTO_WRAPPER=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper]
@@ -210,13 +210,13 @@ events:
         ignore line: [gcc version 9.3.0 (Buildroot 2020.08) ]
         ignore line: [COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/]
         ignore line: [LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4ae04' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        link line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccx1lxFW.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_4ae04 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_8d0e0' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        link line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/cc9kjJHE.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_8d0e0 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o]
           arg [/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2] ==> ignore
           arg [-plugin] ==> ignore
           arg [/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so] ==> ignore
           arg [-plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper] ==> ignore
-          arg [-plugin-opt=-fresolution=/tmp/ccx1lxFW.res] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/cc9kjJHE.res] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
           arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -230,7 +230,7 @@ events:
           arg [-EL] ==> ignore
           arg [-maarch64linux] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_4ae04] ==> ignore
+          arg [cmTC_8d0e0] ==> ignore
           arg [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o] ==> obj [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o]
           arg [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o] ==> obj [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o]
           arg [/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o] ==> obj [/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o]
@@ -242,7 +242,7 @@ events:
           arg [-L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib] ==> dir [/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib]
           arg [-L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib] ==> dir [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib]
           arg [-L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib] ==> dir [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib]
-          arg [CMakeFiles/cmTC_4ae04.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [CMakeFiles/cmTC_8d0e0.dir/CMakeCCompilerABI.c.o] ==> ignore
           arg [-lgcc] ==> lib [gcc]
           arg [--push-state] ==> ignore
           arg [--as-needed] ==> ignore
@@ -284,8 +284,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-l1Xp7z"
-      binary: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-l1Xp7z"
+      source: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-1l16CP"
+      binary: "/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-1l16CP"
     cmakeVariables:
       CMAKE_CXX_FLAGS: ""
       CMAKE_EXE_LINKER_FLAGS: ""
@@ -293,21 +293,21 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-l1Xp7z'
+        Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-1l16CP'
         
-        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_c6c84/fast
-        /usr/bin/gmake  -f CMakeFiles/cmTC_c6c84.dir/build.make CMakeFiles/cmTC_c6c84.dir/build
-        gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-l1Xp7z'
-        Building CXX object CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o
-        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++   -v -o CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_9ca69/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_9ca69.dir/build.make CMakeFiles/cmTC_9ca69.dir/build
+        gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-1l16CP'
+        Building CXX object CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o
+        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++   -v -o CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp
         Using built-in specs.
         COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++.br_real
         Target: aarch64-buildroot-linux-gnu
         Configured with: ./configure --prefix=/sources/build/build --sysconfdir=/sources/build/build/etc --enable-static --target=aarch64-buildroot-linux-gnu --with-sysroot=/sources/build/build/aarch64-buildroot-linux-gnu/sysroot --enable-__cxa_atexit --with-gnu-ld --disable-libssp --disable-multilib --disable-decimal-float --with-gmp=/sources/build/build --with-mpc=/sources/build/build --with-mpfr=/sources/build/build --with-pkgversion='Buildroot 2020.08' --with-bugurl=http://bugs.buildroot.net/ --without-zstd --disable-libquadmath --disable-libquadmath-support --enable-tls --enable-threads --without-isl --without-cloog --with-abi=lp64 --with-cpu=cortex-a53 --enable-languages=c,c++,fortran --with-build-time-tools=/sources/build/build/aarch64-buildroot-linux-gnu/bin --enable-shared --enable-libgomp
         Thread model: posix
         gcc version 9.3.0 (Buildroot 2020.08) 
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1plus -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot -D_GNU_SOURCE /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/ccQlY0ZL.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1plus -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot -D_GNU_SOURCE /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/cc4BzWPZ.s
         GNU C++14 (Buildroot 2020.08) version 9.3.0 (aarch64-buildroot-linux-gnu)
         	compiled by GNU C version 4.8.4, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version none
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
@@ -332,15 +332,15 @@ events:
         	compiled by GNU C version 4.8.4, GMP version 6.1.2, MPFR version 4.0.2, MPC version 1.1.0, isl version none
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
         Compiler executable checksum: f1b4521017b6b0aaeb65d7d236240d32
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-         /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccQlY0ZL.s
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+         /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o /tmp/cc4BzWPZ.s
         GNU assembler version 2.33.1 (aarch64-buildroot-linux-gnu) using BFD version (GNU Binutils) 2.33.1
         COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/
         LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/
-        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-        Linking CXX executable cmTC_c6c84
-        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c6c84.dir/link.txt --verbose=1
-        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++  -v CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_c6c84 
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+        Linking CXX executable cmTC_9ca69
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9ca69.dir/link.txt --verbose=1
+        /opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++  -v CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_9ca69 
         Using built-in specs.
         COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++.br_real
         COLLECT_LTO_WRAPPER=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper
@@ -350,10 +350,10 @@ events:
         gcc version 9.3.0 (Buildroot 2020.08) 
         COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/
         LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_c6c84' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccnTKzVU.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_c6c84 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o
-        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_c6c84' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
-        gmake[1]: Leaving directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-l1Xp7z'
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_9ca69' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+         /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccO8W9i7.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_9ca69 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_9ca69' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64'
+        gmake[1]: Leaving directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-1l16CP'
         
       exitCode: 0
   -
@@ -393,21 +393,21 @@ events:
     message: |
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(aarch64-buildroot-linux-gnu-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
-        ignore line: [Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-l1Xp7z']
+        ignore line: [Change Dir: '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-1l16CP']
         ignore line: []
-        ignore line: [Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_c6c84/fast]
-        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_c6c84.dir/build.make CMakeFiles/cmTC_c6c84.dir/build]
-        ignore line: [gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-l1Xp7z']
-        ignore line: [Building CXX object CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o]
-        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++   -v -o CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_9ca69/fast]
+        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_9ca69.dir/build.make CMakeFiles/cmTC_9ca69.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/sl-antoinep/Documents/ai-blox-bsp-zedx/Daemon/driver_zed_loader/build_native/CMakeFiles/CMakeScratch/TryCompile-1l16CP']
+        ignore line: [Building CXX object CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++   -v -o CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++.br_real]
         ignore line: [Target: aarch64-buildroot-linux-gnu]
         ignore line: [Configured with: ./configure --prefix=/sources/build/build --sysconfdir=/sources/build/build/etc --enable-static --target=aarch64-buildroot-linux-gnu --with-sysroot=/sources/build/build/aarch64-buildroot-linux-gnu/sysroot --enable-__cxa_atexit --with-gnu-ld --disable-libssp --disable-multilib --disable-decimal-float --with-gmp=/sources/build/build --with-mpc=/sources/build/build --with-mpfr=/sources/build/build --with-pkgversion='Buildroot 2020.08' --with-bugurl=http://bugs.buildroot.net/ --without-zstd --disable-libquadmath --disable-libquadmath-support --enable-tls --enable-threads --without-isl --without-cloog --with-abi=lp64 --with-cpu=cortex-a53 --enable-languages=c,c++,fortran --with-build-time-tools=/sources/build/build/aarch64-buildroot-linux-gnu/bin --enable-shared --enable-libgomp]
         ignore line: [Thread model: posix]
         ignore line: [gcc version 9.3.0 (Buildroot 2020.08) ]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1plus -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot -D_GNU_SOURCE /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/ccQlY0ZL.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/cc1plus -quiet -v -iprefix /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/ -isysroot /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot -D_GNU_SOURCE /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mcpu=cortex-a53 -mlittle-endian -mabi=lp64 -auxbase-strip CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -version -o /tmp/cc4BzWPZ.s]
         ignore line: [GNU C++14 (Buildroot 2020.08) version 9.3.0 (aarch64-buildroot-linux-gnu)]
         ignore line: [	compiled by GNU C version 4.8.4  GMP version 6.1.2  MPFR version 4.0.2  MPC version 1.1.0  isl version none]
         ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
@@ -432,15 +432,15 @@ events:
         ignore line: [	compiled by GNU C version 4.8.4  GMP version 6.1.2  MPFR version 4.0.2  MPC version 1.1.0  isl version none]
         ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
         ignore line: [Compiler executable checksum: f1b4521017b6b0aaeb65d7d236240d32]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccQlY0ZL.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        ignore line: [ /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/as -v -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o /tmp/cc4BzWPZ.s]
         ignore line: [GNU assembler version 2.33.1 (aarch64-buildroot-linux-gnu) using BFD version (GNU Binutils) 2.33.1]
         ignore line: [COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/]
         ignore line: [LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        ignore line: [Linking CXX executable cmTC_c6c84]
-        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c6c84.dir/link.txt --verbose=1]
-        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++  -v CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_c6c84 ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        ignore line: [Linking CXX executable cmTC_9ca69]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9ca69.dir/link.txt --verbose=1]
+        ignore line: [/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++  -v CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_9ca69 ]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=/opt/aarch64--glibc--stable-final/bin/aarch64-buildroot-linux-gnu-g++.br_real]
         ignore line: [COLLECT_LTO_WRAPPER=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper]
@@ -450,13 +450,13 @@ events:
         ignore line: [gcc version 9.3.0 (Buildroot 2020.08) ]
         ignore line: [COMPILER_PATH=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/bin/]
         ignore line: [LIBRARY_PATH=/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/:/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/:/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_c6c84' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
-        link line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccnTKzVU.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_c6c84 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_9ca69' '-shared-libgcc' '-mcpu=cortex-a53' '-mlittle-endian' '-mabi=lp64']
+        link line: [ /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2 -plugin /opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so -plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccO8W9i7.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot --eh-frame-hdr -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -o cmTC_9ca69 /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib/../lib64 -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64 -L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib -L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtend.o /opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crtn.o]
           arg [/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/collect2] ==> ignore
           arg [-plugin] ==> ignore
           arg [/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/liblto_plugin.so] ==> ignore
           arg [-plugin-opt=/opt/aarch64--glibc--stable-final/bin/../libexec/gcc/aarch64-buildroot-linux-gnu/9.3.0/lto-wrapper] ==> ignore
-          arg [-plugin-opt=-fresolution=/tmp/ccnTKzVU.res] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/ccO8W9i7.res] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
           arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -470,7 +470,7 @@ events:
           arg [-EL] ==> ignore
           arg [-maarch64linux] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_c6c84] ==> ignore
+          arg [cmTC_9ca69] ==> ignore
           arg [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o] ==> obj [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crt1.o]
           arg [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o] ==> obj [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib/../lib64/crti.o]
           arg [/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o] ==> obj [/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/crtbegin.o]
@@ -482,7 +482,7 @@ events:
           arg [-L/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib] ==> dir [/opt/aarch64--glibc--stable-final/bin/../lib/gcc/aarch64-buildroot-linux-gnu/9.3.0/../../../../aarch64-buildroot-linux-gnu/lib]
           arg [-L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib] ==> dir [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/lib]
           arg [-L/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib] ==> dir [/opt/aarch64--glibc--stable-final/aarch64-buildroot-linux-gnu/sysroot/usr/lib]
-          arg [CMakeFiles/cmTC_c6c84.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [CMakeFiles/cmTC_9ca69.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
           arg [-lstdc++] ==> lib [stdc++]
           arg [-lm] ==> lib [m]
           arg [-lgcc_s] ==> lib [gcc_s]

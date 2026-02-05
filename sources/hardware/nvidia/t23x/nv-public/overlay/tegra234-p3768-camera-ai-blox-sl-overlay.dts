@@ -75,7 +75,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "4";
+						zedx-id = "0";
 						channel = "a"; /* deserializer channel */
 						
 						has-eeprom;
@@ -89,7 +89,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "5";
+						zedx-id = "1";
 						channel = "a"; /* deserializer channel */
 						
 						has-eeprom;
@@ -103,7 +103,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "6";
+						zedx-id = "2";
 						channel = "a";   /* deserializer channel */
 						
 						has-eeprom;
@@ -117,7 +117,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "7";
+						zedx-id = "3";
 						channel = "a";   /* deserializer channel */
 						
 						has-eeprom;
@@ -131,7 +131,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "14";
+						zedx-id = "4";
 						channel = "a";  /* deserializer channel */
 						
 						has-eeprom;
@@ -145,7 +145,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "15";
+						zedx-id = "5";
 						channel = "a";  /* deserializer channel */
 						
 						has-eeprom;
@@ -160,7 +160,7 @@
 						ZED_ORIN_CLKS
 						
 						channel = "a";  /* deserializer channel */
-						zedx-id = "16";
+						zedx-id = "6";
 						
 						has-eeprom;
 						eeprom-addr = <0x52>;
@@ -173,7 +173,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "17";
+						zedx-id = "7";
 						channel = "a";  /* deserializer channel */
 						
 						has-eeprom;
@@ -188,33 +188,33 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x20>;
 						
-						zedx-id = "4";
+						zedx-id = "0";
 						channel = "a";
 						mode = "master";
 						
 						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs0>;
-						imu = <&bmi088_a &bmi088_b>;
+						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
 					};
 					
 					zedxone_gs_ser1: zedxone_gs_ser_1@21 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x21>;
 						
-						zedx-id = "5";
+						zedx-id = "1";
 						channel = "a";
 						mode = "master";
 						
 						camera_model = "zedonegs";
 						camera-sensors = <&zedxone_gs1>;
-						imu = <&bmi088_a &bmi088_b>;
+						imu = <&bmi088_a &bmi088_b &bmi088_c &bmi088_d>;
 					};
 					
 					zedxone_gs_ser2: zedxone_gs_ser_2@22 {
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x22>;
 						
-						zedx-id = "6";
+						zedx-id = "2";
 						channel = "a";
 						mode = "master";
 						
@@ -227,7 +227,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x23>;
 						
-						zedx-id = "7";
+						zedx-id = "3";
 						channel = "a";
 						mode = "master";
 						
@@ -241,7 +241,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4c>;
 						
-						zedx-id = "14";
+						zedx-id = "4";
 						channel = "a";
 						mode = "master";
 						
@@ -254,7 +254,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4d>;
 						
-						zedx-id = "15";
+						zedx-id = "5";
 						channel = "a";
 						mode = "master";
 						
@@ -268,7 +268,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4e>;
 						
-						zedx-id = "16";
+						zedx-id = "6";
 						channel = "a";
 						mode = "master";
 						
@@ -281,7 +281,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x4f>;
 						
-						zedx-id = "17";
+						zedx-id = "7";
 						channel = "a";
 						mode = "master";
 						
@@ -335,7 +335,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "22";
+						zedx-id = "8";
 						channel = "b";   /* deserializer channel */
 						
 						has-eeprom;
@@ -349,7 +349,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "23";
+						zedx-id = "9";
 						channel = "b";   /* deserializer channel */
 						
 						has-eeprom;
@@ -363,7 +363,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "24";
+						zedx-id = "10";
 						channel = "b";   /* deserializer channel */
 						
 						has-eeprom;
@@ -377,7 +377,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "25";
+						zedx-id = "11";
 						channel = "b";   /* deserializer channel */
 						
 						has-eeprom;
@@ -391,7 +391,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "32";
+						zedx-id = "12";
 						channel = "b";  /* deserializer channel */
 						
 						eeprom-addr = <0x52>;
@@ -405,7 +405,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "33";
+						zedx-id = "13";
 						channel = "b";  /* deserializer channel */
 						
 						has-eeprom;
@@ -419,7 +419,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "34";
+						zedx-id = "14";
 						channel = "b";  /* deserializer channel */
 						
 						eeprom-addr = <0x52>;
@@ -433,7 +433,7 @@
 						
 						ZED_ORIN_CLKS
 						
-						zedx-id = "35";
+						zedx-id = "15";
 						channel = "b";  /* deserializer channel */
 						
 						has-eeprom;
@@ -442,11 +442,11 @@
 					
 					/* Serializers */
 					
-					zedxone_gs_ser4: zedxone_gs_ser_4@40 {
+					zedxone_gs_ser4: zedxone_gs_ser_4@43 {
 						compatible = "stereolabs,sl_max9295";
-						reg = <0x40>;
+						reg = <0x43>;
 						
-						zedx-id = "22";
+						zedx-id = "8";
 						channel = "b";
 						mode = "master";
 						
@@ -455,11 +455,11 @@
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
 					};
 					
-					zedxone_gs_ser5: zedxone_gs_ser_5@41 {
+					zedxone_gs_ser5: zedxone_gs_ser_5@44 {
 						compatible = "stereolabs,sl_max9295";
-						reg = <0x41>;
+						reg = <0x44>;
 						
-						zedx-id = "23";
+						zedx-id = "9";
 						channel = "b";
 						mode = "master";
 						
@@ -468,11 +468,11 @@
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
 					};
 					
-					zedxone_gs_ser6: zedxone_gs_ser_6@42  {
+					zedxone_gs_ser6: zedxone_gs_ser_6@45  {
 						compatible = "stereolabs,sl_max9295";
-						reg = <0x42>;
+						reg = <0x45>;
 						
-						zedx-id = "24";
+						zedx-id = "10";
 						channel = "b";
 						mode = "master";
 						
@@ -481,11 +481,11 @@
 						imu = <&bmi088_e &bmi088_f &bmi088_g &bmi088_h>;
 					};
 					
-					zedxone_gs_ser7: zedxone_gs_ser_7@43 {
+					zedxone_gs_ser7: zedxone_gs_ser_7@46 {
 						compatible = "stereolabs,sl_max9295";
-						reg = <0x43>;
+						reg = <0x46>;
 						
-						zedx-id = "25";
+						zedx-id = "11";
 						channel = "b";
 						mode = "master";
 						
@@ -499,7 +499,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6c>;
 						
-						zedx-id = "32";
+						zedx-id = "12";
 						channel = "b";
 						mode = "master";
 						
@@ -512,7 +512,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6d>;
 						
-						zedx-id = "33";
+						zedx-id = "13";
 						channel = "b";
 						mode = "master";
 						
@@ -525,7 +525,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6e>;
 						
-						zedx-id = "34";
+						zedx-id = "14";
 						channel = "b";
 						mode = "master";
 						
@@ -538,7 +538,7 @@
 						compatible = "stereolabs,sl_max9295";
 						reg = <0x6f>;
 						
-						zedx-id = "35";
+						zedx-id = "15";
 						channel = "b";
 						mode = "master";
 						
