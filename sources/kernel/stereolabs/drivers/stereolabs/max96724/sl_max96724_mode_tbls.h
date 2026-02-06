@@ -146,7 +146,6 @@ void get_zedx_alt_fingerprint(struct i2c_fingerprint* table, const size_t size,c
 static struct i2c_fingerprint zedx_sensor_reset[]= {
 	//Test reset addr
   //	{0x63, 0x0000, 0x84}, /* Fsync pin is pulled up */
-  	{0x42, 0x0010, 0x91}, /* Fsync pin is pulled up */
 	{0x62, 0x02D4, 0x60}, /* Set sensor MFP to push pull */
 	{0x62, 0x02D3, 0x80}, /* Power off sensor MFP */
 	{0x62, 0x02D3, 0x90}, /* Power on sensor@x18 MFP */
@@ -311,7 +310,7 @@ static struct index_reg_8 zedxhdr_mappings[] = {
 
 static struct i2c_fingerprint zedonehdr_sensor_reset[]= {
   	//	{0x40, 0x0000, 0x84}, /* Fsync pin is pulled up */
-	{0x42, 0x0010, 0x91},
+	//{0x42, 0x0010, 0x91}, //removed ser reset because don't want to reset 3 to 6 gbps config
 	{0x42, 0x02BE, 0x90}, /* Power on sensor MFP */
 	{SLEEP, 0x00, 0x00},
 	{SLEEP, 0x00, 0x00},
@@ -385,7 +384,7 @@ static struct index_reg_8 zedonehdr_mappings[] = {
 
 static struct i2c_fingerprint zedone4k_sensor_reset[]= {
 //	{0x44, 0x0000, 0x84}, /* Reset the serializer */
-	{0x42, 0x0010, 0x91}, /* Reset the serializer */
+//	{0x42, 0x0010, 0x91}, /* Reset the serializer */
 	{0x42, 0x02BF, 0x60}, /* Set sensor MFP to push pull */
 	{0x42, 0x02BE, 0x80}, /* Power off sensor MFP */
 	{SLEEP, 0x00, 0x00},

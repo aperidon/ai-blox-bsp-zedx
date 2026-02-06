@@ -393,7 +393,7 @@ static inline int check_model(struct max96724 *priv, u8 i)
 	/* We reset the alternative i2c_mapping, if any */
     /* Do not check returned error, try to communicate with empty address */
 	err = model_reset(priv, i);
-    
+
 	/* We check the i2c fingerprint correspondance with this model */
 	while (fingerprint[j].i2c_addr!=MAX96724_TABLE_END)
 	{
@@ -439,7 +439,11 @@ static inline int configure_3Gbps_cameras_to_6Gbps(struct max96724 *priv, int li
 	err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr, gmsl_3gbps_mode);
 	dev_dbg(&client->dev, "%s: Switching deserializer mode to 3Gbps: %d %x %x %02x\n",
 		__func__, err,client->addr, reg_gmsl_ctrl_addr, gmsl_3gbps_mode);
-	msleep(150);
+
+    err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0);
+    msleep(SLEEP_TIME);
+    err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<link));
+    msleep(SLEEP_TIME);
 
 	// Reset every possible serializer at 3Gbps
     for (j = 0; j < N_MAX_TOTAL_SER; j++){
@@ -473,7 +477,11 @@ static inline int configure_3Gbps_cameras_to_6Gbps(struct max96724 *priv, int li
 	err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr, gmsl_6gbps_mode);
 	dev_dbg(&client->dev, "%s: Switching deserializer mode to 6Gbps: %d %x %x %02x\n",
 		__func__, err,client->addr,reg_gmsl_ctrl_addr,gmsl_6gbps_mode);
-	msleep(150);
+
+    err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0);
+    msleep(SLEEP_TIME);
+    err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<link));
+    msleep(SLEEP_TIME);
 
 	return err;
 }
@@ -836,7 +844,11 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
             err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
             dev_dbg(&client->dev, "%s: %d %x %x %02x\n",
                 __func__, err,client->addr,reg_gmsl_ctrl_addr,gmsl_3gbps_mode);
-            msleep(150);
+
+            err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0);
+            msleep(SLEEP_TIME);
+            err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
+            msleep(SLEEP_TIME);
             
             // Read the link status again
             err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
@@ -844,7 +856,11 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
             // Set deserializer at 6Gbps gmsl speed
             err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
-            msleep(150);
+
+            err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0);
+            msleep(SLEEP_TIME);
+            err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
+            msleep(SLEEP_TIME);
         }
 
         if(link)
@@ -857,8 +873,6 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
     {
         err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
 
-        msleep(SLEEP_TIME);
-        msleep(SLEEP_TIME);
         msleep(SLEEP_TIME);
 
         if (err || verbosity_level)
@@ -889,7 +903,10 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
             // Set deserializer at 3Gpbs gmsl speed 
             err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , gmsl_3gbps_mode);
 
-            msleep(150);
+            err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0);
+            msleep(SLEEP_TIME);
+            err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
+            msleep(SLEEP_TIME);
             
             // Read the link status again
             err = regmap_read(priv->regmap, mode_table[tab_id][i].addr, &link);
@@ -902,7 +919,11 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
                 // Set deserializer at 6Gbps gmsl speed
                 err = regmap_write(priv->regmap, reg_gmsl_ctrl_addr , 0x22);
-                msleep(150);
+
+                err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0);
+                msleep(SLEEP_TIME);
+                err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0|(1<<i));
+                msleep(SLEEP_TIME);
 
                 continue;
             }

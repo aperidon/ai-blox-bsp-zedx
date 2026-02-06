@@ -292,7 +292,7 @@
 					
 					/* IMU A*/
 					bmi088_a: bmi088_a_@60 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x60>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x70>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
@@ -301,7 +301,7 @@
 					
 					/* IMU B*/
 					bmi088_b: bmi088_b_@61 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x61>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x71>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
@@ -310,7 +310,7 @@
 					
 					/* IMU C*/
 					bmi088_c: bmi088_c_@62 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x62>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x72>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
@@ -319,7 +319,7 @@
 					
 					/* IMU D*/
 					bmi088_d: bmi088_d_@63 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x63>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x73>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
@@ -550,7 +550,7 @@
 					
 					/* IMU A*/
 					bmi088_e: bmi088_e_@64 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x64>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x74>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
@@ -559,7 +559,7 @@
 					
 					/* IMU B*/
 					bmi088_f: bmi088_f_@65 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x65>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x75>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
@@ -568,7 +568,7 @@
 					
 					/* IMU C*/
 					bmi088_g: bmi088_g_@66 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x66>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x76>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];
@@ -577,7 +577,7 @@
 					
 					/* IMU D*/
 					bmi088_h: bmi088_h_@67 {
-						//compatible = "bmi,bmi088";
+						compatible = "stereolabs,sl_bmi088";
 						reg = <0x67>; /* <-- Must be gyroscope I2C address */
 						accel_i2c_addr = <0x77>; /* Must be specified */
 						accel_matrix    = [01 00 00 00 01 00 00 00 01];

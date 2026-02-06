@@ -136,10 +136,6 @@ MainProcess::MainProcess() {
     if (fileExists(max96724_driver))
         startBlockingProcess("./", "rmmod sl_max96724", true, false);
 
-    std::string max96712_driver = base_path + "max96712/sl_max96712.ko";
-    if (fileExists(max96712_driver))
-        startBlockingProcess("./", "rmmod sl_max96712", true, false);
-
     std::string max9296_driver = base_path + "max9296/sl_max9296.ko";
     if (fileExists(max9296_driver))
         startBlockingProcess("./", "rmmod sl_max9296", true, false);
@@ -150,9 +146,6 @@ MainProcess::MainProcess() {
     // DESERIALIZERS
     if (fileExists(max96724_driver))
         startBlockingProcess("./", "insmod " + max96724_driver + " sync_mode=" + std::to_string(mSynch_mode), true, false);
-
-    if (fileExists(max96712_driver))
-        startBlockingProcess("./", "insmod " + max96712_driver + " sync_mode=" + std::to_string(mSynch_mode), true, false);
 
     if (fileExists(max9296_driver))
         startBlockingProcess("./", "insmod " + max9296_driver + " sync_mode=" + std::to_string(mSynch_mode), true, false);

@@ -437,19 +437,23 @@ static int probe_serializer(struct sl_max9295 *priv){
 	// 	acc_addr = ZED_MONO_ACC_BASE_ADDR;
 	// 	priv->camera_model = ZEDONE4K;
 	// }
-	// else if (strcmp(str, "zedonegs")==0)
-	// {
-	// 	if( !second_cam)
-	// 		err = ser_write_table(priv, mode_table_A[AR0234_9295A_SER]);
-	// 	else
-	// 		err = ser_write_table(priv, mode_table_B[AR0234_9295A_SER]);
+	if (strcmp(str, "zedonegs")==0)
+	{
+		static struct index_reg_8 tmp[ZEDXONEGS_TAB_SIZE];
+		memcpy(tmp, mode_table[AR0234_9295A_SER], sizeof(tmp));
+		tmp[1].val = ((1<<pipe_index)<<4);
+		tmp[2].val = (0x70 | (1 << pipe_index));
 
-	// 	gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
-	// 	acc_addr = ZED_MONO_ACC_BASE_ADDR;
-	// 	priv->camera_model = ZEDONEGS;
-	// 	// err = ser_write_table(priv, table[AR0234_9295A_SER]);
-	// }
-	/*else*/ if (strcmp(str, "zedonehdr")==0)
+		dev_info(dev, "%s: pipe index : %d -> (0x%x , 0x%x) (0x%x , 0x%x)\n",
+				__func__, pipe_index,tmp[1].addr, tmp[1].val,tmp[2].addr, tmp[2].val);
+		
+		err = ser_write_table(priv, tmp);
+			
+		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
+		acc_addr = ZED_MONO_ACC_BASE_ADDR;
+		priv->camera_model = ZEDONEGS;
+	}
+	else if (strcmp(str, "zedonehdr")==0)
 	{
 
 		static struct index_reg_8 tmp[ZEDXONEHDR_TAB_SIZE];

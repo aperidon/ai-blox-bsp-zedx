@@ -391,7 +391,7 @@ static struct index_reg_8 isx031_9295A_Ser_A[] = {
 // };
 
 #define ZEDXONEHDR_TAB_SIZE (sizeof(isx031_9295A_Ser_A) / sizeof(isx031_9295A_Ser_A[0]))
-
+#define ZEDXONEGS_TAB_SIZE (sizeof(ar0234_9295A_Ser_A) / sizeof(ar0234_9295A_Ser_A[0]))
 
 enum
 {
