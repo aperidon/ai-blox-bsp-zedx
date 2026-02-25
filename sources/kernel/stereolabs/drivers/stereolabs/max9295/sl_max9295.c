@@ -390,8 +390,8 @@ static int probe_serializer(struct sl_max9295 *priv){
 	//struct index_reg_8** table = mode_table_A;
 	//int second_cam = isSecondCamFromI2C(priv->channel, priv->zedx_id);
 	int pipe_index = getCamPipeIndex(priv->channel, priv->zedx_id);
-	int acc_addr = 0;
-	int gyro_addr = 0;
+	// int acc_addr = 0;
+	// int gyro_addr = 0;
     static int index_serializer = 0;
 
 	err = of_property_read_string(np, "camera_model", &str);
@@ -449,8 +449,8 @@ static int probe_serializer(struct sl_max9295 *priv){
 		
 		err = ser_write_table(priv, tmp);
 			
-		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
-		acc_addr = ZED_MONO_ACC_BASE_ADDR;
+		priv->gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
+		priv->acc_addr = ZED_MONO_ACC_BASE_ADDR;
 		priv->camera_model = ZEDONEGS;
 	}
 	else if (strcmp(str, "zedonehdr")==0)
@@ -468,8 +468,8 @@ static int probe_serializer(struct sl_max9295 *priv){
 		
 		err = ser_write_table(priv, tmp);
 
-		gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
-		acc_addr = ZED_MONO_ACC_BASE_ADDR;
+		priv->gyro_addr = ZED_MONO_GYRO_BASE_ADDR;
+		priv->acc_addr = ZED_MONO_ACC_BASE_ADDR;
 		priv->camera_model = ZEDONEHDR;
 	}
 	// else if (strcmp(str, "zedxhdr")==0)

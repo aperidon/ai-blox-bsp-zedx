@@ -1782,7 +1782,7 @@ static int bmi_probe(struct i2c_client *client)
 MODULE_DEVICE_TABLE(i2c, bmi_i2c_device_ids);
 
 static const struct of_device_id bmi_of_match[] = {
-	{ .compatible = "stereolabs,sl_bmi088", },
+	{ .compatible = "bmi,bmi088", },
 	{}
 };
 

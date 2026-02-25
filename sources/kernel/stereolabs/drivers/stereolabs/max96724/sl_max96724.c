@@ -114,6 +114,7 @@ struct max96724
     s8 port_to_i2c[N_GMSL_PORTS];
     u8 avail_pipe;
     u8 n_cam;
+    int n_serializers;
     struct serializer_devices ser_devices[N_MAX_TOTAL_SER];
     struct sensor detected_sensors[2*N_GMSL_PORTS];
 	int mfp_trig_in; // Mfp used as trigger input (default MFP10) 
@@ -124,7 +125,7 @@ struct max96724
  *
  * Array of pointers to deserializer device structures representing connected devices.
  */
-struct max96724 *global_priv[4];
+struct max96724 *global_priv[2];
 static int sync_mode = 0;
 module_param(sync_mode, int, 0);
 
@@ -804,7 +805,7 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
     int model;
     bool cam_found, config_supported;
     int cam_model_count;
-    u8 i,j;
+    u8 i,j, n;
     int reg_gmsl_ctrl_addr = 0;
     int gmsl_3gbps_mode = 0;
     int active_gmsl=0;
@@ -952,6 +953,23 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
         /* Configure 3Gpbs serializer (one hdr) to 6Gbps*/
         configure_3Gbps_cameras_to_6Gbps(priv, i);
+        msleep(SLEEP_TIME);
+        msleep(SLEEP_TIME);
+        dev_info(&client->dev, "hard_reset : n_serializer = %d", priv->n_serializers);
+        for(j=0; j < priv->n_serializers; j++)
+        {
+            for(n=0; n<3 ; n++)
+            {
+                client->addr = priv->ser_devices[j].ser_addr;
+                err = regmap_write(priv->regmap, 0x0000, 0x84);
+            }
+                
+            dev_info(&client->dev, "hard_reset : hard reset of model %d 0x%x return %d", priv->ser_devices[j].camera_model, priv->ser_devices[j].ser_addr, err);
+            
+            msleep(6);
+        }
+
+        client->addr = deser_addr;
 
         /* read the camera fingerprint and return its ID */
         model = sl_max96724_get_camera_model(priv);
@@ -1287,9 +1305,21 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 	int err = -1;
 	struct list_head *pos;
 	struct sensor *sp;
+    int i=0;
 
     if (global_priv[channel]->intialized == 0)
         return err;
+
+    for( i=0; i<2; i++)
+    {
+        if (global_priv[i]->intialized == 0)
+            continue;
+        err = write_reg_Dser(i, GMSL_LINKS_EN_REG, 
+            0xF0);
+        if (err)
+            return -1;
+        msleep(100);
+    }
     
     list_for_each(pos, &global_priv[channel]->sensor_list){
 		sp = list_entry(pos, struct sensor, list);
@@ -1324,13 +1354,32 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 EXPORT_SYMBOL(dser_enable_gmsl_link);
 
 int dser_open_all_gmsl_link(int channel){
-    int err = -1;
+    // int err = -1;
 
-    if (global_priv[channel]->intialized == 0)
-        return err;
+    // if (global_priv[channel]->intialized == 0)
+    //     return err;
         
-    err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
-            0xFF);
+    // err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
+    //         0xFF);
+
+    int i, j, err = -1;
+    u8 val;
+
+    for( i=0; i<2; i++)
+    {
+        if (global_priv[i]->intialized == 0)
+            return err;
+        for( j=0; j<N_GMSL_PORTS; j++)
+        {
+            val = 0xF0 | ((1 << (j+1)) - 1);
+            err = write_reg_Dser(i, GMSL_LINKS_EN_REG, 
+                            val);
+            dev_dbg(&global_priv[i]->i2c_client->dev,
+            "%s: open GMSL link %d -> 0x%x\n",
+            __func__, j, val);
+            msleep(100);
+        }
+    }
     return err;
 }
 EXPORT_SYMBOL(dser_open_all_gmsl_link);
@@ -1511,8 +1560,8 @@ static int sl_max96724_parse_serializer_node(struct max96724 *priv,
 	struct device_node *mux_node;
 	struct device_node *ports_node, *port_node, *endpoint_node;
     struct sensor *sp;
-    int n_sensors;
 	const char *str;
+    int n_sensors;
     u8 i,j;
 
 	if (!ser_node)
@@ -1715,7 +1764,7 @@ static int sl_max96724_parse_dt(struct max96724 *priv)
 	struct device_node *ser_np;
 	//struct of_phandle_args args;
 	const char *str;
-    int n_serializers;
+    //int n_serializers;
 	s8 i;
 
 	err = of_property_read_string(np, "channel", &str);
@@ -1739,19 +1788,19 @@ static int sl_max96724_parse_dt(struct max96724 *priv)
 
 	global_priv[priv->channel] = priv;
 
-    n_serializers = of_count_phandle_with_args(np, "camera-serializers", NULL);
+    priv->n_serializers = of_count_phandle_with_args(np, "camera-serializers", NULL);
 
     dev_dbg(&i2c_client->dev, "%s: Number of declared cameras with this deserializer : %d\n",
-     __func__, n_serializers);
+     __func__, priv->n_serializers);
     
-     if(n_serializers % 4 != 0)
+     if(priv->n_serializers % 4 != 0)
         dev_warn(&i2c_client->dev,"%s: Camera not declared for all GMSL link",__func__);
 
-    if(n_serializers % 4 != 0)
+    if(priv->n_serializers % 4 != 0)
         dev_warn(&i2c_client->dev,"%s: Camera not declared for all GMSL link. If you don't want a camera at a certain port, set a dummy instead",__func__);
 
     /* retrieve all information for each port */
-	for ( i = 0 ; i < n_serializers ; i++ )
+	for ( i = 0 ; i < priv->n_serializers ; i++ )
 	{
 
 		ser_np = of_parse_phandle(np, "camera-serializers" , i);

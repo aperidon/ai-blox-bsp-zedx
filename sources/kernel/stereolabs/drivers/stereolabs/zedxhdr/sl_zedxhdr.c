@@ -584,7 +584,7 @@ static int zedxhdr_start_streaming(struct tegracam_device *tc_dev)
 		mode_table[ISX031_MODE_START_STREAM]);
 	if (err)
 	{
-		dev_dbg(dev, "%s: zedxhdr_write_table  fail--------\n", __func__);
+		dev_warn(dev, "%s: zedxhdr_write_table  fail--------\n", __func__);
 		return -EINVAL;
 	}
 
@@ -1089,6 +1089,14 @@ static int zedxhdr_probe(struct i2c_client *client)
 	tegracam_set_privdata(tc_dev, (void *)priv);
 
 	err = zedxhdr_write_table(priv,mode_table[ISX031_MODE_INIT]);
+	if (err){
+		tegracam_device_unregister(tc_dev);
+		dev_err(dev, "%s: Init sensor fail", __func__);
+		return -EINVAL;
+	}
+
+	/* might need to stop stream at power up */
+	err = zedxhdr_write_table(priv,mode_table[ISX031_MODE_STOP_STREAM]);
 	if (err){
 		tegracam_device_unregister(tc_dev);
 		dev_err(dev, "%s: Init sensor fail", __func__);
