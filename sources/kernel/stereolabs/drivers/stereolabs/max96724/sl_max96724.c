@@ -102,7 +102,7 @@ typedef struct serializer_devices{
  */
 struct max96724
 {
-    bool intialized;
+    bool initialized;
     struct i2c_client *i2c_client;
     struct regmap *regmap;
     struct list_head sensor_list;
@@ -1200,7 +1200,7 @@ int dser_get_gmsl_port(int channel, int zedx_id){
     struct list_head *pos;
 	struct sensor *sp;
 
-    if (global_priv[channel]->intialized == 0)
+    if (global_priv[channel]->initialized == 0)
         return err;
 
     list_for_each(pos, &global_priv[channel]->sensor_list){
@@ -1307,12 +1307,12 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 	struct sensor *sp;
     int i=0;
 
-    if (global_priv[channel]->intialized == 0)
+    if (global_priv[channel]->initialized == 0)
         return err;
 
     for( i=0; i<2; i++)
     {
-        if (global_priv[i]->intialized == 0)
+        if (global_priv[i]->initialized == 0)
             continue;
         err = write_reg_Dser(i, GMSL_LINKS_EN_REG, 
             0xF0);
@@ -1354,20 +1354,12 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 EXPORT_SYMBOL(dser_enable_gmsl_link);
 
 int dser_open_all_gmsl_link(int channel){
-    // int err = -1;
-
-    // if (global_priv[channel]->intialized == 0)
-    //     return err;
-        
-    // err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
-    //         0xFF);
-
     int i, j, err = -1;
     u8 val;
 
     for( i=0; i<2; i++)
     {
-        if (global_priv[i]->intialized == 0)
+        if (global_priv[i]->initialized == 0)
             return err;
         for( j=0; j<N_GMSL_PORTS; j++)
         {
@@ -1471,7 +1463,7 @@ int isSecondCamFromI2C(int channel, int zedx_id)
     struct sensor *sp;
     u8 i = 0;
 
-    if (global_priv[channel]->intialized == 0)
+    if (global_priv[channel]->initialized == 0)
         return -1;
 
     for( i=0; i < global_priv[channel]->n_cam; i++)
@@ -1895,7 +1887,7 @@ static int sl_max96724_probe(struct i2c_client *client)
     INIT_LIST_HEAD(&priv->sensor_list);
 
     priv->avail_pipe = 0;
-    priv->intialized = 0;
+    priv->initialized = 0;
     priv->i2c_client = client;
     priv->regmap = devm_regmap_init_i2c(priv->i2c_client,
             &sl_max96724_regmap_config);
@@ -1936,9 +1928,11 @@ static int sl_max96724_probe(struct i2c_client *client)
     err = write_reg_Dser(priv->channel, 0x04AF, pipe_sync_val);
     dev_info(dev,"%s: set SYNC 0x04AF to 0x%x", __func__, pipe_sync_val);
 
+    err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, 0xF0);
+
     /*set daymode by fault*/
     dev_info(dev, "%s: success\n", __func__);
-    priv->intialized = 1;
+    priv->initialized = 1;
     return err;
 }
 

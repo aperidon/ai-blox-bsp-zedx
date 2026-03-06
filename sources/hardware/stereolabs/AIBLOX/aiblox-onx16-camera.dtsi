@@ -111,7 +111,7 @@
 						zedxonehdr_vi_in0: endpoint {
 							status = "okay";
 							vc-id = <0>;
-							port-index = <1>;
+							port-index = <0>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out0>;
 						};
@@ -122,7 +122,7 @@
 						zedxonehdr_vi_in1: endpoint {
 							status = "okay";
 							vc-id = <1>;
-							port-index = <1>;
+							port-index = <0>;
 							bus-width = <NUM_LANES>;
 							remote-endpoint = <&zedxonehdr_csi_out1>;
 						};
@@ -421,7 +421,7 @@
 									status = "okay";
 									zedxonehdr_csi_in0: endpoint@16 {
 										status = "okay";
-										port-index = <1>;
+										port-index = <0>;
 										bus-width = <NUM_LANES>;
 										remote-endpoint = <&zedxonehdr_isx031_out0>;
 									};
@@ -447,7 +447,7 @@
 									status = "okay";
 									zedxonehdr_csi_in1: endpoint@18 {
 										status = "okay";
-										port-index = <1>;
+										port-index = <0>;
 										bus-width = <NUM_LANES>;
 										remote-endpoint = <&zedxonehdr_isx031_out1>;
 									};
@@ -739,7 +739,7 @@
 						sync_sensor = "ZEDXONE_CAM6";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("0", "serial_b", "6")
+						ISX031_MODES("0", "serial_a", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -748,8 +748,8 @@
 								reg = <0>;
 								zedxonehdr_isx031_out0: endpoint {
 									vc-id = <0>;
-									port-index = <1>;
-									opt-csi-port = "f";
+									port-index = <0>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
 									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in0>;
@@ -765,7 +765,7 @@
 						sync_sensor = "ZEDXONE_CAM8";
 						sync_sensor_index = <1>;
 						
-						ISX031_MODES("1", "serial_b", "6")
+						ISX031_MODES("1", "serial_a", "6")
 						
 						ports {
 							#address-cells = <1>;
@@ -774,8 +774,8 @@
 								reg = <0>;
 								zedxonehdr_isx031_out1: endpoint {
 									vc-id = <1>;
-									port-index = <1>;
-									opt-csi-port = "f";
+									port-index = <0>;
+									opt-csi-port = "e";
 									bus-width = <NUM_LANES>;
 									i2c-cc = <1>;
 									remote-endpoint = <&zedxonehdr_csi_in1>;

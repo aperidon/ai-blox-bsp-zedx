@@ -143,12 +143,18 @@ MainProcess::MainProcess() {
     ::Debug::debugPrint("[ZED-X Daemon] ZED-X Daemon removed\n");
 
     // Insert drivers: deserializer → serializer → sensors
+    startBlockingProcess("./", "i2cset -y -f 1 0x2e 0x00 0x06 0xf0 i", true, false);
+    startBlockingProcess("./", "i2cset -y -f 1 0x27 0x00 0x06 0xf0 i", true, false);
     // DESERIALIZERS
     if (fileExists(max96724_driver))
         startBlockingProcess("./", "insmod " + max96724_driver + " sync_mode=" + std::to_string(mSynch_mode), true, false);
 
     if (fileExists(max9296_driver))
         startBlockingProcess("./", "insmod " + max9296_driver + " sync_mode=" + std::to_string(mSynch_mode), true, false);
+
+    startBlockingProcess("./", "i2cset -y -f 1 0x2e 0x00 0x06 0xff i", true, false);
+    startBlockingProcess("./", "i2cset -y -f 1 0x27 0x00 0x06 0xff i", true, false);
+    startBlockingProcess("./", "sleep .5", true, false);
 
     // SERIALIZER
     if (fileExists(max9295_driver))
