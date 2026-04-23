@@ -34,6 +34,19 @@
 			bus@0 {
 				/* i2c-1 */
 				i2c@c240000{
+
+					max96724_b@27 {
+						compatible = "stereolabs,sl_max96724";
+						reg = <0x27>;  /* deserializer i2c_address */
+						channel = "b"; /* deserializer channel: one per deser */
+						pwdn-gpio =	<&gpio CAM0_PWDN GPIO_ACTIVE_HIGH>;
+						
+						camera-serializers = <
+						/* GMSL 0 */&zedxone_gs_ser4 &zedxone_hdr_ser4
+						/* GMSL 1 */&zedxone_gs_ser5 &zedxone_hdr_ser5
+						/* GMSL 2 */&zedxone_gs_ser6 &zedxone_hdr_ser6
+						/* GMSL 3 */&zedxone_gs_ser7 &zedxone_hdr_ser7 >;
+					};
 					
 					max96724_a@2e {
 						compatible = "stereolabs,sl_max96724";
@@ -49,18 +62,7 @@
 						
 					};
 					
-					max96724_b@27 {
-						compatible = "stereolabs,sl_max96724";
-						reg = <0x27>;  /* deserializer i2c_address */
-						channel = "b"; /* deserializer channel: one per deser */
-						pwdn-gpio =	<&gpio CAM0_PWDN GPIO_ACTIVE_HIGH>;
-						
-						camera-serializers = <
-						/* GMSL 0 */&zedxone_gs_ser4 &zedxone_hdr_ser4
-						/* GMSL 1 */&zedxone_gs_ser5 &zedxone_hdr_ser5
-						/* GMSL 2 */&zedxone_gs_ser6 &zedxone_hdr_ser6
-						/* GMSL 3 */&zedxone_gs_ser7 &zedxone_hdr_ser7 >;
-					};
+					
 				};
 				
 				/* i2c-2 */

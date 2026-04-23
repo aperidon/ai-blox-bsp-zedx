@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-// #define DEBUG
+#define DEBUG
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/gpio.h>
@@ -658,6 +658,9 @@ static int zedxhdr_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 {
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 
+	if (client == NULL)
+		return -EADDRNOTAVAIL;
+
 	dev_dbg(&client->dev, "%s:\n", __func__);
 
 	return 0;
@@ -1207,7 +1210,8 @@ static int zedxhdr_probe(struct i2c_client *client)
 	return 0;
 }
 
-static void zedxhdr_shutdown(struct i2c_client *client){
+static void upgrade_eeprom_at_remove(struct i2c_client *client)
+{
 	struct camera_common_data *s_data = NULL;
 	struct zedxhdr *priv = NULL;
 	int err = 0;
@@ -1295,6 +1299,39 @@ static void zedxhdr_shutdown(struct i2c_client *client){
 	dev_dbg(&priv->i2c_client->dev,"Eeprom successfully written\r\n");
 }
 
+static void zedxhdr_shutdown(struct i2c_client *client){
+	struct device *dev = &client->dev;
+	struct camera_common_data *s_data = NULL;
+	struct zedxhdr *priv = NULL;
+
+	s_data = to_camera_common_data(&client->dev);
+	priv = (struct zedxhdr *)s_data->priv;
+
+	upgrade_eeprom_at_remove(client);
+
+	kobject_put(&priv->zed_sysfs.info_kobj);
+
+	if (priv->tc_dev){
+		tegracam_v4l2subdev_unregister(priv->tc_dev);
+		tegracam_device_unregister(priv->tc_dev);
+	}
+
+	zedxhdr_eeprom_device_release(priv);
+	dev_dbg(dev, " ZED-X sensor successfully removed\n");
+
+	msleep(5000);
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
+	v4l2_ctrl_handler_free(&priv->ctrl_handler);
+#endif
+
+	zedxhdr_probe_count--;
+	if (zedxhdr_probe_count < 0)
+		dev_alert(&client->dev,"%s: zedxhdr_probe_count < 0\n", __func__);
+
+	dev_dbg(dev, " ZED-X sensor successfully removed\n");
+}
+
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
 static int zedxhdr_remove(struct i2c_client *client)
 #else
@@ -1308,7 +1345,7 @@ static void zedxhdr_remove(struct i2c_client *client)
 	s_data = to_camera_common_data(&client->dev);
 	priv = (struct zedxhdr *)s_data->priv;
 
-	zedxhdr_shutdown(client);
+	upgrade_eeprom_at_remove(client);
 
 	kobject_put(&priv->zed_sysfs.info_kobj);
 
@@ -1318,6 +1355,10 @@ static void zedxhdr_remove(struct i2c_client *client)
 	}
 
 	zedxhdr_eeprom_device_release(priv);
+	dev_dbg(dev, " ZED-X sensor successfully removed\n");
+
+	msleep(5000);
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 0)
 	v4l2_ctrl_handler_free(&priv->ctrl_handler);
 #endif

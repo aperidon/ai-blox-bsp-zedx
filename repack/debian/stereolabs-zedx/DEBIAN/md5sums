@@ -28,7 +28,7 @@ d41d8cd98f00b204e9800998ecf8427e  boot/stereolabs/utils/Utils/__init__.py
 21b4140509d39d54dbd640f2a33c715f  boot/stereolabs/utils/extlinux.py
 7bda5078a06892aee1eda4ce32c5c072  boot/stereolabs/utils/fio.py
 8d3968ef14457e755dc27a87a74fd6b8  boot/stereolabs/utils/zlconfig
-b5a3e23dff34021a713e21af882ca4d6  boot/tegra234-p3768-camera-ai-blox-sl-overlay.dtbo
+53ef6aafe00dd346e7148f065514f97d  boot/tegra234-p3768-camera-ai-blox-sl-overlay.dtbo
 4eae8e58da85de26a2715f3278ab3fa1  tmp/0010-nvidia-capture-ivc-fix-multi-cam-race-condition.patch
 bc11f2fe656fc5d44446376e07ed840a  tmp/0011-nvidia-vi5-fix-channel_error_recover-memory-leak.patch
 f86b87db06265a80633bffab8bac0c14  tmp/0012-nvidia-vi5-timeout-handling-fix.diff
@@ -40,14 +40,14 @@ cea32444ba0a688cf2580d1e7ef3520f  tmp/zed_x_daemon.service
 cc170080be2154259f4d462002d3f123  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/bmi088/bmi088.ko
 ffbc8f0116cc749672c4e8df0c354137  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/bmi088/bmi_spsc.ko
 face802e52edc5dc6d8d229d7349aa34  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max9295/sl_max9295.ko
-4f098182644e03cf3be304be47dc7918  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max96724/sl_max96724.ko
+ffc4831e40902a966d75901bbcfed22d  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/max96724/sl_max96724.ko
 7ab21e71bf68af57d52faf2d1a502289  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedone4k/sl_zedxone_uhd.ko
 3b3530d406db4a5440e09c795312b6fb  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedx/sl_zedx.ko
-d5bcc001663cad3c7a4281894f8c4f07  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxhdr/sl_zedxhdr.ko
+8e988163df8270d0cb226701ed35c0cc  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxhdr/sl_zedxhdr.ko
 3439a2e1c82602e3a3f28d7eedda6b6e  usr/lib/modules/5.15.148-tegra/kernel/drivers/stereolabs/zedxpro
 c464fb2117308c32a12c84e340da06dc  usr/sbin/IMU_Daemon
 02a0927f62613d5d04fb0cc9f4003cac  usr/sbin/ZEDX_Daemon
-7c077cfdfa83ef68b9e22a794ad309a9  usr/sbin/ZEDX_Driver
+3751ce74ad4b4b5893763bc88f8002a0  usr/sbin/ZEDX_Driver
 e5c0900dbb98a09c16bf46fd6e126fb2  usr/share/doc/stereolabs-zedx/changelog.Debian.gz
 9818f840b6d211be486e6b89670b8e62  var/nvidia/nvcam/settings/zedx_ar0234.isp
 5dcfc043c6800cbb1ed8f3a806b0a757  var/nvidia/nvcam/settings/zedx_ar0234_l4t327.isp

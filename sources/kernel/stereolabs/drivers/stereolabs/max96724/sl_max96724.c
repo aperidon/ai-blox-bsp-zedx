@@ -943,8 +943,8 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
             
             client->addr = reset_table[0].i2c_addr;
             err = regmap_write(priv->regmap, reset_table[0].reg_addr, reset_table[0].val);
-            dev_dbg(&client->dev, "%s: reset ser %s %d %d %x %x %02x\n",
-                    __func__,camera_names[priv->ser_devices[j].camera_model],priv->ser_devices[j].zedx_id, err,client->addr,reset_table[0].reg_addr,reset_table[0].val);
+            dev_dbg(&client->dev, "%s: reset ser %s %d (addr: 0x%x): i2c-%d 0x%x 0x%02x -> %d\n",
+                    __func__,camera_names[priv->ser_devices[j].camera_model],priv->ser_devices[j].zedx_id,client->addr,client->adapter->nr ,reset_table[0].reg_addr,reset_table[0].val, err);
 
             msleep(6);
         }
