@@ -1,0 +1,59 @@
+From 4d5f49ef7b052a98d7a2fd162676d33a7576325f Mon Sep 17 00:00:00 2001
+From: null <null@nvidia.com>
+Date: Wed, 2 Jul 2025 15:31:37 +0800
+Subject: [PATCH] vi5: fix vi5_channel_error_recover memory leak
+
+release chan->request_iova and also chan->emb_buf memory
+
+Bug 5371485
+
+Change-Id: I6e2642733a222a85b2f7d6814716835afc921948
+
+---
+ .../media/platform/tegra/camera/vi/vi5_fops.c | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c b/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c
+index c6093a75..1eda1549 100644
+--- a/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c
++++ b/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c
+@@ -603,6 +603,9 @@ rel_buf:
+ 	vi5_release_buffer(chan, buf);
+ }
+ 
++static void vi5_unit_get_device_handle(struct platform_device *pdev,
++			uint32_t csi_stream_id, struct device **dev);
++
+ static int vi5_channel_error_recover(struct tegra_channel *chan,
+ 	bool queue_error)
+ {
+@@ -620,6 +623,27 @@ static int vi5_channel_error_recover(struct tegra_channel *chan,
+ 			dev_err(&chan->video->dev, "vi capture release failed\n");
+ 			goto done;
+ 		}
++
++		/* Release capture requests */
++		if (chan->request[vi_port] != NULL) {
++			dma_free_coherent(chan->tegra_vi_channel[vi_port]->rtcpu_dev,
++			chan->capture_queue_depth * sizeof(struct capture_descriptor),
++			chan->request[vi_port], chan->request_iova[vi_port]);
++		}
++		chan->request[vi_port] = NULL;
++
++		/* Release emd data buffers */
++		if (chan->emb_buf_size > 0) {
++			struct device *vi_unit_dev;
++
++			vi5_unit_get_device_handle(\
++					vi->ndev, chan->port[0],\
++					&vi_unit_dev);
++			dma_free_coherent(vi_unit_dev, chan->emb_buf_size,
++				chan->emb_buf_addr, chan->emb_buf);
++				chan->emb_buf_size = 0;
++		}
++
+ 		vi_channel_close_ex(chan->vi_channel_id[vi_port],
+ 					chan->tegra_vi_channel[vi_port]);
+ 		chan->tegra_vi_channel[vi_port] = NULL;
+-- 
+2.25.1

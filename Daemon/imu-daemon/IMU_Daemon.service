@@ -1,0 +1,13 @@
+[Unit]
+Description=IIO Privileged Helper Daemon
+After=zed_x_daemon.service
+Requires=zed_x_daemon.service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/IMU_Daemon
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

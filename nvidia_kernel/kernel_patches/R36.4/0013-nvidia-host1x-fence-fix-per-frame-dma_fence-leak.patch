@@ -1,0 +1,21 @@
+From: Stereolabs <embedded@stereolabs.com>
+Subject: [PATCH] host1x-fence: drop dma_fence ref on FENCE_EXTRACT success path
+
+dev_file_ioctl_fence_extract() takes a dma_fence reference via
+sync_file_get_fence() but only releases it on the error paths
+(put_fence:). The success path returns 0 without dma_fence_put(),
+leaking one host1x_syncpt_fence (256B, kmalloc-256) per frame on the
+Argus EGLStream thread (HOST1X_IOCTL_FENCE_EXTRACT). ~122 MB/h @ 60fps.
+Ref: NVIDIA devforum 325399.
+---
+diff --git a/src/nvidia-oot/drivers/gpu/host1x-fence/dev.c b/src/nvidia-oot/drivers/gpu/host1x-fence/dev.c
+--- a/src/nvidia-oot/drivers/gpu/host1x-fence/dev.c
++++ b/src/nvidia-oot/drivers/gpu/host1x-fence/dev.c
+@@ -172,6 +172,7 @@
+ 		goto put_fence;
+ 	}
+ 
++	dma_fence_put(fence);
+ 	return 0;
+ 
+ put_fence:

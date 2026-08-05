@@ -1,0 +1,33 @@
+From: Stereolabs <embedded@stereolabs.com>
+Subject: [PATCH] host1x: fix race in syncpt alloc/free (kref_put_mutex)
+
+host1x_syncpt_put() did kref_put() then syncpt_release() separately
+acquired syncpt_mutex; in that window host1x_syncpt_alloc() (scanning
+for kref_read()==0 under the mutex) could grab the slot being released
+and kref_init() it, after which syncpt_release() kfree()'d sp->name /
+freed the base of the live new allocation (UAF / double-free /
+syncpoint reused before fully released). Use kref_put_mutex() so the
+mutex is held atomically across the zero-refcount window.
+Backport of torvalds c7d393267c497502fa737607f435f05dfe6e3d9b.
+---
+diff --git a/src/nvidia-oot/drivers/gpu/host1x/syncpt.c b/src/nvidia-oot/drivers/gpu/host1x/syncpt.c
+--- a/src/nvidia-oot/drivers/gpu/host1x/syncpt.c
++++ b/src/nvidia-oot/drivers/gpu/host1x/syncpt.c
+@@ -414,8 +414,6 @@
+ 
+ 	sp->locked = false;
+ 
+-	mutex_lock(&sp->host->syncpt_mutex);
+-
+ 	host1x_syncpt_base_free(sp->base);
+ 	kfree(sp->name);
+ 	sp->base = NULL;
+@@ -438,7 +436,7 @@
+ 	if (!sp)
+ 		return;
+ 
+-	kref_put(&sp->ref, syncpt_release);
++	kref_put_mutex(&sp->ref, syncpt_release, &sp->host->syncpt_mutex);
+ }
+ EXPORT_SYMBOL(host1x_syncpt_put);
+ 

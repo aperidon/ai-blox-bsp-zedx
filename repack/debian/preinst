@@ -1,0 +1,96 @@
+#!/bin/bash
+set -e
+
+PKG_VERSION=""
+
+# Check for real-time kernel
+if ! uname -r | grep -q "rt"; then
+    # We're on a non-RT kernel
+    # Check if this package is a real-time package
+    if [[ "$PKG_VERSION" == *"rt"* ]]; then
+        echo "ERROR: RT package cannot be installed on non-RT kernel: $(uname -r)" >&2
+        exit 1
+    fi
+else
+    # We're on an RT kernel
+    # Check if this package is a non-real-time package
+    if [[ ! "$PKG_VERSION" == *"rt"* ]]; then
+        echo "ERROR: non-RT package cannot be installed on RT kernel: $(uname -r)" >&2
+        exit 1
+    fi
+fi
+
+# If we reach this point, we've passed the kernel compatibility check
+touch /tmp/stereolabs_preinst_passed
+
+# Setup udev rules and imu group for SPSC BMI088 devices
+echo "Setting up udev rules for SPSC BMI088 IMU devices..."
+if ! grep -q 'SUBSYSTEM=="bmi_spsc"' /etc/udev/rules.d/99-imu.rules 2>/dev/null; then
+    echo 'SUBSYSTEM=="bmi_spsc", GROUP="imu", MODE="0660"' > /etc/udev/rules.d/99-imu.rules
+fi
+if ! getent group imu > /dev/null; then
+    groupadd imu
+fi
+usermod -aG imu ${SUDO_USER:-$USER}
+udevadm control --reload-rules
+udevadm trigger
+
+## remove old stereolabs driver content - this is normally already done with the postrm+purge of the repack
+if [ -d "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max9296/" ] 
+then
+if [ "$(ls -A "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max9296/")" ]; then
+   rm /lib/modules/$(uname -r)/kernel/drivers/stereolabs/max9296/*
+fi 
+fi
+
+if [ -d "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max96712/" ] 
+then
+if [ "$(ls -A "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/max96712/")" ]; then
+   rm /lib/modules/$(uname -r)/kernel/drivers/stereolabs/max96712/*
+fi 
+fi
+
+if [ -d "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/zedx/" ] 
+then
+if [ "$(ls -A "/lib/modules/$(uname -r)/kernel/drivers/stereolabs/zedx/")" ]; then
+   rm /lib/modules/$(uname -r)/kernel/drivers/stereolabs/zedx/*
+fi 
+fi
+ 
+## Stop Daemon / remove service / remove executable (either from old ZED SDK + old driver)
+DAEMON_FILE=/etc/systemd/system/zed_x_daemon.service
+DAEMON_DRIVER_FILE=/etc/systemd/system/driver_zed_loader.service
+IMU_DAEMON_FILE=/etc/systemd/system/IMU_Daemon.service
+
+if [[ -f "$DAEMON_FILE" ]]; then
+    sudo systemctl stop zed_x_daemon
+    rm $DAEMON_FILE
+    if [[ -f "/usr/local/zed/bin/ZEDX_Daemon" ]]; then
+    rm "/usr/local/zed/bin/ZEDX_Daemon"
+    fi
+    if [[ -f "/usr/sbin/ZEDX_Daemon" ]]; then
+    rm "/usr/sbin/ZEDX_Daemon"
+    fi
+fi
+
+if [[ -f "$DAEMON_DRIVER_FILE" ]]; then
+    rm $DAEMON_DRIVER_FILE
+    if [[ -f "/usr/local/zed/bin/ZEDX_Driver" ]]; then
+    rm "/usr/local/zed/bin/ZEDX_Driver"
+    fi
+    if [[ -f "/usr/sbin/ZEDX_Driver" ]]; then
+    rm "/usr/sbin/ZEDX_Driver"
+    fi
+fi
+
+if [[ -f "$IMU_DAEMON_FILE" ]]; then
+    sudo systemctl stop IMU_Daemon
+    rm $IMU_DAEMON_FILE
+    if [[ -f "/usr/sbin/IMU_Daemon" ]]; then
+    rm "/usr/sbin/IMU_Daemon"
+    fi
+fi
+
+sync
+
+exit 0

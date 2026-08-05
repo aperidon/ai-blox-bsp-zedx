@@ -1,0 +1,108 @@
+diff --color -Naur a/src/kernel/kernel-jammy-src/arch/arm64/configs/defconfig b/src/kernel/kernel-jammy-src/arch/arm64/configs/defconfig
+--- a/src/kernel/kernel-jammy-src/arch/arm64/configs/defconfig	2025-01-01 00:00:00.000000000 +0000
++++ b/src/kernel/kernel-jammy-src/arch/arm64/configs/defconfig	2025-01-02 00:00:00.000000000 +0000
+@@ -440,6 +440,11 @@
+ CONFIG_BRCMFMAC=m
+ # CONFIG_BRCMFMAC_SDIO is not set
+ CONFIG_BRCMFMAC_PCIE=y
++CONFIG_IWLWIFI=m
++CONFIG_IWLWIFI_LEDS=y
++CONFIG_IWLDVM=m
++CONFIG_IWLMVM=m
++CONFIG_IWLWIFI_OPMODE_MODULAR=y
+ CONFIG_MWIFIEX=m
+ CONFIG_MWIFIEX_PCIE=m
+ CONFIG_WL18XX=m
+diff --color -Naur a/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000+p3767.dtsi b/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000+p3767.dtsi
+--- a/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000+p3767.dtsi	2025-01-01 00:00:00.000000000 +0000
++++ b/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000+p3767.dtsi	2025-01-02 00:00:00.000000000 +0000
+@@ -89,6 +89,11 @@
+ 						usb3-1 {
+ 							nvidia,function = "xusb";
+ 							status = "okay";
++						};
++
++						usb3-2 {
++							nvidia,function = "xusb";
++							status = "okay";
+ 						};
+ 					};
+ 				};
+@@ -100,6 +105,12 @@
+ 					vbus-supply = <&vdd_5v0_sys>;
+ 					status = "okay";
+ 					usb-role-switch;
++					connector {
++						compatible = "usb-b-connector", "gpio-usb-b-connector";
++						label = "micro-USB";
++						type = "micro";
++						vbus-gpio = <&gpio TEGRA234_MAIN_GPIO(Z, 1) GPIO_ACTIVE_LOW>;
++					};
+ 				};
+ 
+ 				/* hub */
+@@ -118,13 +129,18 @@
+ 
+ 				/* hub */
+ 				usb3-0 {
+-					nvidia,usb2-companion = <1>;
++					nvidia,usb2-companion = <2>; /* should be 2, connected to som */
+ 					status = "okay";
+ 				};
+ 
+ 				/* J5 */
+ 				usb3-1 {
+-					nvidia,usb2-companion = <0>;
++					nvidia,usb2-companion = <1>; /* should be 1, connected to hub */
++					status = "okay";
++				};
++
++				usb3-2 {
++					nvidia,usb2-companion = <1>; /* should be 1, connected to hub */
+ 					status = "okay";
+ 				};
+ 			};
+@@ -133,21 +149,21 @@
+ 		usb@3550000 {
+ 			status = "okay";
+ 
+-			phys = <&{/bus@0/padctl@3520000/pads/usb2/lanes/usb2-0}>,
+-			       <&{/bus@0/padctl@3520000/pads/usb3/lanes/usb3-1}>;
+-			phy-names = "usb2-0", "usb3-0";
++			phys = <&{/bus@0/padctl@3520000/pads/usb2/lanes/usb2-0}>;
++			phy-names = "usb2-0";
+ 		};
+ 
+ 		usb@3610000 {
+ 			status = "okay";
+ 
+-			phys = <&{/bus@0/padctl@3520000/pads/usb2/lanes/usb2-0}>,
+-			       <&{/bus@0/padctl@3520000/pads/usb2/lanes/usb2-1}>,
++			phys = <&{/bus@0/padctl@3520000/pads/usb2/lanes/usb2-1}>,
+ 			       <&{/bus@0/padctl@3520000/pads/usb2/lanes/usb2-2}>,
++			       <&{/bus@0/padctl@3520000/pads/usb2/lanes/usb2-3}>,
+ 			       <&{/bus@0/padctl@3520000/pads/usb3/lanes/usb3-0}>,
+-			       <&{/bus@0/padctl@3520000/pads/usb3/lanes/usb3-1}>;
+-			phy-names = "usb2-0", "usb2-1", "usb2-2", "usb3-0",
+-				    "usb3-1";
++			       <&{/bus@0/padctl@3520000/pads/usb3/lanes/usb3-1}>,
++			       <&{/bus@0/padctl@3520000/pads/usb3/lanes/usb3-2}>;
++			phy-names = "usb2-1", "usb2-2", "usb2-3", "usb3-0",
++				    "usb3-1", "usb3-2";
+ 		};
+ 
+ 		/* C8 - Ethernet */
+@@ -207,6 +223,13 @@
+ 			phys = <&p2u_gbe_0>, <&p2u_gbe_1>;
+ 			phy-names = "p2u-0", "p2u-1";
+ 		};
++
++		pps {
++			gpios = <&gpio TEGRA234_MAIN_GPIO(A, 6) GPIO_ACTIVE_HIGH>;
++			compatible = "pps-gpio";
++			status = "okay";
++		};
++
+ 	};
+ 
+ 	gpio-keys {

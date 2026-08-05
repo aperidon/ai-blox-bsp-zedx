@@ -1,0 +1,33 @@
+--- /dev/null	2024-01-02 17:56:58.904011752 +0100
++++ b/repack/debian/control	2024-01-10 11:08:15.392228891 +0100
+@@ -0,0 +1,14 @@
++Source: stereolabs-zedx
++Section: kernel
++Priority: standard
++Maintainer: NVIDIA Corporation, Stereolabs Inc.
++Build-Depends: debhelper (>=9)
++Standards-Version: 3.9.6
++Homepage: www.stereolabs.com
++
++Package: stereolabs-zedx
++Architecture: arm64
++Pre-Depends: nvidia-l4t-core (>> 39.2-0), nvidia-l4t-core (<< 39.3-0)
++Depends: device-tree-compiler, nvidia-l4t-rt-kernel (>= 6.8.12-1021-rt-tegra) | nvidia-l4t-kernel (>= 6.8.12-1021-tegra), nvidia-l4t-rt-kernel (<= 6.8.13-rt-tegra) | nvidia-l4t-kernel (<= 6.8.13-tegra)
++Description: NVIDIA Kernel DTB Modified Package by Stereolabs
++X-Jetpack_Base: L4T39.2
+--- /dev/null	2024-01-02 17:56:58.904011752 +0100
++++ b/repack/debian/changelog	2024-01-10 11:05:57.123890447 +0100
+@@ -0,0 +1,13 @@
++stereolabs-zedx (0.4.9-MAX96712-L4T39.2.1) stable; urgency=low
++
++  * Bump to L4T 39.2.1
++  * ZED X multi-carrier board support
++
++ -- Stereolabs Inc <support@stereolabs.com>  Mon, 06 May 2024 15:09:22 +0200
++
++nvidia-l4t-kernel-dtbs (6.8.12-1021-tegra-39.2.1) stable; urgency=low
++
++  * Bump to L4T 39.2
++  * Refer to Package Release Notes for details: http://developer.nvidia.com/jetson
++
++ -- NVIDIA Corporation <linux-tegra-bugs@nvidia.com>  Wed, 24 Apr 2024 19:36:48 -0800

@@ -1,0 +1,92 @@
+diff --color -Naur a/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-p3448-0002-p3449-0000-b00.dts b/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-p3448-0002-p3449-0000-b00.dts
+--- a/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-p3448-0002-p3449-0000-b00.dts	2023-06-07 18:57:52.000000000 +0200
++++ b/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-p3448-0002-p3449-0000-b00.dts	2024-06-25 13:37:59.679072300 +0200
+@@ -19,12 +19,14 @@
+  */
+ 
+ #include "tegra210-porg-p3448-common.dtsi"
+-#include "porg-platforms/tegra210-porg-camera-rbpcv3-dual-imx477.dtsi"
+-#include "porg-platforms/tegra210-porg-camera-rbpcv2-dual-imx219.dtsi"
++//#include "porg-platforms/tegra210-porg-camera-rbpcv3-dual-imx477.dtsi"
++//#include "porg-platforms/tegra210-porg-camera-rbpcv2-dual-imx219.dtsi"
+ #include "porg-platforms/tegra210-porg-pinmux-p3448-0002-b00.dtsi"
+ #include "porg-platforms/tegra210-porg-gpio-p3448-0002-b00.dtsi"
+ #include "porg-platforms/tegra210-porg-p3448-emc-a00.dtsi"
+ 
++//sl_placeholder
++
+ / {
+ 	model = "NVIDIA Jetson Nano Developer Kit";
+ 	compatible ="nvidia,p3449-0000-b00+p3448-0002-b00", "nvidia,jetson-nano", "nvidia,tegra210";
+diff --color -Naur a/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi b/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
+--- a/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi	2023-06-07 18:57:52.000000000 +0200
++++ b/src/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi	2024-06-25 13:38:47.227003393 +0200
+@@ -27,7 +27,7 @@
+ #include "porg-platforms/tegra210-porg-power-tree-p3448-0000-a00.dtsi"
+ #include "porg-platforms/tegra210-pinmux-drive-sdmmc-common.dtsi"
+ #include "porg-platforms/tegra210-porg-pwm-fan.dtsi"
+-#include <t210-common-platforms/tegra210-ers-hdmi-e2190-1100-a00.dtsi>
++//#include <t210-common-platforms/tegra210-ers-hdmi-e2190-1100-a00.dtsi>
+ #include <t210-common-platforms/tegra210-dp.dtsi>
+ #include <t210-common-platforms/tegra210-thermal-userspace-alert.dtsi>
+ #include "porg-platforms/tegra210-porg-thermal.dtsi"
+diff --color -Naur a/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile b/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile
+--- a/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile	2023-06-07 18:58:18.000000000 +0200
++++ b/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile	2024-06-25 13:50:17.638792965 +0200
+@@ -41,9 +41,11 @@
+ DTC_FLAGS += -i $(tegra-dtstree)/soc/t210/kernel-dts
+ DTC_FLAGS += -i $(tegra-dtstree)/platform/t210/common/kernel-dts
+ DTC_FLAGS += -i $(tegra-dtstree)/platform/t210b01/common/kernel-dts
++DTC_FLAGS += -i $(stereolabs-dtstree)/NANO_Streamer
+ DTCCPP_FLAGS += -I$(tegra-dtstree)/soc/t210/kernel-dts
+ DTCCPP_FLAGS += -I$(tegra-dtstree)/platform/t210/common/kernel-dts
+ DTCCPP_FLAGS += -I$(tegra-dtstree)/platform/t210b01/common/kernel-dts
++DTCCPP_FLAGS += -I$(stereolabs-dtstree)/NANO_Streamer
+ endif
+ 
+ ifeq ($(CONFIG_ARCH_TEGRA_18x_SOC),y)
+diff --color -Naur a/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig b/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig
+--- a/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig	2023-06-07 18:58:18.000000000 +0200
++++ b/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig	2024-06-25 12:03:38.450349813 +0200
+@@ -772,10 +772,14 @@
+ CONFIG_I2C_IOEXPANDER_PCA9570=y
+ CONFIG_VIDEO_TC358840=m
+ CONFIG_VIDEO_LT6911UXC=y
+-CONFIG_I2C_IOEXPANDER_SER_MAX9295=y
+-CONFIG_I2C_IOEXPANDER_DESER_MAX9296=y
+-CONFIG_VIDEO_IMX390=y
+-CONFIG_VIDEO_IMX204=y
++#CONFIG_I2C_IOEXPANDER_SER_MAX9295=y
++#CONFIG_I2C_IOEXPANDER_DESER_MAX9296=y
++#CONFIG_VIDEO_IMX390=y
++#CONFIG_VIDEO_IMX204=y
++#CONFIG_SL_DESER_MAX9296=m
++CONFIG_SL_DESER_MAX96712=m
++CONFIG_SL_VIDEO_ZEDX=m
++CONFIG_TEGRA_L4T_351=y
+ # CONFIG_VGA_ARB is not set
+ CONFIG_DRM=y
+ CONFIG_DRM_TEGRA_UDRM=m
+diff --color -Naur a/src/kernel/kernel-4.9/Makefile b/src/kernel/kernel-4.9/Makefile
+--- a/src/kernel/kernel-4.9/Makefile	2023-06-07 18:58:18.000000000 +0200
++++ b/src/kernel/kernel-4.9/Makefile	2024-06-25 12:09:17.396430247 +0200
+@@ -4,6 +4,7 @@
+ KERNEL_OVERLAYS += $(CURDIR)/../nvgpu
+ KERNEL_OVERLAYS += $(CURDIR)/../nvgpu-next
+ KERNEL_OVERLAYS += $(CURDIR)/../nvidia-t23x
++KERNEL_OVERLAYS += $(CURDIR)/../stereolabs
+ else
+ override KERNEL_OVERLAYS := $(subst :, ,$(KERNEL_OVERLAYS))
+ endif
+diff --color -Naur a/src/kernel/kernel-4.9/scripts/Kbuild.include b/src/kernel/kernel-4.9/scripts/Kbuild.include
+--- a/src/kernel/kernel-4.9/scripts/Kbuild.include	2023-06-07 18:58:21.000000000 +0200
++++ b/src/kernel/kernel-4.9/scripts/Kbuild.include	2024-06-25 12:07:28.779772312 +0200
+@@ -484,6 +484,8 @@
+ tegra-dtstree = $(srctree)/../../hardware/nvidia
+ endif
+ 
++stereolabs-dtstree = $(srctree)/../../hardware/stereolabs
++
+ tegra-root-dtstree = $(subst ^$(realpath $(tegra-dtstree)/../..)/,,^$(realpath $(srctree)/arch/arm64/boot/dts))
+ tegra-rel-dtstree = $(subst $(the-space),/,$(patsubst %,..,$(subst /, ,$(tegra-root-dtstree))))
+ # delete partially updated (i.e. corrupted) files on error

@@ -1,0 +1,23 @@
+diff --git a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi
+index 511d36c5d..0dd257833 100644
+--- a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi
++++ b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi
+@@ -26,6 +26,18 @@
+ 		phy-names = "p2u-0", "p2u-1", "p2u-2", "p2u-3";
+ 	};
+ 
++	pcie@141e0000 {
++		/*
++		 * C7 - M2 Key M, default config, other config possible as
++		 * below:
++		 * C7 x2 - default
++		 * C7 x1 or C9 x1
++		 */
++		status = "okay";
++		phys = <&p2u_gbe_0>, <&p2u_gbe_1>;
++		phy-names = "p2u-0", "p2u-1";
++	};
++
+ 	pcie@140a0000 {/* C8 - Ethernet */
+ 		status = "okay";
+ 

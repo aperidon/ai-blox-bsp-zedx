@@ -1,0 +1,584 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-FileCopyrightText: Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+#include "../../../Utils/isx031-sl-modes.dtsi"
+#include "../../../Utils/ar0234-sl-modes.dtsi"
+#include "../../../Utils/imx678-sl-modes.dtsi"
+
+#define NUM_LANES 2
+
+/ {
+
+	tegra-capture-vi {
+		num-channels = <7>;
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			port@0 {
+				reg = <0>;
+				status = "okay";
+				zedx_vi_in0: endpoint {
+					status = "okay";
+					vc-id = <0>;
+					port-index = <2>;
+					bus-width = <NUM_LANES>;
+					remote-endpoint = <&zedx_csi_out0>;
+				};
+			};
+			port@1 {
+				reg = <1>;
+				status = "okay";
+				zedx_vi_in1: endpoint {
+					status = "okay";
+					vc-id = <1>;
+					port-index = <2>;
+					bus-width = <NUM_LANES>;
+					remote-endpoint = <&zedx_csi_out1>;
+				};
+			};
+			port@2 {
+				reg = <2>;
+				status = "okay";
+				ar0234_vi_in0: endpoint {
+					status = "okay";
+					vc-id = <0>;
+					port-index = <2>;
+					bus-width = <NUM_LANES>;
+					remote-endpoint = <&ar0234_csi_out0>;
+				};
+			};
+			port@3 {
+				reg = <3>;
+				status = "okay";
+				imx678_vi_in0: endpoint {
+					status = "okay";
+					port-index = <2>;
+					bus-width = <NUM_LANES>;
+					remote-endpoint = <&imx678_csi_out0>;
+				};
+			};
+
+
+			port@4 {
+				reg = <4>;
+				status = "okay";
+				zedxhdr_vi_in0: endpoint {
+					status = "okay";
+					vc-id = <0>;
+					port-index = <2>;
+					bus-width = <NUM_LANES>;
+					remote-endpoint = <&zedxhdr_csi_out0>;
+				};
+			};
+			port@5 {
+				reg = <5>;
+				status = "okay";
+				zedxhdr_vi_in1: endpoint {
+					status = "okay";
+					vc-id = <1>;
+					port-index = <2>;
+					bus-width = <NUM_LANES>;
+					remote-endpoint = <&zedxhdr_csi_out1>;
+				};
+			};
+			port@6 {
+				reg = <6>;
+				status = "okay";
+				zedonehdr_vi_in0: endpoint {
+					status = "okay";
+					vc-id = <0>;
+					port-index = <2>;
+					bus-width = <NUM_LANES>;
+					remote-endpoint = <&zedonehdr_csi_out0>;
+				};
+			};
+		};
+	};
+
+	host1x@13e00000 {
+		nvcsi@15a00000 {
+			num-channels = <7>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			channel@0 {
+				reg = <0>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						zedx_csi_in0: endpoint@0 {
+							status = "okay";
+							port-index = <2>;
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedx_ar0234_out0>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						zedx_csi_out0: endpoint@1 {
+							status = "okay";
+							remote-endpoint = <&zedx_vi_in0>;
+						};
+					};
+				};
+			};
+			channel@1 {
+				reg = <1>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						zedx_csi_in1: endpoint@2 {
+							status = "okay";
+							port-index = <2>;
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedx_ar0234_out1>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						zedx_csi_out1: endpoint@3 {
+							status = "okay";
+							remote-endpoint = <&zedx_vi_in1>;
+						};
+					};
+				};
+			};
+			channel@2 {
+				reg = <2>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						ar0234_csi_in0: endpoint@4 {
+							status = "okay";
+							port-index = <2>;
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&ar0234_ar0234_out0>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						ar0234_csi_out0: endpoint@5 {
+							status = "okay";
+							remote-endpoint = <&ar0234_vi_in0>;
+						};
+					};
+				};
+			};
+			channel@3 {
+				reg = <3>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						imx678_csi_in0: endpoint@6 {
+							status = "okay";
+							port-index = <2>;
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&imx678_imx678_out0>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						imx678_csi_out0: endpoint@7 {
+							status = "okay";
+							remote-endpoint = <&imx678_vi_in0>;
+						};
+					};
+				};
+			};
+			channel@4 {
+				reg = <4>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						zedxhdr_csi_in0: endpoint@8 {
+							status = "okay";
+							port-index = <2>;
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedxhdr_isx031_out0>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						zedxhdr_csi_out0: endpoint@9 {
+							status = "okay";
+							remote-endpoint = <&zedxhdr_vi_in0>;
+						};
+					};
+				};
+			};
+			channel@5 {
+				reg = <5>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						zedxhdr_csi_in1: endpoint@10 {
+							status = "okay";
+							port-index = <2>;
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedxhdr_isx031_out1>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						zedxhdr_csi_out1: endpoint@11 {
+							status = "okay";
+							remote-endpoint = <&zedxhdr_vi_in1>;
+						};
+					};
+				};
+			};
+			channel@6 {
+				reg = <6>;
+				status = "okay";
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						status = "okay";
+						zedonehdr_csi_in0: endpoint@12 {
+							status = "okay";
+							port-index = <2>;
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedonehdr_isx031_out0>;
+						};
+					};
+					port@1 {
+						reg = <1>;
+						status = "okay";
+						zedonehdr_csi_out0: endpoint@13 {
+							status = "okay";
+							remote-endpoint = <&zedonehdr_vi_in0>;
+						};
+					};
+				};
+			};
+		};
+	};
+			
+	cam_i2cmux{
+		i2c@0 {
+
+		};
+		i2c@1 {
+						
+			/* ZEDX 0 left camera sensor */
+			zedx_left0: zedx_left_0@28 {
+				
+				devnode = "video0";
+				
+				sync_sensor = "ZED_CAM0";
+				sync_sensor_index = <1>;
+
+				AR0234_MODES("0", "serial_c", "0")
+				
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						zedx_ar0234_out0: endpoint {
+							vc-id = <0>;
+							port-index = <2>;
+							opt-csi-port = "a";
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedx_csi_in0>;
+						};
+					};
+				};
+			};
+			
+			/* ZEDX 0 right camera sensor */
+			zedx_right0: zedx_right_0@20 {
+				
+				devnode = "video2";
+				
+				sync_sensor = "ZED_CAM0";
+				sync_sensor_index = <2>;
+
+				AR0234_MODES("1", "serial_c", "0")
+				
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						zedx_ar0234_out1: endpoint {
+							vc-id = <1>;
+							port-index = <2>;
+							opt-csi-port = "a";
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedx_csi_in1>;
+						};
+					};
+				};
+			};
+			
+			zedxone_gs0: zedxone_gs_0@10 {
+				
+				devnode = "video4";
+				
+				sync_sensor = "ZEDXONE_CAM0";
+				sync_sensor_index = <1>;
+				
+				AR0234_MODES("0", "serial_c", "0")
+											
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						ar0234_ar0234_out0: endpoint {
+							vc-id = <0>;
+							port-index = <2>;
+							opt-csi-port = "a";
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&ar0234_csi_in0>;
+						};
+					};
+				};
+			};
+			
+			
+			/* ZEDX One UHD 0 camera sensor */
+			zedxone_uhd0:zedxone_uhd_0@1a {
+				
+				devnode = "video6";
+				
+				sync_sensor = "ZEDXONE_CAM2";
+				sync_sensor_index = <1>;
+
+				IMX678_MODES("0", "serial_c", "0")
+				
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						imx678_imx678_out0: endpoint {
+							vc-id = <0>;
+							port-index = <2>;
+							opt-csi-port = "a";
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&imx678_csi_in0>;
+						};
+					};
+				};
+			};
+			
+			zedx_hdr_left0: zedx_hdr_left_0@3e {
+				
+				devnode = "video8";
+				
+				sync_sensor = "ZED_CAM2";
+				sync_sensor_index = <1>;
+				
+				ISX031_MODES("0", "serial_c", "0")
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						zedxhdr_isx031_out0: endpoint {
+							vc-id = <0>;
+							port-index = <2>;
+							opt-csi-port = "a";
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedxhdr_csi_in0>;
+						};
+					};
+				};
+			};
+			
+			zedx_hdr_right0: zedx_hdr_right_0@2e {
+				
+				devnode = "video10";
+				
+				sync_sensor = "ZED_CAM2";
+				sync_sensor_index = <2>;
+				
+				ISX031_MODES("1", "serial_c", "0")
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						zedxhdr_isx031_out1: endpoint {
+							vc-id = <1>;
+							port-index = <2>;
+							opt-csi-port = "a";
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedxhdr_csi_in1>;
+						};
+					};
+				};
+			};
+			
+			zedxone_hdr0: zedxone_hdr_0@4e {
+				
+				devnode = "video12";
+				
+				sync_sensor = "ZEDXONE_CAM4";
+				sync_sensor_index = <1>;
+				
+				ISX031_MODES("0", "serial_c", "0")
+				
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+					port@0 {
+						reg = <0>;
+						zedonehdr_isx031_out0: endpoint {
+							vc-id = <0>;
+							port-index = <2>;
+							opt-csi-port = "a";
+							bus-width = <NUM_LANES>;
+							remote-endpoint = <&zedonehdr_csi_in0>;
+						};
+					};
+				};
+			};
+		};
+	};
+
+	tegra-camera-platform {
+		compatible = "nvidia, tegra-camera-platform";
+		/**
+		* Physical settings to calculate max ISO BW
+		*
+		* num_csi_lanes = <>;
+		* Total number of CSI lanes when all cameras are active
+		*
+		* max_lane_speed = <>;
+		* Max lane speed in Kbit/s
+		*
+		* min_bits_per_pixel = <>;
+		* Min bits per pixel
+		*
+		* vi_peak_byte_per_pixel = <>;
+		* Max byte per pixel for the VI ISO case
+		*
+		* vi_bw_margin_pct = <>;
+		* Vi bandwidth margin in percentage
+		*
+		* max_pixel_rate = <>;
+		* Max pixel rate in Kpixel/s for the ISP ISO case
+		*
+		* isp_peak_byte_per_pixel = <>;
+		* Max byte per pixel for the ISP ISO case
+		*
+		* isp_bw_margin_pct = <>;
+		* Isp bandwidth margin in percentage
+		*/
+		num_csi_lanes = <2>;
+		max_lane_speed = <2000000>;
+		min_bits_per_pixel = <8>;
+		vi_peak_byte_per_pixel = <2>;
+		vi_bw_margin_pct = <25>;
+		isp_peak_byte_per_pixel = <5>;
+		isp_bw_margin_pct = <25>;
+
+		/**
+		 * The general guideline for naming badge_info contains 3 parts, and is as follows,
+		 * The first part is the camera_board_id for the module; if the module is in a FFD
+		 * platform, then use the platform name for this part.
+		 * The second part contains the position of the module, ex. "rear" or "front".
+		 * The third part contains the last 6 characters of a part number which is found
+		 * in the module's specsheet from the vender.
+		 */
+		modules {
+			module0 {
+				badge = "zedx_ar0234";
+				position = "front";
+				orientation = "1";
+				status = "okay";
+				drivernode0 {
+					status = "okay";
+					/* Declare PCL support driver (classically known as guid)  */
+					pcl_id = "v4l2_sensor";
+					/* Driver v4l2 device name */
+					devname = "zedx 10-0028";
+					/* Declare the device-tree hierarchy to driver instance */
+					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@1/zedx_left_0@28";
+				};
+			};
+			module1 {
+				badge = "zedx_ar0234";
+				position = "front";
+				orientation = "1";
+				status = "okay";
+				drivernode0 {
+					status = "okay";
+					 /* Declare PCL support driver (classically known as guid)  */
+					pcl_id = "v4l2_sensor";
+					/* Driver v4l2 device name */
+					devname = "zedx 10-0020";
+					/* Declare the device-tree hierarchy to driver instance */
+					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@1/zedx_right_0@20";
+				};
+			};
+
+			module2 {
+				badge = "zedx_ar0234";
+				position = "front";
+				orientation = "1";
+				status = "okay";
+				drivernode0 {
+					status = "okay";
+					 /* Declare PCL support driver (classically known as guid)  */
+					pcl_id = "v4l2_sensor";
+					/* Driver v4l2 device name */
+					devname = "zedx 10-0010";
+					/* Declare the device-tree hierarchy to driver instance */
+					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@1/zedxone_gs_0@10";
+				};
+			};
+			module3 {
+				badge = "zedx_imx678";
+				position = "front";
+				orientation = "1";
+				status = "okay";
+				drivernode0 {
+					status = "okay";
+					 /* Declare PCL support driver (classically known as guid)  */
+					pcl_id = "v4l2_sensor";
+					/* Driver v4l2 device name */
+					devname = "zedxone_uhd 10-001a";
+					/* Declare the device-tree hierarchy to driver instance */
+					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@1/zedxone_uhd_0@1a";
+				};
+			};
+		};
+	};
+};

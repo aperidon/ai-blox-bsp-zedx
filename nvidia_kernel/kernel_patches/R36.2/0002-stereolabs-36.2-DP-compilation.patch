@@ -1,0 +1,222 @@
+diff --color -Naur a/src/hardware/nvidia/t23x/nv-public/tegra234-p3737-0000.dtsi b/src/hardware/nvidia/t23x/nv-public/tegra234-p3737-0000.dtsi
+--- a/src/hardware/nvidia/t23x/nv-public/tegra234-p3737-0000.dtsi	2023-11-30 19:26:41.000000000 +0100
++++ b/src/hardware/nvidia/t23x/nv-public/tegra234-p3737-0000.dtsi	2024-01-09 11:15:59.615511954 +0100
+@@ -1,6 +1,10 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
+ #include <dt-bindings/sound/rt5640.h>
++#include <dt-bindings/gpio/tegra234-gpio.h>
++#include <dt-bindings/interrupt-controller/irq.h>
++
++//sl_placeholder
+ 
+ / {
+ 	compatible = "nvidia,p3737-0000";
+diff --color -Naur a/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000.dtsi b/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000.dtsi
+--- a/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000.dtsi	2023-11-30 19:26:41.000000000 +0100
++++ b/src/hardware/nvidia/t23x/nv-public/tegra234-p3768-0000.dtsi	2024-01-09 16:37:07.987939939 +0100
+@@ -1,5 +1,10 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
++#include <dt-bindings/gpio/tegra234-gpio.h>
++#include <dt-bindings/interrupt-controller/irq.h>
++
++//sl_placeholder
++
+ / {
+ 	compatible = "nvidia,p3768-0000";
+ 
+diff --color -Naur a/src/kernel_src_build_env.sh b/src/kernel_src_build_env.sh
+--- a/src/kernel_src_build_env.sh	2023-11-30 19:27:46.000000000 +0100
++++ b/src/kernel_src_build_env.sh	2024-01-08 16:19:58.738790773 +0100
+@@ -32,5 +32,5 @@
+ # shellcheck disable=SC2034
+ KERNEL_SRC_DIR="kernel-jammy-src"
+ KERNEL_DEF_CONFIG="defconfig"
+-OOT_SOURCE_LIST="nvethernetrm  nvgpu  nvidia-oot hwpm hardware nvdisplay"
++OOT_SOURCE_LIST="nvethernetrm  nvgpu  nvidia-oot hwpm hardware nvdisplay kernel/stereolabs"
+ KERNEL_MODULAR_BUILD="y"
+diff --color -Naur a/src/Makefile b/src/Makefile
+--- a/src/Makefile	2024-01-09 16:45:21.321128453 +0100
++++ b/src/Makefile	2024-01-08 19:13:43.525088910 +0100
+@@ -7,6 +7,7 @@
+ MAKEFILE_DIR := $(abspath $(shell dirname $(lastword $(MAKEFILE_LIST))))
+ NVIDIA_HEADERS ?= ${MAKEFILE_DIR}/out/nvidia-linux-header
+ NVIDIA_CONFTEST ?= ${MAKEFILE_DIR}/out/nvidia-conftest
++SL_DRIVERS ?= ${MAKEFILE_DIR}/stereolabs/drivers
+ 
+ ifneq ($(words $(subst :, ,$(MAKEFILE_DIR))), 1)
+ $(error source directory cannot contain spaces or colons)
+@@ -50,6 +51,7 @@
+ endif
+ 
+ hwpm: conftest
++ifneq ($(MAKECMDGOALS), modules_oot)
+ 	@if [ ! -d "$(MAKEFILE_DIR)/hwpm" ] ; then \
+ 		echo "Directory hwpm is not found, exiting.."; \
+ 		false; \
+@@ -64,8 +66,25 @@
+ 		srctree.hwpm=$(MAKEFILE_DIR)/hwpm \
+ 		srctree.nvconftest=$(NVIDIA_CONFTEST) \
+ 		$(MAKECMDGOALS)
++else
++	@if [ ! -d "$(MAKEFILE_DIR)/hwpm" ] ; then \
++		echo "Directory hwpm is not found, exiting.."; \
++		false; \
++	fi
++	@echo   "================================================================================"
++	@echo   "make $(MAKECMDGOALS) - hwpm ..."
++	@echo   "================================================================================"
++	$(MAKE) -j $(NPROC) ARCH=arm64 \
++		-C $(KERNEL_HEADERS) \
++		M=$(MAKEFILE_DIR)/hwpm/drivers/tegra/hwpm \
++		CONFIG_TEGRA_OOT_MODULE=m \
++		srctree.hwpm=$(MAKEFILE_DIR)/hwpm \
++		srctree.nvconftest=$(NVIDIA_CONFTEST) \
++		modules
++endif
+ 
+ nvidia-oot: conftest hwpm
++ifneq ($(MAKECMDGOALS), modules_oot)
+ 	@if [ ! -d "$(MAKEFILE_DIR)/nvidia-oot" ] ; then \
+ 		echo "Directory nvidia-oot is not found, exiting.."; \
+ 		false; \
+@@ -80,8 +99,28 @@
+ 		srctree.nvidia-oot=$(MAKEFILE_DIR)/nvidia-oot \
+ 		srctree.hwpm=$(MAKEFILE_DIR)/hwpm \
+ 		srctree.nvconftest=$(NVIDIA_CONFTEST) \
++		srctree.sl_drivers=$(SL_DRIVERS) \
+ 		KBUILD_EXTRA_SYMBOLS=$(MAKEFILE_DIR)/hwpm/drivers/tegra/hwpm/Module.symvers \
+ 		$(MAKECMDGOALS)
++else
++	@if [ ! -d "$(MAKEFILE_DIR)/nvidia-oot" ] ; then \
++		echo "Directory nvidia-oot is not found, exiting.."; \
++		false; \
++	fi
++	@echo   "================================================================================"
++	@echo   "make $(MAKECMDGOALS) - nvidia-oot ..."
++	@echo   "================================================================================"
++	$(MAKE) -j $(NPROC) ARCH=arm64 \
++		-C $(KERNEL_HEADERS) \
++		M=$(MAKEFILE_DIR)/nvidia-oot \
++		CONFIG_TEGRA_OOT_MODULE=m \
++		srctree.nvidia-oot=$(MAKEFILE_DIR)/nvidia-oot \
++		srctree.hwpm=$(MAKEFILE_DIR)/hwpm \
++		srctree.nvconftest=$(NVIDIA_CONFTEST) \
++		srctree.sl_drivers=$(SL_DRIVERS) \
++		KBUILD_EXTRA_SYMBOLS=$(MAKEFILE_DIR)/hwpm/drivers/tegra/hwpm/Module.symvers \
++		modules
++endif
+ 
+ nvgpu: conftest nvidia-oot
+ 	if [ ! -d "$(MAKEFILE_DIR)/nvgpu" ] ; then \
+diff --color -Naur a/src/nvbuild.sh b/src/nvbuild.sh
+--- a/src/nvbuild.sh	2024-01-09 16:45:21.321128453 +0100
++++ b/src/nvbuild.sh	2024-01-08 20:10:30.437203671 +0100
+@@ -50,6 +50,7 @@
+         -h              Displays this help
+         -r              Enable RT Kernel
+         -m              Build/install NVIDIA OOT modules only (skip kernel)
++        -mr             Build/install NVIDIA OOT reduced set of modules only (skip kernel/display/...)
+         -i              Perform install to INSTALL_MOD_PATH
+         -o <outdir>     Creates kernel build output in <outdir>
+ EOM
+@@ -75,6 +76,10 @@
+ 				OOT_MODULES_ONLY=1
+ 				shift 1
+ 				;;
++			-mr)
++				REDUCED_OOT_MODULES_ONLY=1
++				shift 1
++				;;
+ 			-i)
+ 				DO_INSTALL=1
+ 				shift 1
+@@ -167,7 +172,13 @@
+ 
+ 	echo "Building NVIDIA OOT modules sources in ${KERNEL_OUT_DIR}"
+ 	echo "Using KERNEL_HEADERS from directory : ${KERNEL_HEADERS}"
+-	make -C "${KERNEL_OUT_DIR}" modules
++	if [ "${REDUCED_OOT_MODULES_ONLY}" -eq 1 ]; then
++		make -C "${KERNEL_OUT_DIR}" modules_oot
++	else
++		make -C "${KERNEL_OUT_DIR}" modules
++	fi
++
++	touch "${KERNEL_OUT_DIR}"/.BUILD_ONCE
+ 
+ 	echo "Building NVIDIA DTBs"
+ 	make -C "${KERNEL_OUT_DIR}" dtbs
+@@ -177,6 +188,7 @@
+ 		echo "Error: Missing nvgpu.ko in \"${gpu_out}\""
+ 		exit 1
+ 	fi
++
+ 	echo "Modules compiled successfully."
+ }
+ 
+@@ -209,7 +221,7 @@
+ 			echo "Error: Path ${CROSS_COMPILE}gcc does not exist."
+ 			exit 1
+ 		fi
+-		if [ "${OOT_MODULES_ONLY}" -eq 1 ]; then
++		if [[ "${OOT_MODULES_ONLY}" -eq 1 || "${REDUCED_OOT_MODULES_ONLY}" -eq 1 ]]; then
+ 			if [ -z "${KERNEL_HEADERS}" ]; then
+ 				echo "Error: Env variable KERNEL_HEADERS is not set!!"
+ 				exit 1
+@@ -256,7 +268,7 @@
+ 		exit 1
+ 	fi
+ 
+-	if [ "${OOT_MODULES_ONLY}" -eq 0 ]; then
++	if [ "${OOT_MODULES_ONLY}" -eq 0 || "${REDUCED_OOT_MODULES_ONLY}" -eq 0 ]; then
+ 		install_kernel
+ 	fi
+ 
+@@ -270,7 +282,7 @@
+ fi
+ 
+ # Compile kernel sources for "arm64"
+-if [ "${OOT_MODULES_ONLY}" -eq 0 ]; then
++if [[ "${OOT_MODULES_ONLY}" -eq 0 || "${REDUCED_OOT_MODULES_ONLY}" -eq 0 ]]; then
+ 	build_arm64_kernel_sources
+ fi
+ 
+diff --color -Naur a/src/nvidia-oot/device-tree/platform/generic-dts/Makefile b/src/nvidia-oot/device-tree/platform/generic-dts/Makefile
+--- a/src/nvidia-oot/device-tree/platform/generic-dts/Makefile	2023-11-30 19:27:45.000000000 +0100
++++ b/src/nvidia-oot/device-tree/platform/generic-dts/Makefile	2024-01-08 16:07:30.905062352 +0100
+@@ -47,6 +47,11 @@
+ # SOC independent common include
+ DTC_INCLUDE += $(tegra-dtstree)/tegra/nv-public
+ 
++# Stereolabs dts includes
++DTC_INCLUDE += $(tegra-dtstree)/../stereolabs/AGX_Orin
++DTC_INCLUDE += $(tegra-dtstree)/../stereolabs/NANO_Orin
++DTC_INCLUDE += $(tegra-dtstree)/../stereolabs/NX_Orin
++
+ # SOC T23X specific common include
+ DTC_INCLUDE += $(tegra-dtstree)/t23x/nv-public/include/kernel
+ DTC_INCLUDE += $(tegra-dtstree)/t23x/nv-public/include/nvidia-oot
+diff --color -Naur a/src/nvidia-oot/Makefile b/src/nvidia-oot/Makefile
+--- a/src/nvidia-oot/Makefile	2023-11-30 19:27:45.000000000 +0100
++++ b/src/nvidia-oot/Makefile	2024-01-09 16:37:07.983939930 +0100
+@@ -4,6 +4,7 @@
+ LINUXINCLUDE += -I$(srctree.nvconftest)
+ LINUXINCLUDE += -I$(srctree.nvidia-oot)/include
+ 
++
+ subdir-ccflags-y += -Werror
+ 
+ LINUX_VERSION := $(shell expr $(VERSION) \* 256 + $(PATCHLEVEL))
+@@ -77,6 +78,11 @@
+ 
+ obj-m += drivers/
+ 
++export CONFIG_SL_DESER_MAX96712=m
++export CONFIG_SL_VIDEO_ZEDX=m
++
++obj-m += ../stereolabs/drivers/
++
+ ifdef CONFIG_SND_SOC
+ obj-m += sound/soc/tegra/
+ obj-m += sound/tegra-safety-audio/

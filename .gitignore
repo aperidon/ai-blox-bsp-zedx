@@ -1,0 +1,47 @@
+# Misc
+.vscode/
+.L4T_*
+
+# Build results
+output/
+build_R*
+ci_artifacts
+stereolabs-*
+
+# Nvidia sources
+src/build
+src/dtc-src
+src/generic_rt_build.sh
+src/hardware/nvidia/
+src/hwpm
+src/kernel/kernel*
+src/kernel/nv*
+src/kernel/Makefile
+src/kernel/stereolabs/Makefile*
+src/kernel-devicetree
+src/kernel_src_build_env.sh
+src/Makefile
+src/nv*
+src/toolchain
+src/unifiedgpudisp
+
+repack/debian/control
+repack/debian/changelog
+repack/debian/stereolabs*
+repack/debian/files
+repack/debian/out
+repack/debian/modules.order
+repack/debian/.debhelper
+
+Daemon/IMU_Daemon
+Daemon/ZEDX_Daemon
+Daemon/ZEDX_Driver
+Daemon/.DAEMON*
+Daemon/driver_zed_loader/build_native/
+Daemon/zed_x_daemon/build_native/
+Daemon/imu-daemon/build_native/
+
+nvidia_kernel/src_archives/
+
+# Fetched from the asset bucket via .assets.manifest (was a dangling git-lfs pointer)
+Resources/aarch64--glibc--stable-final.tar.gz

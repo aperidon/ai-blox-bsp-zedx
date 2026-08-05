@@ -1,0 +1,9 @@
+diff --color -Naur src_old/kernel/kernel-5.10/arch/arm64/configs/defconfig src/kernel/kernel-5.10/arch/arm64/configs/defconfig
+--- a/src/kernel/kernel-5.10/arch/arm64/configs/defconfig	2023-10-19 14:02:03.045951371 +0200
++++ b/src/kernel/kernel-5.10/arch/arm64/configs/defconfig	2023-10-19 13:56:52.717368611 +0200
+@@ -1,4 +1,5 @@
+ # CONFIG_LOCALVERSION_AUTO is not set
++CONFIG_TEGRA_L4T_351=y
+ CONFIG_SYSVIPC=y
+ CONFIG_POSIX_MQUEUE=y
+ CONFIG_WATCH_QUEUE=y

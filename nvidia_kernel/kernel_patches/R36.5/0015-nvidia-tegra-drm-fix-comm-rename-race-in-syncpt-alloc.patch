@@ -1,0 +1,32 @@
+From: Stereolabs <embedded@stereolabs.com>
+Subject: [PATCH] drm/tegra: snapshot task comm with get_task_comm() in syncpt alloc
+
+tegra_drm_ioctl_syncpoint_allocate() passes current->comm directly as
+the syncpoint name. A concurrent set_task_comm() (e.g. the h264 encoder
+startup thread being renamed) is a torn read of the comm[] array; the
+syncpoint-naming consistency check can WARN(), whose serial-console
+write stalls the CPU long enough that the host1x IVC worker is not
+scheduled within 50ms, tripping nvargus' 'Status syncpoint signaled but
+status value not updated' watchdog and stopping all streams.
+get_task_comm() takes task->alloc_lock and strscpy()'s a stable copy.
+Ported to R36.5 (unchanged NVIDIA baseline vs R36.4).
+---
+diff --git a/src/nvidia-oot/drivers/gpu/drm/tegra/uapi.c b/src/nvidia-oot/drivers/gpu/drm/tegra/uapi.c
+index 0f9342b..9ecee6d 100644
+--- a/src/nvidia-oot/drivers/gpu/drm/tegra/uapi.c
++++ b/src/nvidia-oot/drivers/gpu/drm/tegra/uapi.c
+@@ -315,11 +315,13 @@ int tegra_drm_ioctl_syncpoint_allocate(struct drm_device *drm, void *data, struc
+ 	struct drm_tegra_syncpoint_allocate *args = data;
+ 	struct host1x_syncpt *sp;
+ 	int err;
++	char comm[TASK_COMM_LEN];
+ 
+ 	if (args->id)
+ 		return -EINVAL;
+ 
+-	sp = host1x_syncpt_alloc(host1x, HOST1X_SYNCPT_CLIENT_MANAGED, current->comm);
++	get_task_comm(comm, current);
++	sp = host1x_syncpt_alloc(host1x, HOST1X_SYNCPT_CLIENT_MANAGED, comm);
+ 	if (!sp)
+ 		return -EBUSY;
+ 

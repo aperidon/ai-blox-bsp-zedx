@@ -1,0 +1,69 @@
+--- a/src/nvbuild.sh	2023-11-30 19:27:46.000000000 +0100
++++ b/src/nvbuild.sh	2024-01-04 14:30:07.300171173 +0100
+@@ -88,7 +88,7 @@
+ 	done
+ }
+ 
+-# Function to kernel sources 
++# Function to kernel sources
+ function sync_kernel_source {
+ 	# Check whether kernel source dir available
+ 	if [ ! -d "kernel/${KERNEL_SRC_DIR}" ]; then
+@@ -98,11 +98,11 @@
+ 
+ 	# Sync kernel source directory to output dir
+ 	echo "Syncing kernel/${KERNEL_SRC_DIR}"
+-	rsync -a --delete "kernel/${KERNEL_SRC_DIR}" "${KERNEL_OUT_DIR}/kernel/"
++	rsync -a "kernel/${KERNEL_SRC_DIR}" "${KERNEL_OUT_DIR}/kernel/"
+ 	cp -a kernel/Makefile "${KERNEL_OUT_DIR}/kernel/"
+ }
+ 
+-# Function to rsync oot modules sources 
++# Function to rsync oot modules sources
+ function sync_oot_modules {
+ 	# Check whether all source directories all available from kernel source list
+ 	for list in ${OOT_SOURCE_LIST}
+@@ -117,7 +117,7 @@
+ 	for list in ${OOT_SOURCE_LIST}
+ 	do
+ 		echo "Syncing ${list}"
+-		rsync -a --delete "${list}" "${KERNEL_OUT_DIR}"
++		rsync -a "${list}" "${KERNEL_OUT_DIR}"
+ 	done
+ 	cp -a Makefile "${KERNEL_OUT_DIR}/"
+ }
+--- a/src/Makefile	2023-11-30 19:27:46.000000000 +0100
++++ b/src/Makefile	2024-01-04 14:49:44.791735250 +0100
+@@ -21,12 +21,14 @@
+ 	@echo   "================================================================================"
+ 	@echo   "Usage:"
+ 	@echo   "   make modules          # to build NVIDIA OOT and display drivers"
++	@echo   "   make modules_oot      # to build NVIDIA OOT"
+ 	@echo   "   make dtbs             # to build NVIDIA DTBs"
+ 	@echo   "   make modules_install  # to install drivers to the INSTALL_MOD_PATH"
+ 	@echo   "   make clean            # to make clean driver sources"
+ 	@echo   "================================================================================"
+ 
+ modules: hwpm nvidia-oot nvgpu nvidia-display
++modules_oot: nvidia-oot
+ dtbs: nvidia-dtbs
+ modules_install: hwpm nvidia-oot nvgpu nvidia-display-install
+ clean: hwpm nvidia-oot nvgpu nvidia-display-clean nvidia-dtbs-clean
+@@ -39,7 +41,7 @@
+ 	@echo   "================================================================================"
+ 	mkdir -p $(NVIDIA_CONFTEST)/nvidia;
+ 	cp -av $(MAKEFILE_DIR)/nvidia-oot/scripts/conftest/* $(NVIDIA_CONFTEST)/nvidia/;
+-	$(MAKE) ARCH=arm64 \
++	$(MAKE) -j $(NPROC) ARCH=arm64 \
+ 		src=$(NVIDIA_CONFTEST)/nvidia obj=$(NVIDIA_CONFTEST)/nvidia \
+ 		CC=$(CROSS_COMPILE)gcc LD=$(CROSS_COMPILE)ld \
+ 		NV_KERNEL_SOURCES=$(KERNEL_HEADERS) \
+@@ -162,7 +164,7 @@
+ 	srctree=$(KERNEL_HEADERS) \
+ 	oottree=$(MAKEFILE_DIR)/nvidia-oot \
+ 	HOSTCC=gcc \
+-	$(MAKE) -f $(MAKEFILE_DIR)/nvidia-oot/scripts/Makefile.build \
++	$(MAKE) -j $(NPROC) -f $(MAKEFILE_DIR)/nvidia-oot/scripts/Makefile.build \
+ 		obj=$(MAKEFILE_DIR)/nvidia-oot/device-tree/platform/generic-dts \
+ 		dtbs
+ 	@echo   "================================================================================"

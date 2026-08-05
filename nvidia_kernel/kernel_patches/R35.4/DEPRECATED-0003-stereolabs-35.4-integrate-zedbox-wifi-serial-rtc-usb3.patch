@@ -1,0 +1,113 @@
+diff --color -Naur a/src/kernel/kernel-5.10/arch/arm64/configs/defconfig b/src/kernel/kernel-5.10/arch/arm64/configs/defconfig
+--- a/src/kernel/kernel-5.10/arch/arm64/configs/defconfig	2023-12-21 12:10:18.825230371 +0100
++++ b/src/kernel/kernel-5.10/arch/arm64/configs/defconfig	2023-12-21 12:07:15.092841681 +0100
+@@ -1179,7 +1179,7 @@
+ CONFIG_INFINIBAND_IPOIB_CM=y
+ CONFIG_INFINIBAND_SRP=m
+ CONFIG_RTC_CLASS=y
+-CONFIG_RTC_HCTOSYS_DEVICE="rtc1"
++CONFIG_RTC_HCTOSYS_DEVICE="rtc0"
+ # CONFIG_RTC_NVMEM is not set
+ CONFIG_RTC_DRV_MAX77686=y
+ CONFIG_RTC_DRV_RX8025=m
+diff --color -Naur a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi
+--- a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi	2023-12-21 12:10:18.825230371 +0100
++++ b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi	2023-12-21 12:08:37.257015372 +0100
+@@ -80,6 +80,10 @@
+ 						nvidia,function = "xusb";
+ 						status = "okay";
+ 					};
++					usb2-3 {
++						nvidia,function = "xusb";
++						status = "okay";
++					};
+ 				};
+ 			};
+ 			usb3 {
+@@ -88,6 +92,14 @@
+ 						nvidia,function = "xusb";
+ 						status = "okay";
+ 					};
++					usb3-1 {
++						nvidia,function = "xusb";
++						status = "okay";
++					};
++					usb3-2 {
++						nvidia,function = "xusb";
++						status = "okay";
++					};
+ 				};
+ 			};
+ 		};
+@@ -114,13 +126,26 @@
+ 			};
+ 			usb2-2 {/* Goes to M2.E */
+ 				mode = "host";
+-                                vbus-supply = <&p3509_vdd_5v_sys>;
++				vbus-supply = <&p3509_vdd_5v_sys>;
++				status = "okay";
++			};
++			usb2-3 {
++				mode = "host";
++				vbus-supply = <&p3509_vdd_av10_hub>;
+ 				status = "okay";
+ 			};
+ 			usb3-0 {
+ 				nvidia,usb2-companion = <1>;
+ 				status = "okay";
+ 			};
++			usb3-1 {
++				nvidia,usb2-companion = <2>;
++				status = "okay";
++			};
++			usb3-2 {
++				nvidia,usb2-companion = <3>;
++				status = "okay";
++			};
+ 		};
+ 	};
+ 
+@@ -135,8 +160,11 @@
+ 		status = "okay";
+ 		phys = <&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-1}>,
+ 			<&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-2}>,
+-			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-0}>;
+-		phy-names = "usb2-1", "usb2-2", "usb3-0";
++			<&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-3}>,
++			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-0}>,
++			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-1}>,
++			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-2}>;
++		phy-names = "usb2-1", "usb2-2", "usb2-3", "usb3-0", "usb3-1", "usb3-2";
+ 		nvidia,xusb-padctl = <&xusb_padctl>;
+ 	};
+ 
+diff --color -Naur a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi
+--- a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi	2023-08-01 21:30:31.000000000 +0200
++++ b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02-pcie.dtsi	2023-12-21 12:07:15.084841664 +0100
+@@ -19,6 +19,12 @@
+ 		phy-names = "p2u-0";
+ 	};
+ 
++	pcie@141e0000 {/* M.2 Key-E JNX42 */
++		status = "okay";
++		phys = <&p2u_gbe_0>, <&p2u_gbe_1>;
++		phy-names = "p2u-0", "p2u-1";
++	};
++
+ 	pcie@14160000 {/* C4 - M2 Key M */
+ 		status = "okay";
+ 		phys = <&p2u_hsio_4>, <&p2u_hsio_5>, <&p2u_hsio_6>,
+diff --color -Naur a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi
+--- a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi	2023-12-21 12:10:18.825230371 +0100
++++ b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi	2023-12-21 12:07:15.092841681 +0100
+@@ -216,6 +216,10 @@
+ 		status = "okay";
+ 	};
+ 
++	serial@3110000 {/* UARTB, for JNX40/42 */
++		status = "okay";
++	};
++
+ 	mttcan@c310000 {
+ 		status = "okay";
+ 	};

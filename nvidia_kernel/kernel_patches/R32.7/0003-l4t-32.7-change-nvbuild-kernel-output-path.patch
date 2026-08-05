@@ -1,0 +1,31 @@
+--- a/src/nvbuild.sh	2023-06-07 10:21:57.000000000 +0200
++++ b/src/nvbuild.sh	2024-06-28 16:32:22.577690471 +0200
+@@ -72,10 +72,6 @@
+ 	kernel_version="${1}"
+ 	echo "Building kernel-${kernel_version} sources"
+ 
+-	# shellcheck disable=SC2153
+-	build_dir="${BUILD_DIR}/kernel_build"
+-	rm -rf "${build_dir}"
+-
+ 	# execute building steps
+ 	source_dir="${SCRIPT_DIR}/kernel/kernel-${kernel_version}/"
+ 	config_file="tegra_defconfig"
+@@ -83,7 +79,7 @@
+ 
+ 	# shellcheck disable=SC2236
+ 	if [ ! -z "${KERNEL_OUT_DIR}" ] ; then
+-		O_OPT=(-O "${KERNEL_OUT_DIR}")
++		O_OPT=(O="${KERNEL_OUT_DIR}")
+ 		tegra_kernel_out="${KERNEL_OUT_DIR}"
+ 	else
+ 		O_OPT=()
+@@ -98,7 +94,7 @@
+ 		LOCALVERSION="-tegra" \
+ 		CROSS_COMPILE="${CROSS_COMPILE_AARCH64}" \
+ 		"${O_OPT[@]}" -j"${NPROC}" \
+-		--output-sync=target zImage
++		--output-sync=target Image
+ 
+ 	"${MAKE_BIN}" -C "${source_dir}" ARCH=arm64 \
+ 		LOCALVERSION="-tegra" \

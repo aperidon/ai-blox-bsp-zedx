@@ -1,0 +1,23 @@
+#define ZED_ORIN_CLKS \
+	/* Define any required hw resources needed by driver */ \
+	/* ie. clocks, io pins, power sources */ \
+	clocks = <&bpmp TEGRA234_CLK_EXTPERIPH1>, \
+	<&bpmp TEGRA234_CLK_EXTPERIPH1>; \
+	clock-names = "extperiph1", "pllp_grtba"; \
+	mclk = "extperiph1"; \
+
+#define ZED_XAVIER_CLKS \
+	/* Define any required hw resources needed by driver */ \
+    /* ie. clocks, io pins, power sources */ \
+    clocks = <&bpmp_clks TEGRA194_CLK_EXTPERIPH1>, \
+            <&bpmp_clks TEGRA194_CLK_EXTPERIPH1>; \
+    clock-names = "extperiph1", "pllp_grtba"; \
+    mclk = "extperiph1"; \
+
+#define ZED_THOR_CLKS \
+    /* Define any required hw resources needed by driver */ \
+    /* ie. clocks, io pins, power sources */ \
+    clocks = <&bpmp TEGRA264_CLK_EXTPERIPH1>, \
+    <&bpmp TEGRA264_CLK_EXTPERIPH1>; \
+    clock-names = "extperiph1", "pllp_grtba"; \
+    mclk = "extperiph1";

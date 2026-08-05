@@ -1,0 +1,36 @@
+From: stereolabs <support@stereolabs.com>
+Subject: [PATCH] usb: host: xhci: brace-wrap case 2 body in xhci_hcd_init_usb3_data
+
+NVIDIA's L4T R39.2 public source adds USB 3.2 SSP-rate detection to the
+minor_rev switch, declaring variables directly after the `case 2:' label
+with no enclosing block. That is invalid C before C23: a label must be
+followed by a statement, not a declaration. It builds only on GCC >= 12
+(which accepts it as an extension, -Wpedantic); the pinned bootlin
+GCC 11.3 cross-toolchain rejects it, breaking the R39.2 kernel build:
+
+  drivers/usb/host/xhci.c:5197:3: error: a label can only be part of a
+  statement and a declaration is not a statement
+
+Wrap the case body in braces so the declarations are legal on every
+supported toolchain. No functional change.
+
+---
+--- a/src/kernel/kernel-noble/drivers/usb/host/xhci.c
++++ b/src/kernel/kernel-noble/drivers/usb/host/xhci.c
+@@ -5193,7 +5193,7 @@
+ 		minor_rev = xhci->usb3_rhub.min_rev / 0x10;
+ 
+ 	switch (minor_rev) {
+-	case 2:
++	case 2: {
+ 		struct xhci_port_cap *port_cap = NULL;
+ 		int i;
+ 
+@@ -5247,6 +5247,7 @@
+ 				hcd->self.root_hub->ssp_rate = USB_SSP_GEN_2x2;
+ 		}
+ 		break;
++	}
+ 	case 1:
+ 		hcd->speed = HCD_USB31;
+ 		hcd->self.root_hub->speed = USB_SPEED_SUPER_PLUS;

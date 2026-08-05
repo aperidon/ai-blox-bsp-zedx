@@ -1,0 +1,68 @@
+diff --git a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi
+index fcbd6ace8..d4fbe57bb 100644
+--- a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi
++++ b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi
+@@ -80,6 +80,10 @@
+ 						nvidia,function = "xusb";
+ 						status = "okay";
+ 					};
++					usb2-3 {
++						nvidia,function = "xusb";
++						status = "okay";
++					};
+ 				};
+ 			};
+ 			usb3 {
+@@ -88,6 +92,14 @@
+ 						nvidia,function = "xusb";
+ 						status = "okay";
+ 					};
++					usb3-1 {
++						nvidia,function = "xusb";
++						status = "okay";
++					};
++					usb3-2 {
++						nvidia,function = "xusb";
++						status = "okay";
++					};
+ 				};
+ 			};
+ 		};
+@@ -117,10 +129,23 @@
+                                 vbus-supply = <&p3509_vdd_5v_sys>;
+ 				status = "okay";
+ 			};
++			usb2-3 {
++				mode = "host";
++                                vbus-supply = <&p3509_vdd_av10_hub>;
++				status = "okay";
++			};
+ 			usb3-0 {
+ 				nvidia,usb2-companion = <1>;
+ 				status = "okay";
+ 			};
++			usb3-1 {
++				nvidia,usb2-companion = <2>;
++				status = "okay";
++			};
++			usb3-2 {
++				nvidia,usb2-companion = <3>;
++				status = "okay";
++			};
+ 		};
+ 	};
+ 
+@@ -135,8 +160,11 @@
+ 		status = "okay";
+ 		phys = <&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-1}>,
+ 			<&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-2}>,
+-			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-0}>;
+-		phy-names = "usb2-1", "usb2-2", "usb3-0";
++			<&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-3}>,
++			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-0}>,
++			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-1}>,
++			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-2}>;
++		phy-names = "usb2-1", "usb2-2", "usb2-3", "usb3-0", "usb3-1", "usb3-2";
+ 		nvidia,xusb-padctl = <&xusb_padctl>;
+ 	};
+ 

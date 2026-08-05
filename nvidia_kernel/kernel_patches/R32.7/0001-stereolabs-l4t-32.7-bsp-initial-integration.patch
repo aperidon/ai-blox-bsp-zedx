@@ -1,0 +1,90 @@
+diff --color -Naur a/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/common/tegra186-p3636-0001-a00-disp.dtsi b/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/common/tegra186-p3636-0001-a00-disp.dtsi
+--- a/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/common/tegra186-p3636-0001-a00-disp.dtsi	2023-06-07 10:21:27.000000000 +0200
++++ b/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/common/tegra186-p3636-0001-a00-disp.dtsi	2024-06-27 18:07:13.710784265 +0200
+@@ -18,7 +18,7 @@
+ #include <dt-bindings/display/tegra-panel.h>
+ #include <panels/panel-a-wuxga-8-0.dtsi>
+ 
+ #include <t18x-common-platforms/tegra186-hdmi.dtsi>
+-#include <t18x-common-platforms/tegra186-dp.dtsi>
++//#include <t18x-common-platforms/tegra186-dp.dtsi>
+ 
+ / {
+diff --color -Naur a/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/tegra186-p3636-0001-p3509-0000-a01.dts b/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/tegra186-p3636-0001-p3509-0000-a01.dts
+--- a/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/tegra186-p3636-0001-p3509-0000-a01.dts	2023-06-07 10:21:27.000000000 +0200
++++ b/src/hardware/nvidia/platform/t18x/lanai/kernel-dts/tegra186-p3636-0001-p3509-0000-a01.dts	2024-06-27 18:07:50.862962335 +0200
+@@ -16,7 +16,9 @@
+ #include "common/tegra186-p3509-0000-cvb.dtsi"
+ #include "common/tegra186-p3509-0000-a00-fixed-regulator.dtsi"
+ #include "common/tegra186-p3636-0001-a00-prod.dtsi"
+-#include "common/tegra186-camera-lanai-rbpcv2-imx219.dtsi"
++//#include "common/tegra186-camera-lanai-rbpcv2-imx219.dtsi"
++
++//sl_placeholder
+ 
+ /* plugin manager */
+ #include "common/tegra186-super-module-e2614-p3509-0000-a00.dtsi"
+diff --color -Naur a/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile b/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile
+--- a/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile	2023-06-07 10:21:45.000000000 +0200
++++ b/src/kernel/kernel-4.9/arch/arm64/boot/dts/Makefile	2024-06-27 18:11:36.632031682 +0200
+@@ -50,9 +50,11 @@
+ DTC_FLAGS += -i $(tegra-dtstree)/soc/t18x/kernel-include
+ DTC_FLAGS += -i $(tegra-dtstree)/soc/t18x/kernel-dts
+ DTC_FLAGS += -i $(tegra-dtstree)/platform/t18x/common/kernel-dts
++DTC_FLAGS += -i $(stereolabs-dtstree)/NANO_Streamer
+ DTCCPP_FLAGS += -I$(tegra-dtstree)/soc/t18x/kernel-include
+ DTCCPP_FLAGS += -I$(tegra-dtstree)/soc/t18x/kernel-dts
+ DTCCPP_FLAGS += -I$(tegra-dtstree)/platform/t18x/common/kernel-dts
++DTCCPP_FLAGS += -I$(stereolabs-dtstree)/NANO_Streamer
+ endif
+ 
+ ifeq ($(CONFIG_ARCH_TEGRA_19x_SOC),y)
+diff --color -Naur a/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig b/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig
+--- a/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig	2023-06-07 10:21:45.000000000 +0200
++++ b/src/kernel/kernel-4.9/arch/arm64/configs/tegra_defconfig	2024-06-27 18:14:45.484913542 +0200
+@@ -772,10 +772,18 @@
+ CONFIG_I2C_IOEXPANDER_PCA9570=y
+ CONFIG_VIDEO_TC358840=m
+ CONFIG_VIDEO_LT6911UXC=y
+-CONFIG_I2C_IOEXPANDER_SER_MAX9295=y
+-CONFIG_I2C_IOEXPANDER_DESER_MAX9296=y
+-CONFIG_VIDEO_IMX390=y
+-CONFIG_VIDEO_IMX204=y
++#CONFIG_I2C_IOEXPANDER_SER_MAX9295=y
++#CONFIG_I2C_IOEXPANDER_DESER_MAX9296=y
++#CONFIG_VIDEO_IMX390=y
++#CONFIG_VIDEO_IMX204=y
++#CONFIG_SL_DESER_MAX9296=m
++CONFIG_SL_SER_MAX9295=m
++CONFIG_SL_DESER_MAX96712=m
++CONFIG_SL_VIDEO_ZEDX=m
++CONFIG_SL_VIDEO_ZEDONE4K=m
++CONFIG_SL_VIDEO_ZEDXHDR=m
++CONFIG_TEGRA_STREAMERBOX_ADDR_FIX=m
++CONFIG_TEGRA_L4T_351=y
+ # CONFIG_VGA_ARB is not set
+ CONFIG_DRM=y
+ CONFIG_DRM_TEGRA_UDRM=m
+diff --color -Naur a/src/kernel/kernel-4.9/Makefile b/src/kernel/kernel-4.9/Makefile
+--- a/src/kernel/kernel-4.9/Makefile	2023-06-07 10:21:45.000000000 +0200
++++ b/src/kernel/kernel-4.9/Makefile	2024-06-27 18:15:35.217144367 +0200
+@@ -4,6 +4,7 @@
+ KERNEL_OVERLAYS += $(CURDIR)/../nvgpu
+ KERNEL_OVERLAYS += $(CURDIR)/../nvgpu-next
+ KERNEL_OVERLAYS += $(CURDIR)/../nvidia-t23x
++KERNEL_OVERLAYS += $(CURDIR)/../stereolabs
+ else
+ override KERNEL_OVERLAYS := $(subst :, ,$(KERNEL_OVERLAYS))
+ endif
+diff --color -Naur a/src/kernel/kernel-4.9/scripts/Kbuild.include b/src/kernel/kernel-4.9/scripts/Kbuild.include
+--- a/src/kernel/kernel-4.9/scripts/Kbuild.include	2023-06-07 10:21:49.000000000 +0200
++++ b/src/kernel/kernel-4.9/scripts/Kbuild.include	2024-06-27 18:16:23.617368546 +0200
+@@ -484,6 +484,8 @@
+ tegra-dtstree = $(srctree)/../../hardware/nvidia
+ endif
+ 
++stereolabs-dtstree = $(srctree)/../../hardware/stereolabs
++
+ tegra-root-dtstree = $(subst ^$(realpath $(tegra-dtstree)/../..)/,,^$(realpath $(srctree)/arch/arm64/boot/dts))
+ tegra-rel-dtstree = $(subst $(the-space),/,$(patsubst %,..,$(subst /, ,$(tegra-root-dtstree))))
+ # delete partially updated (i.e. corrupted) files on error

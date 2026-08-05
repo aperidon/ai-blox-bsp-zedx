@@ -1,0 +1,191 @@
+diff --git a/src/hardware/nvidia/platform/t19x/galen/kernel-dts/tegra194-p2888-0001-p2822-0000.dts b/src/hardware/nvidia/platform/t19x/galen/kernel-dts/tegra194-p2888-0001-p2822-0000.dts
+index a46befcb8..339a7ca2f 100644
+--- a/src/hardware/nvidia/platform/t19x/galen/kernel-dts/tegra194-p2888-0001-p2822-0000.dts
++++ b/src/hardware/nvidia/platform/t19x/galen/kernel-dts/tegra194-p2888-0001-p2822-0000.dts
+@@ -18,7 +18,10 @@
+  * Top level DTS file for CVM:P2888-0001 and CVB:P2822-0000.
+  */
+ #include "common/tegra194-p2888-0001-p2822-0000-common.dtsi"
+-#include "common/tegra194-p2822-camera-modules.dtsi"
++//#include "common/tegra194-p2822-camera-modules.dtsi"
++
++//sl_placeholder
++
+ #include "common/tegra194-audio-p2822-0000.dtsi"
+ 
+ #if defined(LINUX_VERSION) && LINUX_VERSION >= 419
+diff --git a/src/hardware/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi b/src/hardware/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi
+index 6f411e3c1..864950442 100644
+--- a/src/hardware/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi
++++ b/src/hardware/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi
+@@ -16,8 +16,11 @@
+ #include "tegra194-p3509-disp.dtsi"
+ #include "tegra194-audio-p3668.dtsi"
+ #include "tegra194-super-module-e2614-p3509.dtsi"
+-#include "tegra194-camera-jakku-rbpcv3-imx477.dtsi"
+-#include "tegra194-camera-jakku-rbpcv2-imx219.dtsi"
++//#include "tegra194-camera-jakku-rbpcv3-imx477.dtsi"
++//#include "tegra194-camera-jakku-rbpcv2-imx219.dtsi"
++
++//sl_placeholder
++
+ / {
+ 	gpio-keys {
+ 		compatible = "gpio-keys";
+diff --git a/src/hardware/nvidia/platform/t23x/concord/kernel-dts/tegra234-p3701-0000-p3737-0000.dts b/src/hardware/nvidia/platform/t23x/concord/kernel-dts/tegra234-p3701-0000-p3737-0000.dts
+index 210935f41..273ac7ee5 100644
+--- a/src/hardware/nvidia/platform/t23x/concord/kernel-dts/tegra234-p3701-0000-p3737-0000.dts
++++ b/src/hardware/nvidia/platform/t23x/concord/kernel-dts/tegra234-p3701-0000-p3737-0000.dts
+@@ -19,7 +19,10 @@
+ #include "tegra234-power-tree-p3701-0000-p3737-0000.dtsi"
+ #include "tegra234-dcb-p3701-0000-a02-p3737-0000-a01.dtsi"
+ #include <tegra234-soc/mods-simple-bus.dtsi>
+-#include "cvb/tegra234-p3737-camera-modules.dtsi"
++//#include "cvb/tegra234-p3737-camera-modules.dtsi"
++//#include "cvb/tegra234-p3737-0000-camera-ar0234-a00.dtsi"
++
++//sl_placeholder
+ 
+ #include <t234-common-cvm/tegra234-cpuidle.dtsi>
+ #include <t234-common-cvm/tegra234-thermal.dtsi>
+diff --git a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi
+index b6f1047d2..51067c74e 100644
+--- a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi
++++ b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3509-a02.dtsi
+@@ -16,8 +16,13 @@
+ #include "tegra234-p3509-a02-pcie.dtsi"
+ #include "tegra234-p3509-a02-fixed-regulator.dtsi"
+ #include "tegra234-p3509-audio.dtsi"
+-#include "tegra234-p3768-camera-rbpcv3-imx477.dtsi"
+-#include "tegra234-p3768-camera-rbpcv2-imx219.dtsi"
++//#include "tegra234-p3768-camera-rbpcv3-imx477.dtsi"
++//#include "tegra234-p3768-camera-rbpcv2-imx219.dtsi"
++
++// For ZEDBox carrier board CSI pinout (22p/4l) --> use zed_box_orin include
++// For NVIDIA carrier board CSI pinout (15p/2l) --> use zed_box_orin include
++
++//sl_placeholder
+ 
+ / {
+ 	gpio-keys {
+diff --git a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi
+index 01f41c8d0..8dc0b35c6 100644
+--- a/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi
++++ b/src/hardware/nvidia/platform/t23x/p3768/kernel-dts/cvb/tegra234-p3768-0000-a0.dtsi
+@@ -16,8 +16,10 @@
+ #include "tegra234-p3768-0000-a0-pcie.dtsi"
+ #include "tegra234-p3768-0000-a0-fixed-regulator.dtsi"
+ #include "tegra234-p3768-audio.dtsi"
+-#include "tegra234-p3768-camera-rbpcv3-imx477.dtsi"
+-#include "tegra234-p3768-camera-rbpcv2-imx219.dtsi"
++//#include "tegra234-p3768-camera-rbpcv3-imx477.dtsi"
++//#include "tegra234-p3768-camera-rbpcv2-imx219.dtsi"
++
++//sl_placeholder
+ 
+ / {
+ 	gpio-keys {
+@@ -214,6 +216,10 @@
+ 		status = "okay";
+ 	};
+ 
++	serial@3110000 {/* UARTB, for JNX40 and probably 42 */
++		status = "okay";
++	};
++
+ 	mttcan@c310000 {
+ 		status = "okay";
+ 	};
+diff --git a/src/kernel/kernel-5.10/arch/arm64/boot/dts/Makefile b/src/kernel/kernel-5.10/arch/arm64/boot/dts/Makefile
+index dfef14e99..9ec041b7b 100644
+--- a/src/kernel/kernel-5.10/arch/arm64/boot/dts/Makefile
++++ b/src/kernel/kernel-5.10/arch/arm64/boot/dts/Makefile
+@@ -24,6 +24,8 @@ DTC_INCLUDE += $(tegra-dtstree)/soc/t19x/kernel-include
+ DTC_INCLUDE += $(tegra-dtstree)/soc/t19x/kernel-dts
+ DTC_INCLUDE += $(tegra-dtstree)/platform/t19x/common/kernel-dts
+ DTC_INCLUDE += $(tegra-dtstree)/platform/t19x/automotive/kernel-dts/common
++DTC_INCLUDE += $(stereolabs-dtstree)/AGX_Xavier/
++DTC_INCLUDE += $(stereolabs-dtstree)/NX_Xavier/
+ endif
+ 
+ ifeq ($(CONFIG_ARCH_TEGRA_23x_SOC),y)
+@@ -31,6 +33,9 @@ DTC_INCLUDE += $(tegra-dtstree)/soc/t23x/kernel-include
+ DTC_INCLUDE += $(tegra-dtstree)/soc/t23x/kernel-dts
+ DTC_INCLUDE += $(tegra-dtstree)/platform/t23x/common/kernel-dts
+ DTC_INCLUDE += $(tegra-dtstree)/platform/t23x/automotive/kernel-dts/common/linux/
++DTC_INCLUDE += $(stereolabs-dtstree)/AGX_Orin/
++DTC_INCLUDE += $(stereolabs-dtstree)/NX_Orin/
++DTC_INCLUDE += $(stereolabs-dtstree)/NANO_Orin/
+ endif
+ 
+ ifeq ($(CONFIG_ARCH_TEGRA_239_SOC),y)
+diff --git a/src/kernel/kernel-5.10/arch/arm64/configs/defconfig b/src/kernel/kernel-5.10/arch/arm64/configs/defconfig
+index bda2dff57..ea49e1b72 100644
+--- a/src/kernel/kernel-5.10/arch/arm64/configs/defconfig
++++ b/src/kernel/kernel-5.10/arch/arm64/configs/defconfig
+@@ -897,12 +897,15 @@ CONFIG_NV_VIDEO_OV23850=m
+ CONFIG_I2C_IOEXPANDER_PCA9570=m
+ CONFIG_VIDEO_TC358840=m
+ CONFIG_VIDEO_LT6911UXC=m
+-CONFIG_I2C_IOEXPANDER_SER_MAX9295=y
+-CONFIG_I2C_IOEXPANDER_DESER_MAX9296=y
++#CONFIG_I2C_IOEXPANDER_DESER_MAX9296=y
+ CONFIG_NV_VIDEO_IMX390=y
+-CONFIG_NV_DESER_MAX96712=m
+-CONFIG_NV_VIDEO_AR0234=m
+-CONFIG_NV_VIDEO_HAWK_OWL=m
++#CONFIG_SL_DESER_MAX9296=m
++CONFIG_SL_DESER_MAX96712=m
++CONFIG_SL_SER_MAX9295=m
++CONFIG_SL_VIDEO_ZEDX=m
++CONFIG_SL_VIDEO_ZEDONE4K=m
++CONFIG_SL_VIDEO_ZEDXHDR=m
++CONFIG_SL_IMU_BMI088=m
+ # CONFIG_CXD2880_SPI_DRV is not set
+ CONFIG_MEDIA_TUNER_SIMPLE=y
+ # CONFIG_MEDIA_TUNER_TDA18250 is not set
+@@ -1170,7 +1172,7 @@ CONFIG_INFINIBAND_IPOIB=m
+ CONFIG_INFINIBAND_IPOIB_CM=y
+ CONFIG_INFINIBAND_SRP=m
+ CONFIG_RTC_CLASS=y
+-CONFIG_RTC_HCTOSYS_DEVICE="rtc1"
++CONFIG_RTC_HCTOSYS_DEVICE="rtc0"
+ # CONFIG_RTC_NVMEM is not set
+ CONFIG_RTC_DRV_MAX77686=y
+ CONFIG_RTC_DRV_RX8025=m
+@@ -1246,4 +1249,4 @@ CONFIG_DS4424=m
+ CONFIG_HID_SENSOR_GYRO_3D=m
+-CONFIG_BMI088_IIO=m
++CONFIG_BMI088_IIO=n
+ CONFIG_NTB=m
+ CONFIG_NTB_SWITCHTEC=m
+diff --git a/src/kernel/kernel-5.10/kernel-int-overlays.txt b/src/kernel/kernel-5.10/kernel-int-overlays.txt
+index 6a59a9252..8c3a0e41b 100644
+--- a/src/kernel/kernel-5.10/kernel-int-overlays.txt
++++ b/src/kernel/kernel-5.10/kernel-int-overlays.txt
+@@ -3,3 +3,4 @@ nvlink
+ nvgpu
+ nvgpu-next
+ nvidia-t239
++stereolabs
+diff --git a/src/kernel/kernel-5.10/kernel-overlays.txt b/src/kernel/kernel-5.10/kernel-overlays.txt
+index 1a8cf218b..a0f04f7b2 100644
+--- a/src/kernel/kernel-5.10/kernel-overlays.txt
++++ b/src/kernel/kernel-5.10/kernel-overlays.txt
+@@ -1,3 +1,4 @@
+ nvidia
+ nvlink
+ nvgpu
++stereolabs
+diff --git a/src/kernel/kernel-5.10/scripts/Kbuild.include b/src/kernel/kernel-5.10/scripts/Kbuild.include
+index c2d42dd2e..0469f63ac 100644
+--- a/src/kernel/kernel-5.10/scripts/Kbuild.include
++++ b/src/kernel/kernel-5.10/scripts/Kbuild.include
+@@ -334,5 +334,7 @@ else
+ tegra-dtstree = $(srctree)/../../hardware/nvidia
+ endif
+ 
++stereolabs-dtstree = $(srctree)/../../hardware/stereolabs
++
+ tegra-root-dtstree = $(subst ^$(realpath $(tegra-dtstree)/../..)/,,^$(realpath $(srctree)/arch/arm64/boot/dts))
+ tegra-rel-dtstree = $(subst $(space),/,$(patsubst %,..,$(subst /, ,$(tegra-root-dtstree))))

@@ -1,0 +1,126 @@
+From 63a08013a07484e219db862d9941b7692bfc9bae Mon Sep 17 00:00:00 2001
+From: null <null@nvidia.com>
+Date: Thu, 18 Jan 2024 14:59:33 +0800
+Subject: [PATCH] capture-ivc: fix multi-cam race condition
+
+add semaphore to avoid multi-cam race condition
+
+Bug 4425972
+
+Change-Id: I6e01ccb0596efed32ed53618ccf80c1e751b4f29
+
+---
+ .../platform/tegra/rtcpu/capture-ivc-priv.h   | 17 ++++++++--
+ drivers/platform/tegra/rtcpu/capture-ivc.c    | 34 +++++++++++++++++--
+ 2 files changed, 45 insertions(+), 6 deletions(-)
+
+diff --git a/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc-priv.h b/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc-priv.h
+index e503f0af..c6eac69a 100644
+--- a/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc-priv.h
++++ b/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc-priv.h
+@@ -1,6 +1,16 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
++/* SPDX-License-Identifier: LicenseRef-NvidiaProprietary
++ *
++ * SPDX-FileCopyrightText: Copyright (c) 2017-2025 NVIDIA CORPORATION.
++ *                         All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
+  */
+ 
+ #ifndef __CAPTURE_IVC_PRIV_H__
+@@ -26,6 +36,7 @@ struct tegra_capture_ivc_cb_ctx {
+ 	tegra_capture_ivc_cb_func cb_func;
+ 	/** Private context of a VI/ISP capture context */
+ 	const void *priv_context;
++	struct semaphore sem_ch;
+ };
+ 
+ /**
+diff --git a/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc.c b/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc.c
+index 14e1ba3e..3287ae1a 100644
+--- a/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc.c
++++ b/src/nvidia-oot/drivers/platform/tegra/rtcpu/capture-ivc.c
+@@ -1,6 +1,20 @@
+-// SPDX-License-Identifier: GPL-2.0
+-// Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+-
++// SPDX-License-Identifier: LicenseRef-NvidiaProprietary
++/*
++ * SPDX-FileCopyrightText: Copyright (c) 2017-2025 NVIDIA CORPORATION.
++ *                         All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
+ #include <nvidia/conftest.h>
+ 
+ #include <linux/tegra-capture-ivc.h>
+@@ -17,12 +31,17 @@
+ #include <linux/kthread.h>
+ #include <linux/sched.h>
+ #include <linux/version.h>
++#include <linux/semaphore.h>
+ #include <asm/barrier.h>
+ 
+ #include <trace/events/tegra_capture.h>
+ 
+ #include "capture-ivc-priv.h"
+ 
++/* Timeout for acquiring channel-id */
++#define TIMEOUT_ACQUIRE_CHANNEL_ID 120
++
++
+ static int tegra_capture_ivc_tx_(struct tegra_capture_ivc *civc,
+ 				const void *req, size_t len)
+ {
+@@ -184,6 +203,11 @@ int tegra_capture_ivc_notify_chan_id(uint32_t chan_id, uint32_t trans_id)
+ 
+ 	civc = __scivc_control;
+ 
++	if (down_timeout(&civc->cb_ctx[chan_id].sem_ch,
++				TIMEOUT_ACQUIRE_CHANNEL_ID)) {
++		return -EBUSY;
++	}
++
+ 	mutex_lock(&civc->cb_ctx_lock);
+ 
+ 	if (WARN(civc->cb_ctx[trans_id].cb_func == NULL,
+@@ -288,6 +312,7 @@ int tegra_capture_ivc_unregister_control_cb(uint32_t id)
+ 	civc->cb_ctx[id].priv_context = NULL;
+ 
+ 	mutex_unlock(&civc->cb_ctx_lock);
++	up(&civc->cb_ctx[id].sem_ch);
+ 
+ 	/*
+ 	 * If it's trans_id, client encountered an error before or during
+@@ -454,6 +479,9 @@ static int tegra_capture_ivc_probe(struct tegra_ivc_channel *chan)
+ 	mutex_init(&civc->cb_ctx_lock);
+ 	mutex_init(&civc->ivc_wr_lock);
+ 
++	for (i = 0; i < TOTAL_CHANNELS; i++)
++		sema_init(&civc->cb_ctx[i].sem_ch, 1);
++
+ 	/* Initialize kworker */
+ 	kthread_init_work(&civc->work, tegra_capture_ivc_worker);
+ 
+-- 
+2.25.1

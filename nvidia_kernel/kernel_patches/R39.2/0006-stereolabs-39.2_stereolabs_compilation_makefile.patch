@@ -1,0 +1,54 @@
+--- a/dev/null	2024-10-18 11:17:16.631960625 +0200
++++ b/src/kernel/stereolabs/Makefile	2024-10-23 14:31:02.759312785 +0200
+@@ -0,0 +1,41 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (c) 2022-2024, NVIDIA CORPORATION.  All rights reserved.
++
++ccflags-y += -I$(srctree.nvconftest)
++ccflags-y += -I$(srctree.nvidia-oot)/include
++
++subdir-ccflags-y += -Werror
++subdir-ccflags-y += -Wmissing-prototypes
++
++ifeq ($(CONFIG_TEGRA_VIRTUALIZATION),y)
++subdir-ccflags-y += -DCONFIG_TEGRA_VIRTUALIZATION
++endif
++
++ifeq ($(CONFIG_TEGRA_SYSTEM_TYPE_ACK),y)
++subdir-ccflags-y += -DCONFIG_TEGRA_SYSTEM_TYPE_ACK
++subdir-ccflags-y += -Wno-sometimes-uninitialized
++subdir-ccflags-y += -Wno-parentheses-equality
++subdir-ccflags-y += -Wno-enum-conversion
++subdir-ccflags-y += -Wno-implicit-fallthrough
++endif
++
++export CONFIG_SL_DESER_MAX96712=m
++export CONFIG_SL_SER_MAX9295=m
++export CONFIG_SL_VIDEO_ZEDX=m
++export CONFIG_SL_VIDEO_ZEDONE4K=m
++export CONFIG_SL_VIDEO_ZEDXHDR=m
++export CONFIG_TEGRA_STREAMERBOX_ADDR_FIX=n
++export CONFIG_SL_IMU_BMI088=m
++export CONFIG_SL_ZEDLINK_MIPI=n
++
++ifeq ($(CONFIG_SL_DESER_MAX96712),m)
++subdir-ccflags-y += -DCONFIG_SL_DESER_MAX96712
++else
++subdir-ccflags-y += -DCONFIG_SL_DESER_MAX9296
++endif
++
++ifeq ($(CONFIG_TEGRA_STREAMERBOX_ADDR_FIX),m)
++subdir-ccflags-y += -DCONFIG_TEGRA_STREAMERBOX_ADDR_FIX
++endif
++
++obj-m += drivers/
+--- a/dev/null	2024-10-18 11:17:16.631960625 +0200
++++ b/src/kernel/stereolabs/Makefile-dkms	2024-10-22 16:26:59.798559744 +0200
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
++
++KDIR ?= /lib/modules/$(shell uname -r)/build
++
++%:
++	$(MAKE) -C $(KDIR) M=$$PWD/drivers/ srctree.sl_drivers=$$PWD CONFIG_TEGRA_OOT_MODULE=m $@

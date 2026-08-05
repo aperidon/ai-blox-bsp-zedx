@@ -1,0 +1,37 @@
+diff --git a/repack/debian/changelog b/repack/debian/changelog
+new file mode 100644
+index 000000000..8d5692284
+--- /dev/null
++++ b/repack/debian/changelog
+@@ -0,0 +1,11 @@
++stereolabs-zedx (0.4.9-MAX96712-L4T35.1) stable; urgency=low
++
++  * ZED-X customization fro GMSL input
++
++ -- Stereolabs Inc <support@stereolabs.com>  Mon, 12 Sep 2022 20:33:22 +0200
++
++stereolabs-zedx (0.4.9-MAX96712-L4T35.1) stable; urgency=low
++
++  * Refer to Package Release Notes for details: http://developer.nvidia.com/jetson
++
++ -- NVIDIA Corporation <linux-tegra-bugs@nvidia.com>  Sat, 19 Feb 2022 09:03:44 -0800
+diff --git a/repack/debian/control b/repack/debian/control
+new file mode 100644
+index 000000000..0003ca90e
+--- /dev/null
++++ b/repack/debian/control
+@@ -0,0 +1,14 @@
++Source: stereolabs-zedx
++Section: kernel
++Priority: standard
++Maintainer: NVIDIA Corporation, Stereolabs Inc.
++Build-Depends: debhelper (>=9)
++Standards-Version: 3.9.6
++Homepage: www.stereolabs.com
++
++Package: stereolabs-zedx
++Architecture: arm64
++Pre-Depends: nvidia-l4t-core (>> 35.1-0), nvidia-l4t-core (<< 35.2-0), 
++Depends: device-tree-compiler, nvidia-l4t-kernel (=5.10.104-tegra-35.1.0-20220810203728)
++Description: NVIDIA Kernel DTB Modified Package by Stereolabs
++X-Jetpack_Base: L4T35.1.0

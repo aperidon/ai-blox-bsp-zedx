@@ -1,0 +1,45 @@
+From b9d7c977fc03329954b0b9515e011b6d785ff7e9 Mon Sep 17 00:00:00 2001
+From: null <null@nvidia.com>
+Date: Thu, 02 Oct 2025 16:26:12 +0000
+Subject: [PATCH] Camera: fix kernel warning after vi timeout
+
+bug 5512645
+
+Change-Id: Iafc720b1ba74f04490d7d14e2e9014bd599b3cba
+---
+
+diff --git a/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c b/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c
+index c68751f..75cd52b 100644
+--- a/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c
++++ b/src/nvidia-oot/drivers/media/platform/tegra/camera/vi/vi5_fops.c
+@@ -617,11 +617,15 @@
+ 
+ uncorr_err:
+ 	spin_lock_irqsave(&chan->capture_state_lock, flags);
+-	chan->capture_state = CAPTURE_ERROR;
++	if (err == -ETIMEDOUT) {
++		chan->capture_state = CAPTURE_TIMEOUT;
++		buf->vb2_state = VB2_BUF_STATE_QUEUED;
++	} else {
++		chan->capture_state = CAPTURE_ERROR;
++		buf->vb2_state = VB2_BUF_STATE_ERROR;
++	}
+ 	spin_unlock_irqrestore(&chan->capture_state_lock, flags);
+ 
+-	buf->vb2_state = VB2_BUF_STATE_ERROR;
+-
+ rel_buf:
+ 	vi5_release_buffer(chan, buf);
+ }
+@@ -661,7 +665,10 @@
+ 		buf = dequeue_dequeue_buffer(chan);
+ 		if (!buf)
+ 			break;
+-		buf->vb2_state = VB2_BUF_STATE_ERROR;
++		if (chan->capture_state == CAPTURE_TIMEOUT)
++			buf->vb2_state = VB2_BUF_STATE_QUEUED;
++		else
++			buf->vb2_state = VB2_BUF_STATE_ERROR;
+ 		vi5_capture_dequeue(chan, buf);
+ 	}
+ 
