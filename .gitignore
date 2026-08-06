@@ -6,7 +6,8 @@
 output/
 build_R*
 ci_artifacts
-stereolabs-*
+stereolabs-*.buildinfo
+stereolabs-*.changes
 
 # Nvidia sources
 src/build

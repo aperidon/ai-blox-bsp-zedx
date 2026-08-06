@@ -22,7 +22,7 @@
 +subdir-ccflags-y += -Wno-implicit-fallthrough
 +endif
 +
-+export CONFIG_SL_DESER_MAX96712=m
++export CONFIG_SL_DESER_MAX96724=m
 +export CONFIG_SL_SER_MAX9295=m
 +export CONFIG_SL_VIDEO_ZEDX=m
 +export CONFIG_SL_VIDEO_ZEDONE4K=m
