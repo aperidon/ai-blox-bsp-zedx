@@ -1811,9 +1811,21 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 	int err = -1;
 	struct list_head *pos;
 	struct sensor *sp;
+    int i=0;
 
     if (global_priv[channel]->initialized == 0)
         return err;
+
+    for( i=0; i<2; i++)
+    {
+        if (global_priv[i]->initialized == 0)
+            continue;
+        err = write_reg_Dser(i, GMSL_LINKS_EN_REG, 
+            0xF0);
+        if (err)
+            return -1;
+        msleep(100);
+    }
     
     list_for_each(pos, &global_priv[channel]->sensor_list){
 		sp = list_entry(pos, struct sensor, list);
@@ -1855,19 +1867,27 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 EXPORT_SYMBOL(dser_enable_gmsl_link);
 
 int dser_open_all_gmsl_link(int channel){
-    int err = -1;
+    int i, j, err = -1;
+    u8 val;
 
-    if (global_priv[channel]->initialized == 0)
-        return err;
-        
-    err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
-            0xFF);
-
-    if(err){
-        msleep(4);
-        err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
-            0xFF);
+    for(i = 0; i < 2 ; i++)
+    {
+        if (global_priv[channel]->initialized == 0)
+                return err;
+                
+        for( j=0; j<N_GMSL_PORTS; j++)
+        {
+            val = 0xF0 | ((1 << (j+1)) - 1);
+            err = write_reg_Dser(i, GMSL_LINKS_EN_REG, 
+                            val);
+            dev_dbg(&global_priv[i]->i2c_client->dev,
+            "%s: open GMSL link %d -> 0x%x\n",
+            __func__, j, val);
+            msleep(50);
+        }
     }
+
+   
 
     return err;
 }
