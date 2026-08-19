@@ -122,6 +122,7 @@ struct max96724
     int pwr_gpio;
     int pwdn_gpio;
     s8 port_to_i2c[N_GMSL_PORTS];
+    u8 port_to_i2c_val;
     u8 avail_pipe;
     u8 n_cam;
     int n_serializers;
@@ -898,6 +899,7 @@ static int sl_max96724_i2c_setup(struct max96724 *priv)
 
     err = regmap_write(priv->regmap, GMSL_LINKS_CC_REG, val_cc);
     dev_dbg(&priv->i2c_client->dev,"%s: set i2c cc val_cc: 0x%x 0x%x",__func__,GMSL_LINKS_CC_REG, val_cc);
+    priv->port_to_i2c_val = val_cc;
 
     err = regmap_write(priv->regmap, GMSL_LINKS_EN_REG, val_port);
     dev_dbg(&priv->i2c_client->dev,"%s: set i2c cc val_port: 0x%x 0x%x",__func__,GMSL_LINKS_EN_REG, val_port);
@@ -1812,6 +1814,7 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 	struct list_head *pos;
 	struct sensor *sp;
     int i=0;
+    u8 val;
 
     if (global_priv[channel]->initialized == 0)
         return err;
@@ -1820,8 +1823,7 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
     {
         if (global_priv[i]->initialized == 0)
             continue;
-        err = write_reg_Dser(i, GMSL_LINKS_EN_REG, 
-            0xF0);
+        err = write_reg_Dser(i, 0x0003, 0xFF);
         if (err)
             return -1;
         msleep(100);
@@ -1843,21 +1845,21 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
             return err;
         }
 
-        err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
-            0xF0 | (1<<sp->gmsl_link));
+        val = ~(0x03 << (sp->gmsl_link << 1)) & 0xFF;
+
+        err = write_reg_Dser(channel, 0x0003, val);
 
         if (err){
             msleep(4);
-            err = write_reg_Dser(channel, GMSL_LINKS_EN_REG, 
-            0xF0 | (1<<sp->gmsl_link));
+            err = write_reg_Dser(channel, 0x0003, val);
         }
 
         if (err)
             return -1;
 
         dev_dbg(&global_priv[channel]->i2c_client->dev,
-            "%s: open GMSL link %d for zedx-id %d\n",
-            __func__, sp->gmsl_link, zedx_id);
+            "%s: open GMSL link %d for zedx-id %d (0x%x)\n",
+            __func__, sp->gmsl_link, zedx_id, val);
 
         return sp->gmsl_link + (channel * N_GMSL_PORTS);
     }
@@ -1867,27 +1869,19 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
 EXPORT_SYMBOL(dser_enable_gmsl_link);
 
 int dser_open_all_gmsl_link(int channel){
-    int i, j, err = -1;
-    u8 val;
-
+    int err = -1;
+    int  i;
     for(i = 0; i < 2 ; i++)
     {
-        if (global_priv[channel]->initialized == 0)
+        if (global_priv[i]->initialized == 0)
                 return err;
-                
-        for( j=0; j<N_GMSL_PORTS; j++)
-        {
-            val = 0xF0 | ((1 << (j+1)) - 1);
-            err = write_reg_Dser(i, GMSL_LINKS_EN_REG, 
-                            val);
-            dev_dbg(&global_priv[i]->i2c_client->dev,
-            "%s: open GMSL link %d -> 0x%x\n",
-            __func__, j, val);
-            msleep(50);
-        }
+                    
+        err = write_reg_Dser(i, 0x0003, global_priv[i]->port_to_i2c_val);
+        dev_dbg(&global_priv[i]->i2c_client->dev,
+            "%s: open all GMSL link (0x%x)\n", __func__, global_priv[i]->port_to_i2c_val);
+        msleep(50);
+        
     }
-
-   
 
     return err;
 }

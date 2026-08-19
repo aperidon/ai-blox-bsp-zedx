@@ -191,6 +191,9 @@ if [ $BUILD_SUCESS -eq 0 ]; then
 	### Copy ISP files into deb package
 	cp  $DEST_TARGET/ISP/* $REPACK_TARGET/var/nvidia/nvcam/settings/
 	cp $DEST_TARGET/Daemon/blacklist-zed.conf $REPACK_TARGET/etc/modprobe.d/
+
+	### Copy ISP patches for R36.4.3
+	cp -r $DEST_TARGET/nvidia_364_fix/* $REPACK_TARGET/tmp/
 	
 	### Copy Daemon bin into deb package
 	cp $DEST_TARGET/Daemon/ZEDX_Daemon $REPACK_TARGET/usr/sbin/
