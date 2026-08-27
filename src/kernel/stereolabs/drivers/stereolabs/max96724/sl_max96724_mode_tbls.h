@@ -32,6 +32,9 @@ static const u8 EEPROM_I2C_ADDRS[] = { 0x55, 0x57, 0x52 };
 #define EEPROM_KEY_BYTE_OFFSET     4
 #define EEPROM_KEY_VALUE           0x11
 #define EEPROM_MODEL_BYTE_OFFSET   5
+#define EEPROM_CC_SETTLE_MS        50
+/* max other max96724 instances on the same i2c bus that we gate */
+#define N_MAX_SIBLING_DESER        4
 
 #define EEPROM_ZEDX_MARKER1         0x02
 #define EEPROM_ZEDX_MARKER2         0x03

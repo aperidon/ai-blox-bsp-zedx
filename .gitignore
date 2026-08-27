@@ -5,6 +5,7 @@
 # Build results
 output/
 build_R*
+drivers_L4T*/
 ci_artifacts
 stereolabs-*.buildinfo
 stereolabs-*.changes

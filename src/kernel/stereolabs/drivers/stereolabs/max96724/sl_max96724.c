@@ -123,6 +123,9 @@ struct max96724
     int pwdn_gpio;
     s8 port_to_i2c[N_GMSL_PORTS];
     u8 port_to_i2c_val;
+    struct i2c_adapter *cam_adapter;
+    u16 sibling_addr[N_MAX_SIBLING_DESER];
+    u8  n_siblings;
     u8 avail_pipe;
     u8 n_cam;
     int n_serializers;
@@ -660,42 +663,216 @@ static inline void reset_all_models(struct max96724 *priv)
 	}
 }
 
-/* Reads the camera EEPROM and returns the matching CamType.
- *
- * Tries each candidate address in EEPROM_I2C_ADDRS — the EEPROM lives at
- * different i2c addresses across camera variants.
- *
- * Returns -ENODEV when no address yields a valid EEPROM */
-static int identify_via_eeprom(struct max96724 *priv)
+static void collect_sibling_desers(struct max96724 *priv)
+{
+	struct i2c_client *client = priv->i2c_client;
+	struct device_node *bus, *child;
+	u32 addr;
+
+	priv->n_siblings = 0;
+
+	bus = of_get_parent(client->dev.of_node);
+	if (!bus)
+		return;
+
+	for_each_available_child_of_node(bus, child) {
+		if (!of_device_is_compatible(child, "stereolabs,sl_max96724"))
+			continue;
+		if (of_property_read_u32(child, "reg", &addr))
+			continue;
+		if (addr == client->addr)
+			continue;
+		if (priv->n_siblings >= ARRAY_SIZE(priv->sibling_addr))
+			break;
+		priv->sibling_addr[priv->n_siblings++] = (u16)addr;
+		dev_dbg(&client->dev, "%s: sibling deser @0x%02x\n",
+			__func__, addr);
+	}
+
+	of_node_put(bus);
+}
+
+static void sl_max96724_put_cam_adapter(struct max96724 *priv)
+{
+	if (priv->cam_adapter) {
+		i2c_put_adapter(priv->cam_adapter);
+		priv->cam_adapter = NULL;
+	}
+}
+
+static void resolve_cam_adapter(struct max96724 *priv, struct device_node *cam_node)
+{
+	struct device_node *np;
+
+	if (priv->cam_adapter || !cam_node)
+		return;
+
+	/* Same assumption as the mux_node lookup in sl_max96724_parse_dt: the
+	 * sensor's parent owns the adapter */
+	np = of_get_parent(cam_node);
+	if (np) {
+		priv->cam_adapter = of_find_i2c_adapter_by_node(np);
+		of_node_put(np);
+	}
+
+	if (priv->cam_adapter)
+		dev_dbg(&priv->i2c_client->dev,
+			"%s: camera-side i2c adapter = i2c-%d (%s)\n",
+			__func__, priv->cam_adapter->nr,
+			priv->cam_adapter->name);
+	else
+		dev_warn(&priv->i2c_client->dev,
+			 "%s: no camera-side i2c adapter found, eeprom id disabled\n",
+			 __func__);
+}
+
+/* Puts a control-channel gating register back to @val, retrying once. Failing
+ * to restore leaves cameras unreachable, so it is reported at error level
+ * rather than ignored. */
+static void restore_cc(struct max96724 *priv, u16 reg, u8 val)
+{
+	if (!regmap_write(priv->regmap, reg, val))
+		return;
+
+	msleep(4);
+	if (!regmap_write(priv->regmap, reg, val))
+		return;
+
+	dev_err(&priv->i2c_client->dev,
+		"%s: FAILED to restore 0x%04x to 0x%02x on 0x%02x - control channel may be left gated\n",
+		__func__, reg, val, priv->i2c_client->addr);
+}
+
+/* Control-channel state saved across an eeprom identification, so it can be
+ * put back exactly as it was. */
+struct i2c_gating {
+	unsigned int saved_cc;            /* our REG3 */
+	unsigned int saved_xovr;          /* our REG7 */
+	unsigned int sib_cc[N_MAX_SIBLING_DESER];   /* each gated sibling's REG3 */
+	bool sib_gated[N_MAX_SIBLING_DESER];
+};
+
+/* Disable control-channel forwarding on every OTHER deserializer.
+ */
+static bool sibling_gate(struct max96724 *priv, struct i2c_gating *g)
 {
 	struct i2c_client *client = priv->i2c_client;
 	struct device *dev = &client->dev;
-	struct i2c_msg msgs[2];
+	int deser_addr = client->addr;
+	int ch;
+
+	for (ch = 0; ch < (int)priv->n_siblings; ch++) {
+		client->addr = priv->sibling_addr[ch];
+		if (regmap_read(priv->regmap, GMSL_LINKS_CC_REG, &g->sib_cc[ch]) ||
+		    regmap_write(priv->regmap, GMSL_LINKS_CC_REG, 0xFF)) {
+			client->addr = deser_addr;
+			dev_warn(dev, "%s: cannot gate deser @0x%02x\n",
+				 __func__, priv->sibling_addr[ch]);
+			return false;
+		}
+		g->sib_gated[ch] = true;
+		client->addr = deser_addr;
+		dev_dbg(dev, "%s: gated deser @0x%02x (REG3 0x%02x -> 0xFF)\n",
+			__func__, priv->sibling_addr[ch], g->sib_cc[ch]);
+	}
+
+	/* Let the gating take effect before the caller starts writing; skipped
+	 * when there is nothing to gate. */
+	if (priv->n_siblings)
+		msleep(EEPROM_CC_SETTLE_MS);
+
+	return true;
+}
+
+static void sibling_ungate(struct max96724 *priv, struct i2c_gating *g)
+{
+	struct i2c_client *client = priv->i2c_client;
+	int deser_addr = client->addr;
+	int ch;
+
+	for (ch = 0; ch < (int)priv->n_siblings; ch++) {
+		if (!g->sib_gated[ch])
+			continue;
+		client->addr = priv->sibling_addr[ch];
+		restore_cc(priv, GMSL_LINKS_CC_REG, (u8)g->sib_cc[ch]);
+		client->addr = deser_addr;
+		g->sib_gated[ch] = false;
+	}
+}
+
+/* Undoes i2c_gate(). Safe to call on a partially applied gating: only the
+ * siblings actually gated are touched. */
+static void i2c_ungate(struct max96724 *priv, struct i2c_gating *g)
+{
+	restore_cc(priv, GMSL_CC_X_OVR_REG, (u8)g->saved_xovr);
+	restore_cc(priv, GMSL_LINKS_CC_REG, (u8)g->saved_cc);
+
+	sibling_ungate(priv, g);
+
+	msleep(EEPROM_CC_SETTLE_MS);
+}
+
+/* Routes the control channel of GMSL port @port onto the camera-side bus,
+ * alone. Returns true when every step took; on false the caller must still
+ * call i2c_ungate() to undo whatever was applied.
+ */
+static bool i2c_gate(struct max96724 *priv, u8 port, struct i2c_gating *g)
+{
+	struct i2c_client *client = priv->i2c_client;
+	struct device *dev = &client->dev;
+
+	if (!sibling_gate(priv, g))
+		return false;
+
+	if (regmap_write(priv->regmap, GMSL_LINKS_CC_REG,
+			 (u8)(0xFFu ^ (0x02u << (port << 1)))) ||
+	    regmap_write(priv->regmap, GMSL_CC_X_OVR_REG,
+			 (u8)(1u << (4 + port)))) {
+		dev_warn(dev, "%s: cannot route port %u CC, skipping eeprom id\n",
+			 __func__, port);
+		return false;
+	}
+
+	msleep(EEPROM_CC_SETTLE_MS);
+	return true;
+}
+
+/* Walks EEPROM_I2C_ADDRS on the camera-side adapter and fills @data with the
+ * first response carrying a valid key byte. Assumes the gating is in place. */
+static bool eeprom_fetch(struct max96724 *priv, u8 port, u8 *data, size_t len)
+{
+	struct device *dev = &priv->i2c_client->dev;
+	struct i2c_adapter *adap = priv->cam_adapter;
 	u8 reg_buf[1] = { 0x00 };
-	u8 data[EEPROM_MODEL_BYTE_OFFSET + 1];
-	bool found = false;
-	u8 marker;
-	int ret;
+	struct i2c_msg msgs[2];
 	size_t i;
+	int ret;
 
 	msgs[0].flags = 0;
 	msgs[0].len   = sizeof(reg_buf);
 	msgs[0].buf   = reg_buf;
 
 	msgs[1].flags = I2C_M_RD;
-	msgs[1].len   = sizeof(data);
+	msgs[1].len   = len;
 	msgs[1].buf   = data;
 
 	for (i = 0; i < ARRAY_SIZE(EEPROM_I2C_ADDRS); i++) {
 		msgs[0].addr = EEPROM_I2C_ADDRS[i];
 		msgs[1].addr = EEPROM_I2C_ADDRS[i];
 
-		ret = i2c_transfer(client->adapter, msgs, 2);
+		ret = i2c_transfer(adap, msgs, 2);
 		if (ret != 2) {
-			dev_dbg(dev, "%s: eeprom @0x%02x not reachable (%d)\n",
-				__func__, EEPROM_I2C_ADDRS[i], ret);
+			dev_dbg(dev,
+				"%s: port %u: eeprom @0x%02x not reachable on i2c-%d (%d)\n",
+				__func__, port, EEPROM_I2C_ADDRS[i], adap->nr,
+				ret);
 			continue;
 		}
+
+		dev_dbg(dev,
+			"%s: port %u: @0x%02x on i2c-%d -> %02x %02x %02x %02x %02x %02x\n",
+			__func__, port, EEPROM_I2C_ADDRS[i], adap->nr,
+			data[0], data[1], data[2], data[3], data[4], data[5]);
 
 		if (data[EEPROM_KEY_BYTE_OFFSET] != EEPROM_KEY_VALUE) {
 			dev_dbg(dev,
@@ -707,18 +884,46 @@ static int identify_via_eeprom(struct max96724 *priv)
 
 		dev_dbg(dev, "%s: eeprom found @0x%02x\n",
 			__func__, EEPROM_I2C_ADDRS[i]);
-		found = true;
-		break;
+		return true;
 	}
+
+	return false;
+}
+
+/* Reads the EEPROM of the camera on GMSL port @port and returns the matching
+ * CamType.
+ * The read MUST happen on the camera-side bus. 
+ *
+ * Returns -ENODEV when no address yields a valid EEPROM */
+static int identify_via_eeprom(struct max96724 *priv, u8 port)
+{
+	struct device *dev = &priv->i2c_client->dev;
+	u8 data[EEPROM_MODEL_BYTE_OFFSET + 1];
+	struct i2c_gating g = { 0 };
+	bool found;
+
+	if (!priv->cam_adapter) {
+		dev_dbg(dev, "%s: no camera-side adapter, skipping eeprom id\n",
+			__func__);
+		return -ENODEV;
+	}
+
+	if (regmap_read(priv->regmap, GMSL_LINKS_CC_REG, &g.saved_cc) ||
+	    regmap_read(priv->regmap, GMSL_CC_X_OVR_REG, &g.saved_xovr)) {
+		dev_dbg(dev, "%s: cannot read CC gating, skipping eeprom id\n",
+			__func__);
+		return -EIO;
+	}
+
+	found = i2c_gate(priv, port, &g) &&
+		eeprom_fetch(priv, port, data, sizeof(data));
+
+	i2c_ungate(priv, &g);
 
 	if (!found)
 		return -ENODEV;
 
-	marker = data[EEPROM_MODEL_BYTE_OFFSET];
-	dev_dbg(dev, "%s: eeprom[0..5]: %02x %02x %02x %02x %02x %02x\n",
-		__func__, data[0], data[1], data[2], data[3], data[4], data[5]);
-
-	switch (marker) {
+	switch (data[EEPROM_MODEL_BYTE_OFFSET]) {
 	case EEPROM_ZEDX_MARKER1:        return ZEDX;
 	case EEPROM_ZEDX_MARKER2:        return ZEDX;
 	case EEPROM_ZEDX_MARKER3:        return ZEDX;
@@ -731,7 +936,7 @@ static int identify_via_eeprom(struct max96724 *priv)
 	case EEPROM_ZEDONEHDR_MARKER:   return ZEDONEHDR;
 	default:
 		dev_dbg(dev, "%s: unknown eeprom marker 0x%02x\n",
-			__func__, marker);
+			__func__, data[EEPROM_MODEL_BYTE_OFFSET]);
 		return -ENODEV;
 	}
 }
@@ -815,12 +1020,12 @@ static inline int configure_3Gbps_cameras_to_6Gbps(struct max96724 *priv, int li
 	return err;
 }
 
-static inline int sl_max96724_get_camera_model(struct max96724 *priv)
+static inline int sl_max96724_get_camera_model(struct max96724 *priv, u8 port)
 {
 	struct i2c_client *client = priv->i2c_client;
 	int model;
 
-	model = identify_via_eeprom(priv);
+	model = identify_via_eeprom(priv, port);
 	if (model >= 0 && model < N_CAM_TYPE && reset_table[model]) {
 		if (model_reset(priv, model)) {
 			dev_warn(&client->dev,
@@ -1290,6 +1495,8 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
     u8 i;
     int active_gmsl = 0;
     bool link_active[N_GMSL_PORTS] = { false };
+    struct i2c_gating sg;
+    bool gated;
     
     priv->n_cam = 0;
     priv->avail_pipe = 0;
@@ -1346,7 +1553,7 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
 
         /* read the camera fingerprint and return its ID */
-        model = sl_max96724_get_camera_model(priv);
+        model = sl_max96724_get_camera_model(priv, i);
         if (model < 0)
         {
             dev_warn(&client->dev, "%s: Camera model unknown\n", __func__);
@@ -1479,7 +1686,25 @@ static int sl_max96724_gmsl_pipeline_setup(struct max96724 *priv)
 
         dev_info(&client->dev, "%s: GMSL #%d : Link Camera %s (id: %d) to port-index %d",__func__,i,sp->camera,sp->zedx_id,sp->serial);
 
+        /* Remove the other deserializer's control-channel forwarding 
+        before changing the mapping to prevent every serializers from
+        receiving the new address */
+        memset(&sg, 0, sizeof(sg));
+        gated = sibling_gate(priv, &sg);
+        if (!gated)
+        {
+            /* Remapping unisolated would re-address the other deserializer's
+             * cameras too, so fail the port rather than corrupt them. */
+            sibling_ungate(priv, &sg);
+            dev_err(&client->dev,
+                    "%s: cannot isolate sibling deserializers, skipping remap\n",
+                    __func__);
+            return -EIO;
+        }
+
         err = apply_alternate_mapping(priv, sp);
+        sibling_ungate(priv, &sg);
+
         if(err)
         {
             dev_err(&client->dev, "%s: Failed to apply alternate mapping %d", __func__, err);
@@ -1845,7 +2070,7 @@ int dser_enable_gmsl_link(int channel, int zedx_id){
             return err;
         }
 
-        val = ~(0x03 << (sp->gmsl_link << 1)) & 0xFF;
+        val = (u8)(0xFFu ^ (0x02u << (sp->gmsl_link << 1)));
 
         err = write_reg_Dser(channel, 0x0003, val);
 
@@ -2129,6 +2354,9 @@ static int sl_max96724_parse_serializer_node(struct max96724 *priv,
             continue;
         }
         of_property_read_u32(mux_node, "reg", &sp->i2c_bus);
+
+        /* cache the camera-side i2c adapter for eeprom identification */
+        resolve_cam_adapter(priv, cam_node);
         
         of_node_put(mux_node);
         
@@ -2456,8 +2684,11 @@ static int sl_max96724_probe(struct i2c_client *client)
     if(err)
     {
         dev_warn(dev, "%s: Deser initialization failed",__func__);
+        sl_max96724_put_cam_adapter(priv);
         return -EINVAL;
     }    
+
+    collect_sibling_desers(priv);
 
     slow_reset_Dser(priv->channel);
 
@@ -2470,6 +2701,7 @@ static int sl_max96724_probe(struct i2c_client *client)
         for (cleanup_idx = 0; cleanup_idx < 2*N_GMSL_PORTS; cleanup_idx++)
             if (priv->detected_sensors[cleanup_idx].cam_addr != 0)
                 mutex_destroy(&priv->detected_sensors[cleanup_idx].bw_lock);
+        sl_max96724_put_cam_adapter(priv);
         return -EINVAL;
     }
 
@@ -2518,6 +2750,12 @@ static int sl_max96724_probe(struct i2c_client *client)
     dev_info(dev, "%s: success\n", __func__);
     priv->initialized = 1;
     i2c_set_clientdata(client, priv);
+
+    /* probe returning non-zero means remove() never runs, so the adapter
+     * reference has to go back here */
+    if (err)
+        sl_max96724_put_cam_adapter(priv);
+
     return err;
 }
 
@@ -2535,6 +2773,7 @@ static void sl_max96724_remove(struct i2c_client *client)
             if (priv->detected_sensors[i].cam_addr != 0)
                 mutex_destroy(&priv->detected_sensors[i].bw_lock);
         }
+        sl_max96724_put_cam_adapter(priv);
         global_priv[priv->channel] = NULL;
     }
 
